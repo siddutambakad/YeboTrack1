@@ -1,0 +1,21 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Saira-Bold.ttf",
+      "sha1": "d87cddab3e5671c622cd6cf016f219e11ce1d1a4"
+    },
+    {
+      "path": "assets/fonts/Saira-Medium.ttf",
+      "sha1": "4cc545c662dd7cb6c38be57fe83edafe4bde00e9"
+    },
+    {
+      "path": "assets/fonts/Saira-Regular.ttf",
+      "sha1": "d9171e1fa1f21f5ad429cdc4be6ea3bb8350c99d"
+    },
+    {
+      "path": "assets/fonts/Saira-SemiBold.ttf",
+      "sha1": "8a013b12576c6ded511dae2222f85cc7dc96bf4e"
+    }
+  ]
+}
