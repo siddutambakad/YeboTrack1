@@ -15,8 +15,7 @@ const MyTripNavigator = () => {
         tabBarShowLabel: false,
         tabBarActiveTintColor: 'rgba(0, 0, 0, 1)',
         tabBarInactiveTintColor: 'rgba(0, 0, 0, 1)',
-        labelStyle: {fontSize: 14, fontWeight: 'bold'},
-        tabBarContentContainerStyle: {height: 65},
+        tabBarContentContainerStyle: {height: 60},
         tabBarStyle: {
           paddingTop: 10,
           borderTopLeftRadius: 50,
@@ -36,11 +35,12 @@ const MyTripNavigator = () => {
         tabBarIndicatorContainerStyle: {
           marginLeft: 16,
         },
+        tabBarPressColor: 'rgba(246, 246, 246, 1)',
       }}>
       <Tab.Screen
         options={{
           tabBarIcon: ({}) => (
-            <View style={{width: 70, alignItems: 'center', marginLeft: -20}}>
+            <View style={{width: 70, alignItems: 'center', marginLeft: -25}}>
               <Text
                 style={{
                   color: 'black',
@@ -58,7 +58,7 @@ const MyTripNavigator = () => {
       <Tab.Screen
         options={{
           tabBarIcon: ({}) => (
-            <View style={{width: 75, alignItems: 'center', marginLeft: -20}}>
+            <View style={{width: 75, alignItems: 'center', marginLeft: -25}}>
               <Text
                 style={{
                   color: 'black',
@@ -76,7 +76,7 @@ const MyTripNavigator = () => {
       <Tab.Screen
         options={{
           tabBarIcon: ({}) => (
-            <View style={{width: 70, alignItems: 'center', marginLeft: -20}}>
+            <View style={{width: 70, alignItems: 'center', marginLeft: -25}}>
               <Text
                 style={{
                   color: 'black',

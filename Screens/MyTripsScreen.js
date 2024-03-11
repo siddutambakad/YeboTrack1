@@ -14,7 +14,7 @@ const MyTripsScreen = ({navigation}) => {
           <TouchableOpacity
             style={styles.backbutton}
             onPress={() => {
-              navigation.goBack();
+              navigation.navigate('Driver');
             }}>
             <Back width={30} height={30} />
             <Text style={styles.backbuttonText}>My Trips</Text>

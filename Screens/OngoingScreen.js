@@ -5,6 +5,7 @@ import {
   View,
   Modal,
   TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native';
 import React, {useState} from 'react';
 import Cars from '../assets/images/cars.svg';
@@ -14,7 +15,7 @@ import Cancel from '../assets/images/cancel.svg';
 const OngoingScreen = () => {
   const [showModal, setShowModal] = useState(false);
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.imageContainer}>
         <Cars width={80} height={80} />
       </View>
@@ -95,7 +96,7 @@ const OngoingScreen = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 

@@ -38,7 +38,7 @@ function TabNavigator({navigation}) {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: 80,
+          height: 70,
           borderTopRightRadius: 25,
           borderTopLeftRadius: 25,
           // padding: 20,
@@ -53,7 +53,7 @@ function TabNavigator({navigation}) {
         name="Home"
         component={DriverHomeScreen}
         options={{
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('Driver');
@@ -61,17 +61,9 @@ function TabNavigator({navigation}) {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 80,
+                height: 70,
               }}>
-              <View
-                style={{
-                  borderWidth: focused ? 1.5 : 0,
-                  width: 70,
-                  height: 2,
-                  top: -9,
-                  borderColor: focused ? '#C5197D' : 'none',
-                }}></View>
-              <Home style={{marginTop: 8}} />
+              <Home style={{ marginTop: 8 }} />
               <Text
                 style={{
                   color: '#C5197D',
@@ -83,7 +75,6 @@ function TabNavigator({navigation}) {
               </Text>
             </TouchableOpacity>
           ),
-
         }}
       />
       <Tab.Screen
@@ -95,14 +86,14 @@ function TabNavigator({navigation}) {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 80,
+                height: 70,
               }}>
               <View
                 style={{
                   borderWidth: focused ? 1.5 : 0,
                   width: 70,
                   height: 2,
-                  top: -13,
+                  top: -8,
                   borderColor: focused ? '#C5197D' : 'none',
                 }}></View>
               <Car style={{marginTop: 8}} />
@@ -128,14 +119,14 @@ function TabNavigator({navigation}) {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 80,
+                height: 70,
               }}>
               <View
                 style={{
                   borderWidth: focused ? 1.5 : 0,
                   width: 70,
                   height: 2,
-                  top: -9,
+                  top: -5,
                   borderColor: focused ? '#C5197D' : 'none',
                 }}></View>
               <Profile style={{marginTop: 8}} />
@@ -173,13 +164,13 @@ function Auth(props) {
             component={SplashScreen}
             options={{headerShown: false}}
           />
-        )} */}
-        {/* <Stack.Screen
+        )}
+        <Stack.Screen
           name="LoginPage"
           component={LoginPage}
           options={{headerShown: false}}
-        /> */}
-        {/* <Stack.Screen
+        />
+        <Stack.Screen
           name="Otp"
           component={OtpScreen}
           options={{headerShown: false}}
@@ -192,6 +183,11 @@ function Auth(props) {
         <Stack.Screen
           name="MyTrip"
           component={TabNavigator}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

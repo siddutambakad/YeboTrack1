@@ -14,9 +14,9 @@ import Check from '../assets/images/check.svg';
 import CheckCircle from '../assets/images/checked.svg';
 import CheckBox from '../assets/images/checkBox.svg';
 import Loader from './Components/Loader';
-import { APIS } from './APIURLS/ApiUrls';
+import {APIS} from './APIURLS/ApiUrls';
 import fontFamily from './Styles/FontFamily';
-import { verticalScale } from './Utils/Dimensions';
+import {verticalScale} from './Utils/Dimensions';
 import axios from 'axios';
 
 const OtpScreen = ({navigation, route}) => {
@@ -159,24 +159,25 @@ const OtpScreen = ({navigation, route}) => {
           {errorMsg.ResponseError ? (
             <Text style={styles.errorText}>{errorMsg.ResponseError}</Text>
           ) : null}
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {
-              setSelectedOption(!selectedOption);
-              setShowError({
-                ...showError,
-                termsAndCondition: false,
-              });
-            }}
-            style={styles.otpSentButton}>
-            <View style={styles.checkbox}>{selectedOption && <Check />}</View>
+          <View style={styles.otpSentButton}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {
+                setSelectedOption(!selectedOption);
+                setShowError({
+                  ...showError,
+                  termsAndCondition: false,
+                });
+              }}>
+              <View style={styles.checkbox}>{selectedOption && <Check />}</View>
+            </TouchableOpacity>
             <Text style={styles.otpText}>
               I agree to the{' '}
               <Text style={styles.termsAndConditionText}>
                 terms and conditions
               </Text>
             </Text>
-          </TouchableOpacity>
+          </View>
           {showError.termsAndCondition && (
             <Text style={styles.errorText}>{errorMsg.termsAndCondition}</Text>
           )}
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   vertifyotpText: {
     fontSize: 16,
     fontFamily: fontFamily.regular,
-    color: '#65276F'
+    color: '#65276F',
   },
   otpSent: {
     flexDirection: 'row',
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontSize: 16,
     fontFamily: fontFamily.regular,
-    color: '#65276F'
+    color: '#65276F',
   },
   checkbox: {
     width: 18,
