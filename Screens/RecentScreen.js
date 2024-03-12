@@ -1,10 +1,12 @@
 import {FlatList, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
+import { UpcomingLists } from './Context/AppContext';
 
 const RecentScreen = () => {
   const [data, setData] = useState([1, 1, 1, 1, 1, 1, 1]);
+// const {data1} = useContext(UpcomingLists)
 
   const renderItems = (item, index) => {
     return (

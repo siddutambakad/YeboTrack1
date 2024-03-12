@@ -25,11 +25,12 @@ import DriverHomeScreen from './DriverHomeScreen';
 import ProfileScreen from './ProfileScreen';
 import Profile from '../assets/images/Profile.svg';
 import FontFamily from './Styles/FontFamily';
+import StartTrip from './LoginTrips/StartTrip';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Define your tab navigation screens
+// Bottom tab navigation screens
 function TabNavigator({navigation}) {
   return (
     <Tab.Navigator
@@ -48,6 +49,7 @@ function TabNavigator({navigation}) {
           fontSize: 14,
           color: '#C5197D',
         },
+        tabBarHideOnKeyboard: true
       }}>
       <Tab.Screen
         name="Home"
@@ -188,6 +190,11 @@ function Auth(props) {
         <Stack.Screen
           name="Profile"
           component={ProfileScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Start"
+          component={StartTrip}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

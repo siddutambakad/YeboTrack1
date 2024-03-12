@@ -13,56 +13,18 @@ import Car from '../assets/images/Car.svg';
 import History from '../assets/images/history.svg';
 import Bell from '../assets/images/bell.svg';
 import FontFamily from './Styles/FontFamily';
-import {useNavigation} from '@react-navigation/native';
 
 const DriverHomeScreen = ({navigation}) => {
-  // const navigation = useNavigation();
 
   const handleMyTripsPress = () => {
-    navigation.navigate('MyTrip', {screen: 'MyTrips'}); // Navigate to MyTrips tab
+    navigation.navigate('MyTrip', {screen: 'MyTrips'});
   };
 
   const handleMyProfilePress = () => {
-    navigation.navigate('Profile', {screen: 'Profile'}); // Navigate to Profile tab
+    navigation.navigate('Profile', {screen: 'Profile'});
   };
   return (
-    // <ImageBackground
-    //   style={styles.imageBackground}
-    //   source={require('../assets/images/imageBack.png')}>
-    //   <View style={{backgroundColor: '#66276e', flex: 1, opacity: 0.8}}>
-    //     {/*header strats */}
-    //     <View
-    //       style={{
-    //         alignSelf: 'flex-end',
-    //         marginHorizontal: 20,
-    //         alignItems: 'center',
-    //         marginVertical: 20,
-    //       }}>
-    //       <TouchableOpacity
-    //         activeOpacity={1}
-    //         onPress={() => {}}
-    //         style={{
-    //           width: 60,
-    //           height: 60,
-    //           backgroundColor: '#FFFFFF',
-    //           alignItems: 'center',
-    //           justifyContent: 'center',
-    //           borderRadius: 30,
-    //         }}>
-    //         <Bell width={25} height={25} fill={'#C5197D'} />
-    //       </TouchableOpacity>
-    //     </View>
-    //     <View
-    //       style={{
-    //         backgroundColor: 'white',
-    //         flex: 1,
-    //         borderTopLeftRadius: 50,
-    //         borderTopRightRadius: 50,
-    //         marginTop: 70,
-    //       }}
-    //     />
-    //   </View>
-    // </ImageBackground>
+
     <View style={styles.container}>
       <Image
         source={require('../assets/images/imageBack.png')}
@@ -87,7 +49,6 @@ const DriverHomeScreen = ({navigation}) => {
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => {
-              // navigation.navigate('MyTrip');
               handleMyTripsPress();
             }}
             style={styles.myTripsButton}>

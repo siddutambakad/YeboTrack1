@@ -7,17 +7,32 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import Cancel from '../assets/images/cancel.svg';
+import {UpcomingLists} from './Context/AppContext';
+import ConformationModal from './Components/ConformationModal';
 
-const UpComingScreens = () => {
-  const [data, setData] = useState([1, 1, 1, 1, 1, 1]);
+const UpComingScreens = ({navigation}) => {
+  // const [data, setData] = useState([1, 1, 1, 1, 1, 1]);
+  const {setSelectedItem} = useContext(UpcomingLists);
   const [showModal, setShowModal] = useState(false);
 
-  const renderItems = (index, item) => {
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+  };
+
+    const data = [1, 1, 1, 1, 1]
+
+  const renderItems = ({item, index}) => {
+    console.log(item, '----->>>');
     return (
-      <View>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => {
+          handleItemClick(item)
+          console.log(item);
+        }}>
         <View style={styles.headerText}>
           <Text style={styles.upcomingText}>Upcoming</Text>
           <Text style={styles.dateText}>16-10-2021</Text>
@@ -32,7 +47,7 @@ const UpComingScreens = () => {
           }}>
           <Text style={styles.cancelTripText}>Cancel Trip</Text>
         </TouchableOpacity>
-        <Modal visible={showModal} animationType="fade" transparent={true}>
+        {/* <Modal visible={showModal} animationType="fade" transparent={true}>
           <TouchableWithoutFeedback
             onPress={() => {
               setShowModal(false);
@@ -74,8 +89,16 @@ const UpComingScreens = () => {
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </Modal>
-      </View>
+        </Modal> */}
+        <ConformationModal 
+        title='Are you sure you want to cancel the trip?'
+        onPressYes={() => {
+          setShowModal(false);
+        }}
+        onPressNo={()=>{setShowModal(false)}}
+        showConfirmModal={showModal}
+        />
+      </TouchableOpacity>
     );
   };
   return (
