@@ -13,9 +13,18 @@ import Car from '../assets/images/Car.svg';
 import History from '../assets/images/history.svg';
 import Bell from '../assets/images/bell.svg';
 import FontFamily from './Styles/FontFamily';
+import {
+  fontPixel,
+  getFontSize,
+  horizontalScale,
+  moderateScale,
+  moderateScaleVertical,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from './Utils/Dimensions';
 
 const DriverHomeScreen = ({navigation}) => {
-
   const handleMyTripsPress = () => {
     navigation.navigate('MyTrip', {screen: 'MyTrips'});
   };
@@ -24,35 +33,50 @@ const DriverHomeScreen = ({navigation}) => {
     navigation.navigate('Profile', {screen: 'Profile'});
   };
   return (
-
     <View style={styles.container}>
       <Image
         source={require('../assets/images/imageBack.png')}
         style={styles.imageback}
       />
       <View style={styles.backgroundContainer}>
-        <View>
-          <Image
-            source={require('../assets/images/profile.png')}
-            style={styles.profileImage}
-          />
+        <View style={{}}>
+          <View
+            style={{
+              width: horizontalScale(100),
+              height: verticalScale(105),
+              alignItems: 'center',
+              alignSelf: 'center',
+              top: pixelSizeVertical(-50),
+              borderRadius: 50,
+            }}>
+            <Image
+              source={require('../assets/images/profile.png')}
+              style={styles.profileImage}
+            />
+          </View>
           <Text style={styles.jhonedoeText}>Jhon Doe</Text>
           <Text style={styles.driverIdText}>Driver ID - #1234</Text>
           <TouchableOpacity style={styles.addPhoto}>
             <Camera width={15} height={15} />
             <Text style={styles.addPhotoText}>Add Photo</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.myHistoryButton}>
+          {/* <TouchableOpacity style={styles.myHistoryButton}>
             <History width={30} height={30} />
             <Text style={styles.myhistoryText}>History</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => {
               handleMyTripsPress();
             }}
             style={styles.myTripsButton}>
-            <Car width={40} height={40} />
+            <View style={{paddingRight: pixelSizeHorizontal(25)}}>
+              <Car
+                width={pixelSizeHorizontal(40)}
+                height={pixelSizeVertical(35)}
+                style={styles.carImage}
+              />
+            </View>
             <Text style={styles.myTripsText}>My Trips</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -60,7 +84,12 @@ const DriverHomeScreen = ({navigation}) => {
             onPress={() => {
               handleMyProfilePress();
             }}>
-            <Profile width={30} height={30} />
+            <View style={{paddingRight: pixelSizeHorizontal(25)}}>
+              <Profile
+                width={pixelSizeHorizontal(40)}
+                height={pixelSizeVertical(35)}
+              />
+            </View>
             <Text style={styles.myProfileText}>My Profile</Text>
           </TouchableOpacity>
         </View>
@@ -101,21 +130,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 50,
   },
   profileImage: {
-    width: '25%',
-    height: '42%',
-    alignSelf: 'center',
-    position: 'absolute',
-    top: -90,
-    //   borderWidth: 1,
-    //   borderColor: 'black',
+    width: '100%',
+    height: '100%',
+    // alignSelf: 'center',
+    // position: 'absolute',
+    objectFit: 'scale-down',
     borderRadius: 50,
-    resizeMode: 'contain',
+    // zIndex: 5,
   },
   jhonedoeText: {
     color: 'black',
     textAlign: 'center',
-    marginTop: 70,
-    fontSize: 18,
+    marginTop: pixelSizeVertical(-35),
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   driverIdText: {
@@ -123,6 +150,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 3,
     fontFamily: FontFamily.regular,
+    fontSize: fontPixel(12),
   },
   addPhoto: {
     flexDirection: 'row',
@@ -135,53 +163,35 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     textDecorationLine: 'underline',
     fontFamily: FontFamily.regular,
-  },
-  myHistoryButton: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    width: '55%',
-    height: 70,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    alignSelf: 'center',
-    marginTop: 30,
-    borderRadius: 8,
-    elevation: 10,
-  },
-  myhistoryText: {
-    color: 'black',
-    fontSize: 16,
-    fontFamily: FontFamily.regular,
-    paddingRight: 20,
+    fontSize: fontPixel(12),
   },
   myTripsButton: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    width: '55%',
-    height: 70,
+    width: horizontalScale(230),
+    height: verticalScale(80),
     alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
+    justifyContent: 'center',
     alignSelf: 'center',
     marginTop: 25,
+    paddingHorizontal: pixelSizeHorizontal(30),
     borderRadius: 8,
     elevation: 10,
   },
   myTripsText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.regular,
-    paddingRight: 10,
+    paddingLeft: pixelSizeHorizontal(-12),
   },
   myProfileButton: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    width: '55%',
-    height: 70,
-    paddingHorizontal: 20,
+    width: horizontalScale(230),
+    height: verticalScale(80),
+    paddingHorizontal: pixelSizeHorizontal(35),
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     alignSelf: 'center',
     marginTop: 25,
     borderRadius: 8,
@@ -189,9 +199,9 @@ const styles = StyleSheet.create({
   },
   myProfileText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.regular,
-    // paddingLeft: 20,
+    paddingLeft: pixelSizeHorizontal(-12),
   },
   headerIcon: {
     alignSelf: 'flex-end',

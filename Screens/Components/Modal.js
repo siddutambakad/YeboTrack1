@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Cancel from '../../assets/images/cancel.svg';
 import FontFamily from '../Styles/FontFamily';
-import {horizontalScale, verticalScale} from '../Utils/Dimensions';
+import {fontPixel, horizontalScale, pixelSizeHorizontal, pixelSizeVertical, verticalScale} from '../Utils/Dimensions';
 
 const CustomModal = props => {
   const {
@@ -49,6 +49,7 @@ const CustomModal = props => {
         otp: false,
       });
       setUserDetails('');
+      setErrorMsg({})
       onPressSubmitButton();
     }
   };
@@ -68,18 +69,20 @@ const CustomModal = props => {
                 color: 'black',
                 fontFamily: FontFamily.regular,
                 alignSelf: 'flex-start',
-                paddingHorizontal: 20,
+                paddingHorizontal: pixelSizeHorizontal(54),
+                fontSize: fontPixel(14)
               }}>
               {title}
             </Text>
             <TextInput
               style={{
-                width: '90%',
-                height: verticalScale(40),
+                width: '70%',
+                height: verticalScale(45),
                 backgroundColor: 'rgba(227, 227, 227, 1)',
-                marginVertical: 10,
+                marginVertical: pixelSizeVertical(10),
                 color: 'black',
-                paddingLeft: 10,
+                paddingLeft: pixelSizeHorizontal(10),
+                fontSize: fontPixel(14)
               }}
               maxLength={6}
               keyboardType="number-pad"
@@ -125,8 +128,9 @@ const CustomModal = props => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 width: '90%',
-                paddingHorizontal: 20,
-                marginVertical: 30,
+                paddingHorizontal: pixelSizeHorizontal(36),
+                marginBottom: pixelSizeVertical(25),
+                marginVertical: pixelSizeVertical(30)
               }}>
               <TouchableOpacity
                 onPress={() => {
@@ -144,7 +148,7 @@ const CustomModal = props => {
                   style={{
                     color: 'white',
                     fontFamily: FontFamily.regular,
-                    fontSize: 14,
+                    fontSize: fontPixel(14),
                   }}>
                   Submit
                 </Text>
@@ -165,7 +169,7 @@ const CustomModal = props => {
                   style={{
                     color: 'white',
                     fontFamily: FontFamily.regular,
-                    fontSize: 14,
+                    fontSize: fontPixel(14),
                   }}>
                   Cancel
                 </Text>
@@ -188,9 +192,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   modalContent: {
-    backgroundColor: '#FFF8F2',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    height: 230,
+    // height: 230,
     width: '90%',
     alignItems: 'center',
     padding: 15,
@@ -199,5 +203,6 @@ const styles = StyleSheet.create({
     color: 'red',
     fontFamily: FontFamily.regular,
     alignSelf: 'center',
+    fontSize: fontPixel(12)
   },
 });

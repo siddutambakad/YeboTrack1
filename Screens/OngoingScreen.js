@@ -11,6 +11,7 @@ import React, {useState} from 'react';
 import Cars from '../assets/images/cars.svg';
 import FontFamily from './Styles/FontFamily';
 import Cancel from '../assets/images/cancel.svg';
+import { fontPixel, horizontalScale, moderateScale, pixelSizeHorizontal, pixelSizeVertical, verticalScale } from './Utils/Dimensions';
 
 const OngoingScreen = () => {
   const [showModal, setShowModal] = useState(false);
@@ -73,9 +74,10 @@ const OngoingScreen = () => {
               <View
                 style={{
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  justifyContent: 'space-evenly',
                   width: '100%',
-                  paddingHorizontal: 30,
+                  paddingHorizontal: pixelSizeHorizontal(20),
+                  marginBottom: pixelSizeVertical(30)
                 }}>
                 <TouchableOpacity
                   style={styles.modalButton}
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 20,
     backgroundColor: 'rgba(229, 229, 229, 1)',
-    width: 105,
+    width: 100,
     height: 100,
     alignItems: 'center',
     justifyContent: 'center',
@@ -120,43 +122,43 @@ const styles = StyleSheet.create({
   slotAndDateText: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 20,
+    marginHorizontal: pixelSizeHorizontal(20),
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: pixelSizeVertical(20),
   },
   slottext: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.regular,
   },
   dateText: {
     color: 'black',
     fontWeight: '600',
     fontFamily: FontFamily.semiBold,
-    fontSize: 16,
+    fontSize: fontPixel(16),
   },
   totalFare: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 20,
+    marginHorizontal: pixelSizeHorizontal(20),
     alignItems: 'center',
     marginVertical: 20,
   },
   totalFareText: {
     color: 'rgba(102, 39, 110, 1)',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   totalAmountText: {
     color: 'rgba(102, 39, 110, 1)',
     fontWeight: '600',
     fontFamily: FontFamily.semiBold,
-    fontSize: 16,
+    fontSize: fontPixel(16),
     paddingRight: 55,
   },
   cancelButton: {
-    width: '40%',
-    height: 50,
+    width: horizontalScale(170),
+    height: verticalScale(50),
     backgroundColor: 'rgba(197, 25, 125, 1)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -166,62 +168,63 @@ const styles = StyleSheet.create({
   },
   cancelTripText: {
     color: 'white',
+    fontSize: fontPixel(12)
   },
   ticketNodetails: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: 20,
-    marginBottom: 10,
+    marginHorizontal: pixelSizeHorizontal(20),
+    marginBottom: pixelSizeVertical(10),
   },
   ticketNoText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   tripNoText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   noOfPeopleText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   distanceText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   timeText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   ticketText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   rosterText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   numberOfPeopleText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   distanceMilesText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   minutesText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
   },
   modalContainer: {
@@ -233,8 +236,8 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#FFF8F2',
     borderRadius: 10,
-    height: 230,
-    width: '90%',
+    // height: verticalScale(180),
+    width: horizontalScale(350),
     alignItems: 'center',
     padding: 15,
   },
@@ -242,34 +245,38 @@ const styles = StyleSheet.create({
     padding: 15,
     color: '#454545',
     fontFamily: FontFamily.regular,
-    fontSize: 18,
+    fontSize: fontPixel(18),
     textAlign: 'left',
+    paddingHorizontal: pixelSizeHorizontal(30)
+    // width: '100%'
+    
   },
   modalButtonText: {
     color: '#FFF8F2',
     fontFamily: FontFamily.regular,
-    fontSize: 16,
+    fontSize: fontPixel(16),
   },
   modalButton: {
     backgroundColor: '#C5197D',
     borderRadius: 3,
-    width: 115,
-    height: 40,
+    width: horizontalScale(110),
+    height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
+
   },
   modalButtonNo: {
     backgroundColor: '#454546',
     borderRadius: 3,
-    width: 115,
-    height: 40,
+    width: horizontalScale(110),
+    height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalButtonNoText: {
     color: '#FFF8F2',
     fontFamily: FontFamily.regular,
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontWeight: '600',
   },
 });

@@ -12,26 +12,28 @@ import FontFamily from './Styles/FontFamily';
 import Cancel from '../assets/images/cancel.svg';
 import {UpcomingLists} from './Context/AppContext';
 import ConformationModal from './Components/ConformationModal';
+import {fontPixel, horizontalScale, verticalScale} from './Utils/Dimensions';
 
 const UpComingScreens = ({navigation}) => {
   // const [data, setData] = useState([1, 1, 1, 1, 1, 1]);
   const {setSelectedItem} = useContext(UpcomingLists);
   const [showModal, setShowModal] = useState(false);
 
-  const handleItemClick = (item) => {
+  const handleItemClick = item => {
     setSelectedItem(item);
+    navigation.navigate('MyTripDetail', {
+      params: {items: item},
+    });
   };
 
-    const data = [1, 1, 1, 1, 1]
+  const data = [1, 1, 1, 1, 1];
 
   const renderItems = ({item, index}) => {
-    console.log(item, '----->>>');
     return (
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          handleItemClick(item)
-          console.log(item);
+          handleItemClick(item);
         }}>
         <View style={styles.headerText}>
           <Text style={styles.upcomingText}>Upcoming</Text>
@@ -47,56 +49,15 @@ const UpComingScreens = ({navigation}) => {
           }}>
           <Text style={styles.cancelTripText}>Cancel Trip</Text>
         </TouchableOpacity>
-        {/* <Modal visible={showModal} animationType="fade" transparent={true}>
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setShowModal(false);
-            }}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <TouchableOpacity
-                  style={{alignSelf: 'flex-end', padding: 8}}
-                  onPress={() => {
-                    setShowModal(false);
-                  }}>
-                  <Cancel />
-                </TouchableOpacity>
-                <Text style={styles.modalText}>
-                  {'Are you sure you want to cancel the trip?'}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    paddingHorizontal: 30,
-                  }}>
-                  <TouchableOpacity
-                    style={styles.modalButton}
-                    onPress={() => {
-                      setShowModal(false);
-                    }}>
-                    <Text style={styles.modalButtonText}>Yes</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.modalButtonNo}
-                    onPress={() => {
-                      setShowModal(false);
-                    }}>
-                    <Text style={styles.modalButtonNoText}>No</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal> */}
-        <ConformationModal 
-        title='Are you sure you want to cancel the trip?'
-        onPressYes={() => {
-          setShowModal(false);
-        }}
-        onPressNo={()=>{setShowModal(false)}}
-        showConfirmModal={showModal}
+        <ConformationModal
+          title="Are you sure you want to cancel the trip?"
+          onPressYes={() => {
+            setShowModal(false);
+          }}
+          onPressNo={() => {
+            setShowModal(false);
+          }}
+          showConfirmModal={showModal}
         />
       </TouchableOpacity>
     );
@@ -125,20 +86,38 @@ const styles = StyleSheet.create({
   },
   upcomingText: {
     color: 'black',
-    fontSize: 18,
+    fontSize: fontPixel(19),
     fontFamily: FontFamily.semiBold,
   },
   dateText: {
     color: 'black',
-    fontSize: 18,
+    fontSize: fontPixel(19),
     fontFamily: FontFamily.bold,
   },
-  ticketNo: {color: 'black', marginHorizontal: 20, marginTop: 15},
-  distanceText: {color: 'black', marginHorizontal: 20, marginVertical: 8},
-  timeText: {color: 'black', marginHorizontal: 20, marginVertical: 8},
+  ticketNo: {
+    color: 'black',
+    marginHorizontal: 20,
+    marginTop: 15,
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(14),
+  },
+  distanceText: {
+    color: 'black',
+    marginHorizontal: 20,
+    marginTop: 8,
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(14),
+  },
+  timeText: {
+    color: 'black',
+    marginHorizontal: 20,
+    marginVertical: 8,
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(14),
+  },
   cancelTripButton: {
-    width: '38%',
-    height: 50,
+    width: horizontalScale(180),
+    height: verticalScale(50),
     backgroundColor: 'rgba(197, 25, 125, 1)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -149,7 +128,7 @@ const styles = StyleSheet.create({
   cancelTripText: {
     color: 'white',
     fontFamily: FontFamily.regular,
-    fontSize: 14,
+    fontSize: fontPixel(14),
   },
   modalContainer: {
     flex: 1,

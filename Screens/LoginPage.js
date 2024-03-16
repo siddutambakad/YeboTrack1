@@ -10,10 +10,17 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import { APIS } from './APIURLS/ApiUrls';
+import {APIS} from './APIURLS/ApiUrls';
 import Loader from './Components/Loader';
 import fontFamily from './Styles/FontFamily';
-import { verticalScale } from './Utils/Dimensions';
+import {
+  fontPixel,
+  horizontalScale,
+  moderateScale,
+  moderateScaleVertical,
+  verticalScale,
+} from './Utils/Dimensions';
+import FontFamily from './Styles/FontFamily';
 
 const LoginPage = ({navigation}) => {
   const [loader, setLoader] = useState(false);
@@ -49,7 +56,7 @@ const LoginPage = ({navigation}) => {
     try {
       const response = await axios.post(APIS.loginWithOtp, postLoginData);
       const otpResponse = response.data;
-      console.log('otp sent', otpResponse);
+      // console.log('otp sent', otpResponse);
       navigation.navigate('Otp', {otpResponse: otpResponse});
     } catch (error) {
       if (error.response) {
@@ -148,7 +155,6 @@ const LoginPage = ({navigation}) => {
             style={styles.bottomImage}
           />
         </View>
-        
       </View>
       {loader && <Loader />}
     </ScrollView>
@@ -177,7 +183,7 @@ const styles = StyleSheet.create({
   phoneNumberText: {
     marginHorizontal: 20,
     marginVertical: 8,
-    fontFamily: fontFamily.medium,
+    fontFamily: FontFamily.medium,
     fontSize: 16,
     color: '#65276F',
   },
@@ -188,27 +194,29 @@ const styles = StyleSheet.create({
   },
   phoneNumberInput: {
     width: '80%',
-    height: 45,
+    height: verticalScale(50),
     backgroundColor: '#EFEFEF',
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
     paddingLeft: 10,
     color: '#65276F',
+    fontSize: 16,
   },
   countryText: {
     width: '20%',
     backgroundColor: 'lightgray',
-    height: 45,
+    height: verticalScale(50),
     textAlign: 'center',
     textAlignVertical: 'center',
     color: 'black',
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
+    fontSize: fontPixel(16)
   },
   getOtpButton: {
     backgroundColor: '#C5197D',
     width: '40%',
-    height: verticalScale(48),
+    height: verticalScale(50),
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -217,8 +225,8 @@ const styles = StyleSheet.create({
   },
   getOtpText: {
     color: 'white',
-    fontFamily: fontFamily.regular,
-    fontSize: 16
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(15),
   },
   imageContainer: {
     flex: 0.32,
@@ -233,7 +241,6 @@ const styles = StyleSheet.create({
     color: 'red',
     alignSelf: 'flex-start',
     marginHorizontal: 20,
-    fontFamily: fontFamily.regular,
+    fontFamily: FontFamily.regular,
   },
-  
 });

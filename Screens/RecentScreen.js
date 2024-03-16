@@ -3,6 +3,7 @@ import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
 import { UpcomingLists } from './Context/AppContext';
+import { fontPixel } from './Utils/Dimensions';
 
 const RecentScreen = () => {
   const [data, setData] = useState([1, 1, 1, 1, 1, 1, 1]);
@@ -58,19 +59,19 @@ export default RecentScreen;
 const styles = StyleSheet.create({
   ticketNoText: {
     color: 'black',
-    fontSize: 18,
+    fontSize: fontPixel(19),
     fontFamily: FontFamily.semiBold,
   },
   dateAndTimeText: {
     color: 'black',
     marginTop: 8,
-    fontSize: 14,
+    fontSize: fontPixel(14),
     fontFamily: FontFamily.regular,
   },
   dbTestText: {
     color: 'black',
     marginTop: 8,
-    fontSize: 14,
+    fontSize: fontPixel(14),
     fontFamily: FontFamily.regular,
   },
   rateing: {
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   rateingText: {
     color: 'black',
     marginTop: 8,
-    fontSize: 14,
+    fontSize: fontPixel(14),
     fontFamily: FontFamily.regular,
   },
 });

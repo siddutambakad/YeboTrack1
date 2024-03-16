@@ -5,6 +5,13 @@ import OngoingScreen from '../OngoingScreen';
 import RecentScreen from '../RecentScreen';
 import {Text, View} from 'react-native';
 import FontFamily from '../Styles/FontFamily';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from '../Utils/Dimensions';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -15,37 +22,45 @@ const MyTripNavigator = () => {
         tabBarShowLabel: false,
         tabBarActiveTintColor: 'rgba(0, 0, 0, 1)',
         tabBarInactiveTintColor: 'rgba(0, 0, 0, 1)',
-        tabBarContentContainerStyle: {height: 60},
+        tabBarContentContainerStyle: {height: verticalScale(70)},
         tabBarStyle: {
-          paddingTop: 10,
+          // paddingTop: 10,
           borderTopLeftRadius: 50,
           borderTopRightRadius: 50,
           backgroundColor: 'rgba(246, 246, 246, 1)',
           elevation: 0,
+          justifyContent: 'center',
         },
         tabBarItemStyle: {
-          marginHorizontal: 16,
-          justifyContent: 'flex-end',
+          // marginHorizontal: 16,
+          // justifyContent: 'flex-end',
           // borderWidth: 2,
         },
         tabBarIndicatorStyle: {
-          width: '25%',
+          width: horizontalScale(100),
           backgroundColor: 'rgba(102, 39, 110, 1)',
+          marginTop: 10,
         },
         tabBarIndicatorContainerStyle: {
-          marginLeft: 16,
+          marginLeft: pixelSizeHorizontal(20),
         },
         tabBarPressColor: 'rgba(246, 246, 246, 1)',
       }}>
       <Tab.Screen
         options={{
           tabBarIcon: ({}) => (
-            <View style={{width: 70, alignItems: 'center', marginLeft: -25}}>
+            <View
+              style={{
+                width: horizontalScale(100),
+                height: verticalScale(40),
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}>
               <Text
                 style={{
                   color: 'black',
                   fontFamily: FontFamily.semiBold,
-                  fontSize: 16,
+                  fontSize: fontPixel(18),
                 }}>
                 Ongoing
               </Text>
@@ -58,12 +73,18 @@ const MyTripNavigator = () => {
       <Tab.Screen
         options={{
           tabBarIcon: ({}) => (
-            <View style={{width: 75, alignItems: 'center', marginLeft: -25}}>
+            <View
+              style={{
+                width: horizontalScale(100),
+                height: verticalScale(40),
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}>
               <Text
                 style={{
                   color: 'black',
                   fontFamily: FontFamily.semiBold,
-                  fontSize: 16,
+                  fontSize: fontPixel(18),
                 }}>
                 Upcoming
               </Text>
@@ -76,12 +97,18 @@ const MyTripNavigator = () => {
       <Tab.Screen
         options={{
           tabBarIcon: ({}) => (
-            <View style={{width: 70, alignItems: 'center', marginLeft: -25}}>
+            <View
+              style={{
+                width: horizontalScale(100),
+                height: verticalScale(40),
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}>
               <Text
                 style={{
                   color: 'black',
                   fontFamily: FontFamily.semiBold,
-                  fontSize: 16,
+                  fontSize: fontPixel(18),
                 }}>
                 Recent
               </Text>

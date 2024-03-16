@@ -9,13 +9,19 @@ import {
 import React from 'react';
 import Cancel from '../../assets/images/cancel.svg';
 import FontFamily from '../Styles/FontFamily';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from '../Utils/Dimensions';
 
-const ConformationModal = (props) => {
-    const {onPressYes,onPressNo, title, showConfirmModal} = props
+const ConformationModal = props => {
+  const {onPressYes, onPressNo, title, showConfirmModal} = props;
   return (
     <Modal visible={showConfirmModal} animationType="fade" transparent={true}>
-      <TouchableWithoutFeedback
-        onPress={onPressNo}>
+      <TouchableWithoutFeedback onPress={onPressNo}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <TouchableOpacity
@@ -23,19 +29,16 @@ const ConformationModal = (props) => {
               onPress={onPressNo}>
               <Cancel />
             </TouchableOpacity>
-            <Text style={styles.modalText}>
-              {title}
-            </Text>
+            <Text style={styles.modalText}>{title}</Text>
             <View
               style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                paddingHorizontal: 30,
+                  justifyContent: 'space-evenly',
+                  width: '100%',
+                  paddingHorizontal: pixelSizeHorizontal(20),
+                  marginBottom: pixelSizeVertical(30)
               }}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={onPressYes}>
+              <TouchableOpacity style={styles.modalButton} onPress={onPressYes}>
                 <Text style={styles.modalButtonText}>Yes</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -58,13 +61,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
   modalContent: {
-    backgroundColor: '#FFF8F2',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    height: 230,
-    width: '90%',
+    // height: verticalScale(180),
+    width: horizontalScale(350),
     alignItems: 'center',
     padding: 15,
   },
@@ -72,34 +75,35 @@ const styles = StyleSheet.create({
     padding: 15,
     color: '#454545',
     fontFamily: FontFamily.regular,
-    fontSize: 18,
+    fontSize: fontPixel(18),
     textAlign: 'left',
+    paddingHorizontal: pixelSizeHorizontal(30),
+    // width: '100%'
   },
   modalButtonText: {
     color: '#FFF8F2',
     fontFamily: FontFamily.regular,
-    fontSize: 16,
+    fontSize: fontPixel(16),
   },
   modalButton: {
     backgroundColor: '#C5197D',
     borderRadius: 3,
-    width: 115,
-    height: 40,
+    width: horizontalScale(110),
+    height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalButtonNo: {
     backgroundColor: '#454546',
     borderRadius: 3,
-    width: 115,
-    height: 40,
+    width: horizontalScale(110),
+    height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalButtonNoText: {
     color: '#FFF8F2',
     fontFamily: FontFamily.regular,
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: fontPixel(16),
   },
 });

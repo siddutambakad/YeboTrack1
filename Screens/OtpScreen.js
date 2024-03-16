@@ -16,7 +16,7 @@ import CheckBox from '../assets/images/checkBox.svg';
 import Loader from './Components/Loader';
 import {APIS} from './APIURLS/ApiUrls';
 import fontFamily from './Styles/FontFamily';
-import {verticalScale} from './Utils/Dimensions';
+import {fontPixel, horizontalScale, verticalScale} from './Utils/Dimensions';
 import axios from 'axios';
 
 const OtpScreen = ({navigation, route}) => {
@@ -225,17 +225,20 @@ const styles = StyleSheet.create({
   otpSent: {
     flexDirection: 'row',
     marginVertical: 20,
+    alignItems: 'center'
   },
   otpInput: {
     backgroundColor: '#EFEFEF',
-    width: '70%',
+    width: horizontalScale(350),
+    height: verticalScale(50),
     paddingLeft: 20,
     marginBottom: 15,
     color: '#65276F',
+    borderRadius: 5,
   },
   termsAndConditionText: {
     textDecorationLine: 'underline',
-    fontSize: 16,
+    fontSize: fontPixel(14),
     fontFamily: fontFamily.regular,
     color: '#65276F',
   },
@@ -255,12 +258,12 @@ const styles = StyleSheet.create({
   },
   otpText: {
     color: '#65276F',
-    fontSize: 16,
+    fontSize: fontPixel(14),
     fontFamily: fontFamily.medium,
     paddingHorizontal: 8,
   },
   resendButton: {
-    width: '40%',
+    width: horizontalScale(170),
     height: verticalScale(45),
     backgroundColor: '#C5197D',
     alignItems: 'center',
@@ -270,7 +273,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   verifyotpButton: {
-    width: '40%',
+    width: horizontalScale(170),
     height: verticalScale(45),
     backgroundColor: '#454546',
     alignItems: 'center',
@@ -282,10 +285,12 @@ const styles = StyleSheet.create({
   resendOtpText: {
     color: 'white',
     fontFamily: fontFamily.regular,
+    fontSize: fontPixel(14)
   },
   verifyOtp: {
     color: 'white',
     fontFamily: fontFamily.regular,
+    fontSize: fontPixel(14)
   },
   imageContainer: {
     flex: 0.34,

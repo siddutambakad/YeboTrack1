@@ -26,128 +26,140 @@ import ProfileScreen from './ProfileScreen';
 import Profile from '../assets/images/Profile.svg';
 import FontFamily from './Styles/FontFamily';
 import StartTrip from './LoginTrips/StartTrip';
+import HelpDescScreen from './HelpDescScreen';
+import MyTripDetails from './MyTripsScreens/MyTripDetails';
+import LocationReached from './MyTripsScreens/LocationReached';
+import DriveToOffice from './MyTripsScreens/DriveToOffice';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import OngoingScreen from './OngoingScreen';
+import UpComingScreens from './UpComingScreens';
+import RecentScreen from './RecentScreen';
+import StopTripScreen from './MyTripsScreens/StopTripScreen';
+import EmployeePickUp from './MyTripsScreens/EmployeePickUp';
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+const BottomTab = createBottomTabNavigator();
+const TopTab = createMaterialTopTabNavigator();
+
 
 // Bottom tab navigation screens
-function TabNavigator({navigation}) {
-  return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: 70,
-          borderTopRightRadius: 25,
-          borderTopLeftRadius: 25,
-          // padding: 20,
-        },
-        tabBarLabelStyle: {
-          fontFamily: FontFamily.medium,
-          fontSize: 14,
-          color: '#C5197D',
-        },
-        tabBarHideOnKeyboard: true
-      }}>
-      <Tab.Screen
-        name="Home"
-        component={DriverHomeScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('Driver');
-              }}
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 70,
-              }}>
-              <Home style={{ marginTop: 8 }} />
-              <Text
-                style={{
-                  color: '#C5197D',
-                  marginTop: 5,
-                  fontFamily: FontFamily.regular,
-                  fontSize: 14,
-                }}>
-                Home
-              </Text>
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="MyTrips"
-        component={MyTripsScreen}
-        options={{
-          tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 70,
-              }}>
-              <View
-                style={{
-                  borderWidth: focused ? 1.5 : 0,
-                  width: 70,
-                  height: 2,
-                  top: -8,
-                  borderColor: focused ? '#C5197D' : 'none',
-                }}></View>
-              <Car style={{marginTop: 8}} />
-              <Text
-                style={{
-                  color: '#C5197D',
-                  marginTop: 5,
-                  fontFamily: FontFamily.regular,
-                  fontSize: 14,
-                }}>
-                My Trips
-              </Text>
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 70,
-              }}>
-              <View
-                style={{
-                  borderWidth: focused ? 1.5 : 0,
-                  width: 70,
-                  height: 2,
-                  top: -5,
-                  borderColor: focused ? '#C5197D' : 'none',
-                }}></View>
-              <Profile style={{marginTop: 8}} />
-              <Text
-                style={{
-                  color: '#C5197D',
-                  marginTop: 5,
-                  fontFamily: FontFamily.regular,
-                  fontSize: 14,
-                }}>
-                My Profile
-              </Text>
-            </View>
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
+// function TabNavigator({navigation}) {
+//   return (
+//     <BottomTab.Navigator
+//       initialRouteName="Home"
+//       screenOptions={{
+//         headerShown: false,
+//         tabBarShowLabel: false,
+//         tabBarStyle: {
+//           height: 70,
+//           borderTopRightRadius: 25,
+//           borderTopLeftRadius: 25,
+//           // padding: 20,
+//         },
+//         tabBarLabelStyle: {
+//           fontFamily: FontFamily.medium,
+//           fontSize: 14,
+//           color: '#C5197D',
+//         },
+//         tabBarHideOnKeyboard: true,
+//       }}>
+//       <BottomTab.Screen
+//         name="Home"
+//         component={DriverHomeScreen}
+//         options={{
+//           tabBarIcon: ({focused}) => (
+//             <TouchableOpacity
+//               onPress={() => {
+//                 navigation.navigate('Driver');
+//               }}
+//               style={{
+//                 alignItems: 'center',
+//                 justifyContent: 'center',
+//                 height: 70,
+//               }}>
+//               <Home style={{marginTop: 8}} />
+//               <Text
+//                 style={{
+//                   color: '#C5197D',
+//                   marginTop: 5,
+//                   fontFamily: FontFamily.regular,
+//                   fontSize: 14,
+//                 }}>
+//                 Home
+//               </Text>
+//             </TouchableOpacity>
+//           ),
+//         }}
+//       />
+//       <BottomTab.Screen
+//         name="MyTrips"
+//         component={MyTripsScreen}
+//         options={{
+//           tabBarIcon: ({focused}) => (
+//             <View
+//               style={{
+//                 alignItems: 'center',
+//                 justifyContent: 'center',
+//                 height: 70,
+//               }}>
+//               <View
+//                 style={{
+//                   borderWidth: focused ? 1.5 : 0,
+//                   width: 70,
+//                   height: 2,
+//                   top: -8,
+//                   borderColor: focused ? '#C5197D' : 'none',
+//                 }}></View>
+//               <Car style={{marginTop: 8}} />
+//               <Text
+//                 style={{
+//                   color: '#C5197D',
+//                   marginTop: 5,
+//                   fontFamily: FontFamily.regular,
+//                   fontSize: 14,
+//                 }}>
+//                 My Trips
+//               </Text>
+//             </View>
+//           ),
+//         }}
+//       />
+//       <BottomTab.Screen
+//         name="Profile"
+//         component={ProfileScreen}
+//         options={{
+//           tabBarIcon: ({focused}) => (
+//             <View
+//               style={{
+//                 alignItems: 'center',
+//                 justifyContent: 'center',
+//                 height: 70,
+//               }}>
+//               <View
+//                 style={{
+//                   borderWidth: focused ? 1.5 : 0,
+//                   width: 70,
+//                   height: 2,
+//                   top: -5,
+//                   borderColor: focused ? '#C5197D' : 'none',
+//                 }}></View>
+//               <Profile style={{marginTop: 8}} />
+//               <Text
+//                 style={{
+//                   color: '#C5197D',
+//                   marginTop: 5,
+//                   fontFamily: FontFamily.regular,
+//                   fontSize: 14,
+//                 }}>
+//                 My Profile
+//               </Text>
+//             </View>
+//           ),
+//         }}
+//       />
+//     </BottomTab.Navigator>
+//   );
+// }
 
 function Auth(props) {
   const [showSplash, setShowSplash] = useState(true);
@@ -177,14 +189,14 @@ function Auth(props) {
           component={OtpScreen}
           options={{headerShown: false}}
         /> */}
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Driver"
           component={DriverHomeScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
           name="MyTrip"
-          component={TabNavigator}
+          component={MyTripsScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
@@ -193,8 +205,33 @@ function Auth(props) {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="Start"
-          component={StartTrip}
+          name="UpcomingScreen"
+          component={UpComingScreens}
+          options={{headerShown: false}}
+        /> */}
+        {/* <Stack.Screen
+          name="MyTripDetail"
+          component={MyTripDetails}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Location"
+          component={LocationReached}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DriveToOffice"
+          component={DriveToOffice}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="StopTrip"
+          component={StopTripScreen}
+          options={{headerShown: false}}
+        /> */}
+        <Stack.Screen
+          name="PickUp"
+          component={EmployeePickUp}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import Cancel from '../../assets/images/cancel.svg';
-import {horizontalScale, verticalScale} from '../Utils/Dimensions';
+import {fontPixel, horizontalScale, pixelSizeHorizontal, pixelSizeVertical, verticalScale} from '../Utils/Dimensions';
 import FontFamily from '../Styles/FontFamily';
 import Call from '../../assets/images/call.svg';
 import Location from '../../assets/images/location.svg';
@@ -49,8 +49,12 @@ const PickupGuardModal = props => {
                     justifyContent: 'space-between',
                     paddingLeft: 10,
                   }}>
-                  <Call />
-                  <Location />
+                  <TouchableOpacity onPress={options?.button_Action3}>
+                    <Call />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={options?.button_Action4}>
+                    <Location />
+                  </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   modalContent: {
-    backgroundColor: '#FFF8F2',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     // height: 230,
     width: '90%',
@@ -113,39 +117,40 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   modalImage: {
-    width: horizontalScale(72),
+    width: horizontalScale(70),
     height: verticalScale(80),
+    objectFit: 'scale-down',
     // marginHorizontal: 10,
   },
   modalText1: {
     alignSelf: 'flex-start',
-    paddingLeft: 30,
+    paddingLeft: pixelSizeHorizontal(30),
     fontFamily: FontFamily.semiBold,
     color: 'black',
-    fontSize: 16,
+    fontSize: fontPixel(16),
     marginTop: 5,
   },
   modalText2: {
     alignSelf: 'flex-start',
-    paddingLeft: 30,
+    paddingLeft: pixelSizeHorizontal(30),
     fontFamily: FontFamily.regular,
     color: 'black',
-    fontSize: 12,
+    fontSize: fontPixel(14),
   },
   locationText: {
     alignSelf: 'flex-start',
-    paddingLeft: 30,
+    paddingLeft: pixelSizeHorizontal(30),
     fontFamily: FontFamily.medium,
     color: 'black',
-    fontSize: 14,
+    fontSize: fontPixel(14),
     marginVertical: 8,
   },
   addressText: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 30,
+    paddingHorizontal: pixelSizeHorizontal(30),
     fontFamily: FontFamily.medium,
     color: 'black',
-    fontSize: 12,
+    fontSize: fontPixel(14),
     marginTop: 5,
   },
   guardCheckInButton: {
@@ -156,12 +161,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 6,
-    marginVertical: 15,
-    marginHorizontal: 14,
+    marginVertical: pixelSizeVertical(20),
+    marginHorizontal: pixelSizeHorizontal(20),
     padding: 5,
   },
   guardCheckInText: {
-    fontSize: 10,
+    fontSize: fontPixel(12),
     color: 'white',
     fontFamily: FontFamily.regular,
   },
