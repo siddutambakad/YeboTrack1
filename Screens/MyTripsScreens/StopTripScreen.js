@@ -91,8 +91,8 @@ const StopTripScreen = ({navigation}) => {
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
       <BottomTab activeTab="MyTrips" />
+      </View>
     </View>
   );
 };

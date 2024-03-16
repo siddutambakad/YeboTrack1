@@ -22,8 +22,10 @@ import FontFamily from '../Styles/FontFamily';
 import BottomTab from '../Components/BottomTab';
 import Call from '../../assets/images/call.svg';
 import Location from '../../assets/images/location.svg';
+import ConformationModal from '../Components/ConformationModal';
+import CustomModal from '../Components/Modal';
 
-const EmployeePickUp = () => {
+const EmployeePickUp = ({navigation}) => {
   const [data, setData] = useState([
     {
       employeeName: 'siddu',
@@ -50,6 +52,9 @@ const EmployeePickUp = () => {
       image: require('../../assets/images/profile.png'),
     },
   ]);
+  const [showConformationModal, setShowConformationModal] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
   const handleDialPress = () => {
     const phoneNumber = '1234567890';
@@ -61,6 +66,29 @@ const EmployeePickUp = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
     Linking.openURL(url);
   };
+  const removeItem = () => {
+    if (selectedItemIndex !== null) {
+      const newData = [...data];
+      newData.splice(selectedItemIndex, 1); // Remove the item at selectedItemIndex
+      setData(newData);
+    }
+    setShowConformationModal(false);
+  };
+
+  const formatTime = time => {
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    const amOrPm = hours >= 12 ? 'pm' : 'am';
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
+  };
+  const handleButtonClick = index => {
+    const currentTime = new Date();
+    const formattedTime = formatTime(currentTime);
+    return formattedTime;
+  };
+
   const renderItems = ({item, index}) => {
     return (
       <TouchableOpacity style={styles.cardContainer} onPress={() => {}}>
@@ -102,7 +130,8 @@ const EmployeePickUp = () => {
           <TouchableOpacity
             style={styles.checkOutButton}
             onPress={() => {
-              setShowOtpModal(true);
+              setShowConformationModal(true);
+              setSelectedItemIndex(index);
             }}>
             <Text style={styles.checkOutText}>Skip</Text>
           </TouchableOpacity>
@@ -110,6 +139,7 @@ const EmployeePickUp = () => {
             style={styles.checkOutButton}
             onPress={() => {
               setShowOtpModal(true);
+              setSelectedItemIndex(index);
             }}>
             <Text style={styles.checkOutText}>Check In</Text>
           </TouchableOpacity>
@@ -127,25 +157,62 @@ const EmployeePickUp = () => {
               navigation.goBack();
             }}>
             <Back width={horizontalScale(25)} height={verticalScale(25)} />
-            <Text style={styles.backbuttonText}>My Trips</Text>
+            <Text style={styles.backbuttonText}>Employee Check In</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.subMainHeader}>
           <TouchableOpacity style={{paddingRight: 20}}>
-            <Sos width={50} height={50} />
+            <Sos width={horizontalScale(50)} height={verticalScale(50)} />
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => {}}
-            style={styles.bellButton}>
-            <Bell width={25} height={25} fill={'#C5197D'} />
+            onPress={() => {}}>
+            <Bell width={horizontalScale(50)} height={verticalScale(50)} fill={'#C5197D'} />
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.subContainer}>
-        <FlatList data={data} renderItem={renderItems} style={{flex: 1}} />
+        <FlatList
+          data={data}
+          renderItem={renderItems}
+          style={{marginTop: pixelSizeVertical(10)}}
+        />
         <BottomTab activeTab="MyTrips" />
       </View>
+      <ConformationModal
+        showConfirmModal={showConformationModal}
+        title={'Are you sure you want to skip the employee pickup?'}
+        onPressNo={() => {
+          setShowConformationModal(false);
+        }}
+        onPressYes={() => {
+          removeItem();
+          if (data.length === 1) {
+            navigation.navigate('UpcomingScreen');
+          }
+        }}
+      />
+      <CustomModal
+        visible={showOtpModal}
+        onClose={() => {
+          setShowOtpModal(false);
+        }}
+        onPressSubmitButton={() => {
+          handleButtonClick();
+          setShowOtpModal(false);
+          removeItem();
+          if (data.length === 1) {
+            navigation.navigate('MyTripDetail', {
+              otpVerified: true,
+              clickedTime: handleButtonClick(),
+            });
+          }
+        }}
+        onPressCancelButton={() => {
+          setShowOtpModal(false);
+        }}
+        title={'Enter Employee check-In pin '}
+      />
     </View>
   );
 };
@@ -173,25 +240,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: fontPixel(18),
     paddingLeft: 20,
+    fontFamily: FontFamily.regular,
   },
   subMainHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  bellButton: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
-  },
   subContainer: {
     flex: 1,
     backgroundColor: 'rgba(246, 246, 246, 1)',
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
+    borderTopLeftRadius: 45,
+    borderTopRightRadius: 45,
   },
   cardContainer: {
     width: '90%',

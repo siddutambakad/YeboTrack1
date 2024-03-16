@@ -9,7 +9,13 @@ import {
 import React from 'react';
 import FontFamily from '../Styles/FontFamily';
 import Cancel from '../../assets/images/cancel.svg';
-import { fontPixel, horizontalScale, pixelSizeHorizontal, pixelSizeVertical, verticalScale } from '../Utils/Dimensions';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from '../Utils/Dimensions';
 
 const StartTripModal = props => {
   const {onPressOK, title, showConfirmModal, onPressNo} = props;
@@ -56,13 +62,14 @@ const styles = StyleSheet.create({
     // height: 230,
     width: '90%',
     alignItems: 'center',
-    padding: 15,
+    paddingHorizontal: pixelSizeHorizontal(20),
+    paddingVertical: pixelSizeVertical(20),
   },
   modalText: {
-    padding: 15,
+    paddingHorizontal: pixelSizeHorizontal(15),
     color: '#454545',
     fontFamily: FontFamily.medium,
-    fontSize: fontPixel(16),
+    fontSize: fontPixel(18),
     textAlign: 'left',
   },
   modalButtonText: {
@@ -79,7 +86,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     marginTop: 20,
-    marginBottom: pixelSizeVertical(20)
+    marginBottom: pixelSizeVertical(20),
   },
-  
 });

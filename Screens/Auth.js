@@ -189,7 +189,7 @@ function Auth(props) {
           component={OtpScreen}
           options={{headerShown: false}}
         /> */}
-        {/* <Stack.Screen
+        <Stack.Screen
           name="Driver"
           component={DriverHomeScreen}
           options={{headerShown: false}}
@@ -208,8 +208,8 @@ function Auth(props) {
           name="UpcomingScreen"
           component={UpComingScreens}
           options={{headerShown: false}}
-        /> */}
-        {/* <Stack.Screen
+        />
+        <Stack.Screen
           name="MyTripDetail"
           component={MyTripDetails}
           options={{headerShown: false}}
@@ -228,7 +228,7 @@ function Auth(props) {
           name="StopTrip"
           component={StopTripScreen}
           options={{headerShown: false}}
-        /> */}
+        />
         <Stack.Screen
           name="PickUp"
           component={EmployeePickUp}

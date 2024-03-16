@@ -55,7 +55,7 @@ const DriveToOffice = ({navigation}) => {
     handleCheckOut();
     navigation.navigate('MyTripDetail', {
       driveOfficeOtp: true,
-      reachTime: formattedTime,
+      driveOfficeTime: formattedTime,
     });
   };
 
@@ -64,13 +64,13 @@ const DriveToOffice = ({navigation}) => {
       <TouchableOpacity style={styles.cardContainer} onPress={() => {}}>
         <Text style={styles.employeeText}>{item.name}</Text>
         <View style={styles.employeesText}>
-          <Image
-            source={item.image}
-            style={styles.profileImage}
-          />
+          <Image source={item.image} style={styles.profileImage} />
           <View style={styles.employee}>
             <Text style={styles.employeeName}>{item.employeeName}</Text>
-            <Text style={styles.employeeCheckIn}>{`Check-in-Time-${item.employeeCheckInTime}`}</Text>
+            <Text
+              style={
+                styles.employeeCheckIn
+              }>{`Check-in-Time-${item.employeeCheckInTime}`}</Text>
           </View>
         </View>
         <TouchableOpacity
@@ -125,8 +125,8 @@ const DriveToOffice = ({navigation}) => {
             setShowOtpModal(false);
           }}
         />
+        <BottomTab activeTab="MyTrips" />
       </View>
-      <BottomTab activeTab="MyTrips" />
     </View>
   );
 };
