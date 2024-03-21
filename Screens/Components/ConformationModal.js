@@ -19,35 +19,42 @@ import {
 
 const ConformationModal = props => {
   const {onPressYes, onPressNo, title, showConfirmModal} = props;
+  const handleContentClick = event => {
+    event.stopPropagation();
+  };
   return (
     <Modal visible={showConfirmModal} animationType="fade" transparent={true}>
       <TouchableWithoutFeedback onPress={onPressNo}>
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={{alignSelf: 'flex-end', padding: 8}}
-              onPress={onPressNo}>
-              <Cancel />
-            </TouchableOpacity>
-            <Text style={styles.modalText}>{title}</Text>
-            <View
-              style={{
-                flexDirection: 'row',
+          <TouchableWithoutFeedback onPress={handleContentClick}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                style={{alignSelf: 'flex-end', padding: 8}}
+                onPress={onPressNo}>
+                <Cancel />
+              </TouchableOpacity>
+              <Text style={styles.modalText}>{title}</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
                   justifyContent: 'space-evenly',
                   width: '100%',
                   paddingHorizontal: pixelSizeHorizontal(20),
-                  marginBottom: pixelSizeVertical(30)
-              }}>
-              <TouchableOpacity style={styles.modalButton} onPress={onPressYes}>
-                <Text style={styles.modalButtonText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButtonNo}
-                onPress={onPressNo}>
-                <Text style={styles.modalButtonNoText}>No</Text>
-              </TouchableOpacity>
+                  marginBottom: pixelSizeVertical(30),
+                }}>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={onPressYes}>
+                  <Text style={styles.modalButtonText}>Yes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalButtonNo}
+                  onPress={onPressNo}>
+                  <Text style={styles.modalButtonNoText}>No</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>

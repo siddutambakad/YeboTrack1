@@ -10,23 +10,59 @@ import {
 import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import Cancel from '../assets/images/cancel.svg';
-import {UpcomingLists} from './Context/AppContext';
+// import {UpcomingLists} from './Context/AppContext';
 import ConformationModal from './Components/ConformationModal';
 import {fontPixel, horizontalScale, verticalScale} from './Utils/Dimensions';
 
 const UpComingScreens = ({navigation}) => {
-  // const [data, setData] = useState([1, 1, 1, 1, 1, 1]);
-  const {setSelectedItem} = useContext(UpcomingLists);
+  const [data, setData] = useState([
+    {
+      tripType: 'Upcoming',
+      ticketNo: '#00000988786',
+      distance: '25',
+      time: '23 mins',
+      date: '16-05-2024',
+      employeeStatus: 'Login',
+    },
+    {
+      tripType: 'Upcoming',
+      ticketNo: '#00000988786',
+      distance: '25',
+      time: '23 mins',
+      date: '16-05-2024',
+      employeeStatus: 'Logout',
+    },
+    {
+      tripType: 'Upcoming',
+      ticketNo: '#00000988786',
+      distance: '25',
+      time: '23 mins',
+      date: '16-05-2024',
+      employeeStatus: 'Login',
+    },
+    {
+      tripType: 'Upcoming',
+      ticketNo: '#00000988786',
+      distance: '25',
+      time: '23 mins',
+      date: '16-05-2024',
+      employeeStatus: 'Logout',
+    },
+  ]);
   const [showModal, setShowModal] = useState(false);
 
   const handleItemClick = item => {
-    setSelectedItem(item);
-    navigation.navigate('MyTripDetail', {
-      params: {items: item},
-    });
+    if (item.employeeStatus === 'Login') {
+      navigation.navigate('MyTripDetail', {
+        params: {items: item},
+      });
+    } else if (item.employeeStatus === 'Logout') {
+      // Navigate to a different screen for logout status
+      navigation.navigate('MyLogoutTrip', {
+        params: {items: item},
+      });
+    }
   };
-
-  const data = [1, 1, 1, 1, 1];
 
   const renderItems = ({item, index}) => {
     return (
@@ -36,12 +72,12 @@ const UpComingScreens = ({navigation}) => {
           handleItemClick(item);
         }}>
         <View style={styles.headerText}>
-          <Text style={styles.upcomingText}>Upcoming</Text>
-          <Text style={styles.dateText}>16-10-2021</Text>
+          <Text style={styles.upcomingText}>{item.tripType}</Text>
+          <Text style={styles.dateText}>{item.date}</Text>
         </View>
-        <Text style={styles.ticketNo}>Ticket No.- #000988786</Text>
-        <Text style={styles.distanceText}>Distance-2.4 miles</Text>
-        <Text style={styles.timeText}>Time-23 mins</Text>
+        <Text style={styles.ticketNo}>{item.ticketNo}</Text>
+        <Text style={styles.distanceText}>{item.distance}</Text>
+        <Text style={styles.timeText}>{item.time}</Text>
         <TouchableOpacity
           style={styles.cancelTripButton}
           onPress={() => {

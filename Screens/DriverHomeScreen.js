@@ -5,33 +5,164 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
+  Alert,
+  PermissionsAndroid,
+  Linking,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Profile from '../assets/images/profilePic.svg';
 import Camera from '../assets/images/Camera.svg';
 import Car from '../assets/images/Car.svg';
-import History from '../assets/images/history.svg';
-import Bell from '../assets/images/bell.svg';
+import Bell from '../assets/images/bellIcon.svg';
 import FontFamily from './Styles/FontFamily';
 import {
   fontPixel,
-  getFontSize,
   horizontalScale,
-  moderateScale,
-  moderateScaleVertical,
   pixelSizeHorizontal,
   pixelSizeVertical,
+  responsiveBorderRadius,
   verticalScale,
 } from './Utils/Dimensions';
+import AddPhotoModal from './Components/AddPhotoModal';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
+import RN from 'react-native';
+
+const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const DriverHomeScreen = ({navigation}) => {
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  let permissionDeniedAlertShown = false;
   const handleMyTripsPress = () => {
-    navigation.navigate('MyTrip', {screen: 'MyTrips'});
+    navigation.navigate('MyTrip');
   };
 
   const handleMyProfilePress = () => {
-    navigation.navigate('Profile', {screen: 'Profile'});
+    navigation.navigate('Profile');
   };
+
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        openCamera();
+      } else {
+        console.log('Camera permission denied');
+
+        if (!permissionDeniedAlertShown) {
+          permissionDeniedAlertShown = true;
+        } else {
+          Alert.alert(
+            'Alert!!',
+            'Please grant Camera permission to use this feature.',
+            [
+              {
+                text: 'Ask me later',
+              },
+              {
+                text: 'Cancel',
+              },
+              {
+                text: 'OK',
+                onPress: () => {
+                  openSettings();
+                },
+              },
+            ],
+            {cancelable: false},
+          );
+          console.log(granted, '===>>');
+        }
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+  const requestGalleryPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        openGallery();
+      } else {
+        console.log('Gallery permission denied');
+        if (!permissionDeniedAlertShown) {
+          permissionDeniedAlertShown = true;
+        } else {
+          Alert.alert(
+            'Alert!!',
+            'Please grant gallery permission to use this feature.',
+            [
+              {
+                text: 'Ask me Later',
+              },
+              {
+                text: 'Cancel',
+              },
+              {
+                text: 'OK',
+                onPress: () => {
+                  openSettings();
+                },
+              },
+            ],
+            {cancelable: false},
+          );
+          console.log(granted, '===>>');
+        }
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const openSettings = () => {
+    // Open app settings for Android or app info page for iOS
+    if (Platform.OS === 'android') {
+      Linking.openSettings();
+    } else {
+      Linking.openURL('app-settings:');
+    }
+  };
+
+  const openCamera = () => {
+    const options = {
+      title: 'Select Photo',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        mediaType: 'photo',
+      },
+    };
+
+    launchCamera(options, response => handleImageResponse(response));
+  };
+
+  const openGallery = () => {
+    const options = {
+      mediaType: 'photo',
+    };
+
+    launchImageLibrary(options, response => handleImageResponse(response));
+  };
+
+  const handleImageResponse = response => {
+    if (response.didCancel) {
+      console.log('User canceled');
+    } else if (response.errorCode) {
+      console.log('Image error', response.errorCode);
+    } else if (response.errorMessage) {
+      console.log('Image error message', response.errorMessage);
+    } else {
+      const source = {uri: response.assets[0].uri};
+      setSelectedImage(source.uri);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -40,30 +171,24 @@ const DriverHomeScreen = ({navigation}) => {
       />
       <View style={styles.backgroundContainer}>
         <View style={{}}>
-          <View
-            style={{
-              width: horizontalScale(100),
-              height: verticalScale(105),
-              alignItems: 'center',
-              alignSelf: 'center',
-              top: pixelSizeVertical(-50),
-              borderRadius: 50,
-            }}>
+          {selectedImage ? (
+            <Image source={{uri: selectedImage}} style={styles.profileImage} />
+          ) : (
             <Image
               source={require('../assets/images/profile.png')}
               style={styles.profileImage}
             />
-          </View>
+          )}
           <Text style={styles.jhonedoeText}>Jhon Doe</Text>
           <Text style={styles.driverIdText}>Driver ID - #1234</Text>
-          <TouchableOpacity style={styles.addPhoto}>
-            <Camera width={15} height={15} />
+          <TouchableOpacity
+            style={styles.addPhoto}
+            onPress={() => {
+              setShowPhotoModal(true);
+            }}>
+            <Camera width={horizontalScale(18)} height={verticalScale(18)} />
             <Text style={styles.addPhotoText}>Add Photo</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.myHistoryButton}>
-            <History width={30} height={30} />
-            <Text style={styles.myhistoryText}>History</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => {
@@ -100,9 +225,30 @@ const DriverHomeScreen = ({navigation}) => {
           activeOpacity={1}
           onPress={() => {}}
           style={styles.headerIconButton}>
-          <Bell width={25} height={25} fill={'#C5197D'} />
+          <Bell
+            width={horizontalScale(55)}
+            height={verticalScale(55)}
+            fill={'#C5197D'}
+          />
         </TouchableOpacity>
       </View>
+      <AddPhotoModal
+        onOpenGallery={() => {
+          requestGalleryPermission();
+        }}
+        onOpenCamera={() => {
+          requestCameraPermission();
+        }}
+        image={
+          selectedImage
+            ? {uri: selectedImage}
+            : require('../assets/images/profile.png')
+        }
+        showPhotoModal={showPhotoModal}
+        onClickOutSide={() => {
+          setShowPhotoModal(false);
+        }}
+      />
     </View>
   );
 };
@@ -125,24 +271,25 @@ const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
     backgroundColor: 'rgba(246, 246, 246, 1)',
-    marginTop: -60,
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
+    marginTop: pixelSizeVertical(-100),
+    borderTopLeftRadius: responsiveBorderRadius(50),
+    borderTopRightRadius: responsiveBorderRadius(50),
   },
   profileImage: {
-    width: '100%',
-    height: '100%',
-    // alignSelf: 'center',
-    // position: 'absolute',
-    objectFit: 'scale-down',
-    borderRadius: 50,
-    // zIndex: 5,
+    width: SCREEN_HEIGHT * 0.12,
+    height: SCREEN_HEIGHT * 0.12,
+    borderRadius: (SCREEN_HEIGHT * 0.12) / 2,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    marginTop: pixelSizeVertical(-60),
+    borderWidth: 1,
+    borderColor: '#66276E',
   },
   jhonedoeText: {
     color: 'black',
     textAlign: 'center',
-    marginTop: pixelSizeVertical(-35),
-    fontSize: fontPixel(16),
+    marginTop: pixelSizeVertical(10),
+    fontSize: fontPixel(18),
     fontFamily: FontFamily.semiBold,
   },
   driverIdText: {
@@ -212,12 +359,12 @@ const styles = StyleSheet.create({
     right: 10,
     top: 10,
   },
-  headerIconButton: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
-  },
+  // headerIconButton: {
+  //   width: 60,
+  //   height: 60,
+  //   backgroundColor: '#FFFFFF',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   borderRadius: 30,
+  // },
 });

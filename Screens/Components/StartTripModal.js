@@ -19,28 +19,36 @@ import {
 
 const StartTripModal = props => {
   const {onPressOK, title, showConfirmModal, onPressNo} = props;
+
+  const handleContentClick = event => {
+    event.stopPropagation();
+  };
   return (
     <Modal visible={showConfirmModal} animationType="fade" transparent={true}>
       <TouchableWithoutFeedback onPress={onPressNo}>
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={{alignSelf: 'flex-end', padding: 8}}
-              onPress={onPressNo}>
-              <Cancel />
-            </TouchableOpacity>
-            <Text style={styles.modalText}>{title}</Text>
-            <View
-              style={{
-                alignSelf: 'center',
-                width: '100%',
-                paddingHorizontal: pixelSizeHorizontal(20),
-              }}>
-              <TouchableOpacity style={styles.modalButton} onPress={onPressOK}>
-                <Text style={styles.modalButtonText}>Ok</Text>
+          <TouchableWithoutFeedback onPress={handleContentClick}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                style={{alignSelf: 'flex-end', padding: 8}}
+                onPress={onPressNo}>
+                <Cancel />
               </TouchableOpacity>
+              <Text style={styles.modalText}>{title}</Text>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  width: '100%',
+                  paddingHorizontal: pixelSizeHorizontal(20),
+                }}>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={onPressOK}>
+                  <Text style={styles.modalButtonText}>Ok</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -70,7 +78,7 @@ const styles = StyleSheet.create({
     color: '#454545',
     fontFamily: FontFamily.medium,
     fontSize: fontPixel(18),
-    textAlign: 'left',
+    textAlign: 'center',
   },
   modalButtonText: {
     color: '#FFF8F2',

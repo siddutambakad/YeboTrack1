@@ -1,20 +1,53 @@
-import React, {createContext, useState, useContext} from 'react';
+import React, {createContext, useState, useContext, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const UpcomingLists = createContext();
+export const AppContext = createContext();
 
 export const AppProvider = ({children}) => {
-  // const [data, setData] = useState([1, 1, 1, 1, 1]);
-  // const [data1, setData2] = useState([1, 1, 1, 1, 1]);
-  const [selectedItem, setSelectedItem] = useState(null)
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    saveIsLoggedIn();
+  }, [isLoggedIn]);
+
+  const saveIsLoggedIn = async () => {
+    try {
+      const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+      if (loggedIn !== null && loggedIn === 'true') {
+        setIsLoggedIn(true);
+      }
+    } catch (error) {
+      console.error('Error saving isLoggedIn to AsyncStorage:', error);
+    }
+  };
+
+  const handleLogin = async () => {
+    setIsLoggedIn(true);
+    try {
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+      console.log('isLoggedIn set to true successfully');
+    } catch (error) {
+      console.error('Error setting isLoggedIn to true:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    AsyncStorage.setItem('isLoggedIn', 'false');
+  };
+
   return (
-    <UpcomingLists.Provider
+    <AppContext.Provider
       value={{
-        // data,
-        // data1,
         selectedItem,
-        setSelectedItem
+        setSelectedItem,
+        isLoggedIn,
+        setIsLoggedIn,
+        handleLogin,
+        handleLogout,
       }}>
       {children}
-    </UpcomingLists.Provider>
+    </AppContext.Provider>
   );
 };

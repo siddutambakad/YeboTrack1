@@ -9,90 +9,110 @@ import {
 } from 'react-native';
 import React from 'react';
 import Cancel from '../../assets/images/cancel.svg';
-import {fontPixel, horizontalScale, pixelSizeHorizontal, pixelSizeVertical, verticalScale} from '../Utils/Dimensions';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from '../Utils/Dimensions';
 import FontFamily from '../Styles/FontFamily';
 import Call from '../../assets/images/call.svg';
 import Location from '../../assets/images/location.svg';
+import RN from 'react-native';
+
+const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const PickupGuardModal = props => {
   const {showModal, onCloseModel, options} = props;
+  const handleContentClick = event => {
+    event.stopPropagation();
+  };
   return (
     <Modal visible={showModal} animationType="fade" transparent={true}>
       <TouchableWithoutFeedback onPress={onCloseModel}>
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={{alignSelf: 'flex-end', padding: 8}}
-              onPress={onCloseModel}>
-              <Cancel />
-            </TouchableOpacity>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '90%',
-                paddingRight: 20,
-                paddingLeft: 10,
-              }}>
-              <Image
-                source={require('../../assets/images/profile.png')}
-                style={styles.modalImage}
-              />
-              {options?.isSocialMediaRequired && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: '50%',
-                    justifyContent: 'space-between',
-                    paddingLeft: 10,
-                  }}>
-                  <TouchableOpacity onPress={options?.button_Action3}>
-                    <Call />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={options?.button_Action4}>
-                    <Location />
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-
-            <Text style={styles.modalText1}>John Doe</Text>
-            <Text style={styles.modalText2}>Pickup Time - 10:13 am</Text>
-            <Text style={styles.locationText}>Pickup Location</Text>
-            <Text style={styles.addressText}>
-              118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block,
-              Koramangala, Bengaluru, Karnataka 560095
-            </Text>
-            <View
-              style={
-                options?.isSocialMediaRequired
-                  ? {flexDirection: 'row'}
-                  : {width: '100%'}
-              }>
+          <TouchableWithoutFeedback onPress={handleContentClick}>
+            <View style={styles.modalContent}>
               <TouchableOpacity
-                style={styles.guardCheckInButton}
-                onPress={options?.button_action || null}>
-                <Text style={styles.guardCheckInText}>
-                  {options?.button_text}
-                </Text>
+                style={{alignSelf: 'flex-end', padding: 8}}
+                onPress={onCloseModel}>
+                <Cancel />
               </TouchableOpacity>
-              {options?.isSocialMediaRequired && (
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '90%',
+                  paddingRight: 20,
+                  paddingLeft: 10,
+                }}>
+                <Image
+                  source={require('../../assets/images/profile.png')}
+                  style={styles.modalImage}
+                />
+                {options?.isSocialMediaRequired && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      width: '50%',
+                      justifyContent: 'flex-end',
+                      paddingLeft: 10,
+                    }}>
+                    <TouchableOpacity onPress={options?.button_Action3}>
+                      <Call
+                        width={horizontalScale(45)}
+                        height={verticalScale(45)}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={options?.button_Action4}>
+                      <Location
+                        width={horizontalScale(45)}
+                        height={verticalScale(45)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
+              <Text style={styles.modalText1}>John Doe</Text>
+              <Text style={styles.modalText2}>Pickup Time - 10:13 am</Text>
+              <Text style={styles.locationText}>Pickup Location</Text>
+              <Text style={styles.addressText}>
+                118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block,
+                Koramangala, Bengaluru, Karnataka 560095
+              </Text>
+              <View
+                style={
+                  options?.isSocialMediaRequired
+                    ? {flexDirection: 'row'}
+                    : {width: '100%'}
+                }>
                 <TouchableOpacity
-                  style={{
-                    ...styles.guardCheckInButton,
-                    backgroundColor: 'gray',
-                  }}
-                  onPress={options?.button_action2 || null}>
+                  style={styles.guardCheckInButton}
+                  onPress={options?.button_action || null}>
                   <Text style={styles.guardCheckInText}>
-                    {options?.button_text2}
+                    {options?.button_text}
                   </Text>
                 </TouchableOpacity>
-              )}
+                {options?.isSocialMediaRequired && (
+                  <TouchableOpacity
+                    style={{
+                      ...styles.guardCheckInButton,
+                      backgroundColor: 'gray',
+                    }}
+                    onPress={options?.button_action2 || null}>
+                    <Text style={styles.guardCheckInText}>
+                      {options?.button_text2}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -117,9 +137,10 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   modalImage: {
-    width: horizontalScale(70),
-    height: verticalScale(80),
-    objectFit: 'scale-down',
+    width: SCREEN_HEIGHT * 0.1,
+    height: SCREEN_HEIGHT * 0.1,
+    borderRadius: (SCREEN_HEIGHT * 0.1) / 2,
+    // objectFit: 'scale-down',
     // marginHorizontal: 10,
   },
   modalText1: {
@@ -155,8 +176,8 @@ const styles = StyleSheet.create({
   },
   guardCheckInButton: {
     alignSelf: 'flex-end',
-    width: horizontalScale(112),
-    height: verticalScale(45),
+    width: horizontalScale(118),
+    height: verticalScale(50),
     backgroundColor: 'rgba(197, 25, 125, 1)',
     alignItems: 'center',
     justifyContent: 'center',

@@ -10,6 +10,7 @@ import {
   horizontalScale,
   pixelSizeHorizontal,
   pixelSizeVertical,
+  responsiveBorderRadius,
   verticalScale,
 } from '../Utils/Dimensions';
 
@@ -25,8 +26,8 @@ const MyTripNavigator = () => {
         tabBarContentContainerStyle: {height: verticalScale(70)},
         tabBarStyle: {
           // paddingTop: 10,
-          borderTopLeftRadius: 50,
-          borderTopRightRadius: 50,
+          borderTopLeftRadius: responsiveBorderRadius(50),
+          borderTopRightRadius: responsiveBorderRadius(50),
           backgroundColor: 'rgba(246, 246, 246, 1)',
           elevation: 0,
           justifyContent: 'center',

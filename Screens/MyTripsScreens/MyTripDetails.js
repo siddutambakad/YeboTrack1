@@ -28,6 +28,9 @@ import CustomModal from '../Components/Modal';
 import StartTripModal from '../Components/StartTripModal';
 import BottomTab from '../Components/BottomTab';
 import StepIndicator from 'react-native-step-indicator-v2';
+import RN from 'react-native';
+
+const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const MyTripDetails = ({route, navigation}) => {
   const {
@@ -45,6 +48,7 @@ const MyTripDetails = ({route, navigation}) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
+  const [pickupEmployeeCompleted, setPickupEmployeeCompleted] = useState(false)
 
   useEffect(() => {
     if (driveOfficeOtp) {
@@ -73,6 +77,7 @@ const MyTripDetails = ({route, navigation}) => {
 
   const handlePickupEmployeeClick = () => {
     navigation.navigate('PickUp');
+    setPickupEmployeeCompleted(true)
   };
   const formatTime = time => {
     const hours = time.getHours();
@@ -88,24 +93,24 @@ const MyTripDetails = ({route, navigation}) => {
     return formattedTime;
   };
 
-  const handleStartTrip = index => {
+  const handleStartTrip = () => {
     setShowStartTripModal(true);
   };
-  const handleDriveToOfficeClick = () => {
-    navigation.navigate('DriveToOffice');
-  };
+  // const handleDriveToOfficeClick = () => {
+  //   navigation.navigate('DriveToOffice');
+  // };
 
   const labels = [
     'Start Trip',
     'Pickup Guard',
     'Pickup Employee',
-    'Drive To office',
-    'Stop Trip',
+    // 'Drive To office',
+    'End Trip',
   ];
   const customStyles = {
-    stepIndicatorSize: 25,
-    currentStepIndicatorSize: 25,
-    separatorStrokeWidth: 8,
+    stepIndicatorSize: 26,
+    currentStepIndicatorSize: 26,
+    separatorStrokeWidth: 5,
     currentStepStrokeWidth: 0,
     stepStrokeCurrentColor: 'lightgray',
     stepStrokeWidth: 0,
@@ -119,7 +124,7 @@ const MyTripDetails = ({route, navigation}) => {
     stepIndicatorLabelFontSize: 0,
     currentStepIndicatorLabelFontSize: 0,
     labelColor: '#000',
-    labelSize: 14,
+    labelSize: fontPixel(14),
     labelFontFamily: FontFamily.medium,
     currentStepLabelColor: '#000',
     borderRadiusSize: 20,
@@ -130,7 +135,7 @@ const MyTripDetails = ({route, navigation}) => {
     handleStartTrip,
     handlePickupGuardClick,
     handlePickupEmployeeClick,
-    handleDriveToOfficeClick,
+    // handleDriveToOfficeClick,
     () => navigation.navigate('StopTrip'),
   ];
   return (
@@ -180,6 +185,7 @@ const MyTripDetails = ({route, navigation}) => {
           <View
             style={{
               flexDirection: 'row',
+              justifyContent: 'space-between',
               marginHorizontal: pixelSizeHorizontal(20),
             }}>
             <View>
@@ -189,6 +195,8 @@ const MyTripDetails = ({route, navigation}) => {
                   onPress={() => {
                     if (index < selectedPosition) {
                       return;
+                    } else if (index > selectedPosition) {
+                      return;
                     }
                     stepActions[index]();
                   }}>
@@ -197,14 +205,14 @@ const MyTripDetails = ({route, navigation}) => {
                       marginVertical: pixelSizeVertical(2.6),
                       justifyContent: 'center',
                       height: verticalScale(90),
-                      width: 50,
+                      width: horizontalScale(50),
                       marginRight: pixelSizeHorizontal(10),
                     }}>
                     <View
                       style={{
-                        width: horizontalScale(22),
-                        height: verticalScale(25),
-                        borderRadius: responsiveBorderRadius(50),
+                        width: SCREEN_HEIGHT * 0.025,
+                        height: SCREEN_HEIGHT * 0.025,
+                        borderRadius: (SCREEN_HEIGHT * 0.025) / 2,
                         borderColor: 'rgba(102, 39, 110, 1)',
                         borderWidth: 1,
                         alignItems: 'center',
@@ -224,22 +232,42 @@ const MyTripDetails = ({route, navigation}) => {
             <View
               style={{
                 height: '100%',
-                width: 200,
+                width: horizontalScale(200),
               }}>
               <StepIndicator
                 direction="vertical"
                 customStyles={customStyles}
                 currentPosition={selectedPosition}
-                labels={labels}
+                stepCount={4}
+                labels={labels.map((item, index) => (
+                  <Text
+                    style={{
+                      color: 'black',
+                      fontFamily:
+                        index > selectedPosition - 1
+                          ? FontFamily.regular
+                          : FontFamily.semiBold,
+                    }}>
+                    {item}
+                  </Text>
+                ))}
+                labelStyle={styles.labelStyle}
                 onPress={index => {
                   if (index < selectedPosition) {
+                    return;
+                  } else if (index > selectedPosition) {
                     return;
                   }
                   stepActions[index]();
                 }}
               />
             </View>
-            <View>
+            <View
+              style={{
+                borderWidth: 1,
+                width: horizontalScale(80),
+                borderColor: 'rgba(246, 246, 246, 1)',
+              }}>
               {time.map((step, index) => (
                 <TouchableOpacity key={index} onPress={() => {}}>
                   <View
@@ -247,14 +275,13 @@ const MyTripDetails = ({route, navigation}) => {
                       marginVertical: pixelSizeVertical(2.6),
                       justifyContent: 'center',
                       height: verticalScale(90),
-                      width: horizontalScale(80),
-                      alignItems: 'center',
-                      marginLeft: pixelSizeHorizontal(10),
                     }}>
                     <Text
                       style={{
                         color: 'black',
-                        fontFamily: FontFamily.medium,
+                        fontFamily: selectedPosition
+                          ? FontFamily.semiBold
+                          : FontFamily.regular,
                         fontSize: fontPixel(14),
                       }}>
                       {step}
@@ -266,8 +293,9 @@ const MyTripDetails = ({route, navigation}) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-              setSelectedPosition(5);
+              navigation.navigate('UpComing');
             }}
+            disabled={!pickupEmployeeCompleted}
             activeOpacity={1}
             style={{
               width: horizontalScale(130),
@@ -285,7 +313,7 @@ const MyTripDetails = ({route, navigation}) => {
                 fontFamily: FontFamily.regular,
                 fontSize: fontPixel(16),
               }}>
-              Stop Trip
+              End Trip
             </Text>
           </TouchableOpacity>
 
@@ -394,4 +422,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: pixelSizeVertical(8),
   },
+  labelStyle: {
+    marginVertical: 10,
+    borderWidth:3,
+    borderColor:'red' // Adjust this value to co
+  }
 });

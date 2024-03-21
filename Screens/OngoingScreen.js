@@ -11,7 +11,14 @@ import React, {useState} from 'react';
 import Cars from '../assets/images/cars.svg';
 import FontFamily from './Styles/FontFamily';
 import Cancel from '../assets/images/cancel.svg';
-import { fontPixel, horizontalScale, moderateScale, pixelSizeHorizontal, pixelSizeVertical, verticalScale } from './Utils/Dimensions';
+import {
+  fontPixel,
+  horizontalScale,
+  moderateScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from './Utils/Dimensions';
 
 const OngoingScreen = () => {
   const [showModal, setShowModal] = useState(false);
@@ -47,13 +54,22 @@ const OngoingScreen = () => {
         <Text style={styles.totalFareText}>Total Fare</Text>
         <Text style={styles.totalAmountText}>110$</Text>
       </View>
-      <TouchableOpacity
-        style={styles.cancelButton}
-        onPress={() => {
-          setShowModal(true);
-        }}>
-        <Text style={styles.cancelTripText}>Cancel Trip</Text>
-      </TouchableOpacity>
+      <View style={styles.trackAndCancelButton}>
+        <TouchableOpacity
+          style={styles.trackButton}
+          onPress={() => {
+            setShowModal(true);
+          }}>
+          <Text style={styles.trackText}>Track Trip</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => {
+            setShowModal(true);
+          }}>
+          <Text style={styles.cancelTripText}>Cancel Trip</Text>
+        </TouchableOpacity>
+      </View>
       <Modal visible={showModal} animationType="fade" transparent={true}>
         <TouchableWithoutFeedback
           onPress={() => {
@@ -77,7 +93,7 @@ const OngoingScreen = () => {
                   justifyContent: 'space-evenly',
                   width: '100%',
                   paddingHorizontal: pixelSizeHorizontal(20),
-                  marginBottom: pixelSizeVertical(30)
+                  marginBottom: pixelSizeVertical(30),
                 }}>
                 <TouchableOpacity
                   style={styles.modalButton}
@@ -156,19 +172,39 @@ const styles = StyleSheet.create({
     fontSize: fontPixel(16),
     paddingRight: 55,
   },
+  trackAndCancelButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: pixelSizeHorizontal(20),
+    marginTop: pixelSizeVertical(30),
+  },
   cancelButton: {
     width: horizontalScale(170),
     height: verticalScale(50),
     backgroundColor: 'rgba(197, 25, 125, 1)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 30,
-    alignSelf: 'center',
+    // marginVertical: 30,
+    // alignSelf: 'center',
     borderRadius: 8,
   },
   cancelTripText: {
     color: 'white',
-    fontSize: fontPixel(12)
+    fontSize: fontPixel(12),
+  },
+  trackButton: {
+    width: horizontalScale(170),
+    height: verticalScale(50),
+    backgroundColor: 'rgba(197, 25, 125, 1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // marginVertical: 30,
+    // alignSelf: 'center',
+    borderRadius: 8,
+  },
+  trackText: {
+    color: 'white',
+    fontSize: fontPixel(12),
   },
   ticketNodetails: {
     flexDirection: 'row',
@@ -247,9 +283,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
     fontSize: fontPixel(18),
     textAlign: 'left',
-    paddingHorizontal: pixelSizeHorizontal(30)
+    paddingHorizontal: pixelSizeHorizontal(30),
     // width: '100%'
-    
   },
   modalButtonText: {
     color: '#FFF8F2',
@@ -263,7 +298,6 @@ const styles = StyleSheet.create({
     height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   modalButtonNo: {
     backgroundColor: '#454546',

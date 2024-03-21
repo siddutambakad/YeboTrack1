@@ -7,24 +7,47 @@ import {
   TextInput,
   Image,
   Alert,
+  useWindowDimensions,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import YeboLogo from '../assets/images/yeboFinalLogo.svg';
 import Check from '../assets/images/check.svg';
 import CheckCircle from '../assets/images/checked.svg';
-import CheckBox from '../assets/images/checkBox.svg';
 import Loader from './Components/Loader';
 import {APIS} from './APIURLS/ApiUrls';
 import fontFamily from './Styles/FontFamily';
-import {fontPixel, horizontalScale, verticalScale} from './Utils/Dimensions';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  verticalScale,
+} from './Utils/Dimensions';
 import axios from 'axios';
+import {AppContext} from './Context/AppContext';
+import RN from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const OtpScreen = ({navigation, route}) => {
+  // const {height, width, scale, fontScale} = useWindowDimensions();
+  const {height, width} = Dimensions.get('window');
+  const imageAspectRatio = 20.5 / 9;
   const {otpResponse} = route.params;
+  const [otpData, setOtpData] = useState(otpResponse);
   const [selectedOption, setSelectedOption] = useState(false);
   const [loader, setLoader] = useState(false);
+  const {handleLogin} = useContext(AppContext);
+  const inputRef = useRef(null);
+
   const [userDetails, setUserDetails] = useState({
-    otp: '',
+    // otp: '',
+    otp: otpData.otp,
     termsAndCondition: '',
   });
 
@@ -39,16 +62,64 @@ const OtpScreen = ({navigation, route}) => {
     termsAndCondition: false,
   });
 
+  const resendOtp = () => {
+    const resendOtpData = {
+      idVerifyOTP: 0,
+      idUser: 0,
+      mobileNo: otpData.mobileNo,
+      otp: 'string',
+      validateOTP: true,
+      validateOTPDT: '2024-03-05T06:31:17.871Z',
+      otpRemark: 'string',
+      loginSource: 0,
+    };
+    handleResendOtp(resendOtpData);
+  };
+
+  const handleResendOtp = async resendOtpData => {
+    console.log('====>>', resendOtpData);
+    setLoader(true);
+    try {
+      const response = await axios.post(APIS.loginWithOtp, resendOtpData);
+      const otpResponse = response.data;
+      console.log('otp sent', otpResponse);
+      setOtpData(otpResponse);
+      if (response.status === 200) {
+        Alert.alert('Success', 'OTP has been resent successfully');
+      }
+    } catch (error) {
+      if (error.response) {
+        if (
+          error?.response?.status === 500 ||
+          error?.response?.status === 501
+        ) {
+          Alert.alert('Error', 'Server Error');
+        } else {
+          setErrorMsg({
+            ...errorMsg,
+            ResponseError: 'User Not Found',
+          });
+          console.log(error.response);
+        }
+      } else {
+        Alert.alert('Warning!', 'No internet connection');
+      }
+    } finally {
+      setLoader(false);
+    }
+  };
+
   const verifyOtp = () => {
     const verifyData = {
-      idVerifyOTP: otpResponse.idVerifyOTP,
-      idUser: otpResponse.idUser,
-      mobileNo: otpResponse.mobileNo,
-      otp: userDetails.otp,
+      idVerifyOTP: otpData.idVerifyOTP,
+      idUser: otpData.idUser,
+      mobileNo: otpData.mobileNo,
+      // otp: userDetails.otp,
+      otp: otpData.otp,
       validateOTP: false,
-      validateOTPDT: otpResponse.validateOTPDT,
-      otpRemark: otpResponse.otpRemark,
-      loginSource: otpResponse.loginSource,
+      validateOTPDT: otpData.validateOTPDT,
+      otpRemark: otpData.otpRemark,
+      loginSource: otpData.loginSource,
     };
     // console.log(verifyData);
     handleVerifyOtp(verifyData);
@@ -59,8 +130,12 @@ const OtpScreen = ({navigation, route}) => {
       const response = await axios.post(APIS.verifyOtp, verifyData);
       const res_ponse = response.data;
       console.log('verified', res_ponse);
+      await setUserData(res_ponse);
+      // setOtpResponseData(res_ponse);
+      handleLogin();
       navigation.navigate('Driver');
     } catch (error) {
+      console.log('error', error);
       if (error.response) {
         if (
           error?.response?.status === 500 ||
@@ -102,105 +177,162 @@ const OtpScreen = ({navigation, route}) => {
       verifyOtp();
     }
   };
+
+  const handleFocus = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const setUserData = async userData => {
+    try {
+      await AsyncStorage.setItem('otpResponseData', JSON.stringify(userData));
+      console.log('otpResponseData saved successfully');
+    } catch (error) {}
+  };
+
+  const StatusBarHeight =
+    Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+
+  const availableScreenHeight =
+    height > 550
+      ? width > 550
+        ? height - StatusBarHeight
+        : height
+      : height - StatusBarHeight;
   return (
-    <ScrollView contentContainerStyle={{flex: 1}}>
-      <View style={styles.container}>
-        <View style={styles.subContainer}>
-          <YeboLogo width={100} height={100} />
-          <Text style={styles.vertifyotpText}>Verify OTP</Text>
-          <View style={styles.otpSent}>
-            <CheckCircle />
-            <Text style={styles.otpText}>
-              OTP has been sent to your mobile.
-            </Text>
-          </View>
-          <TextInput
-            style={styles.otpInput}
-            placeholder="Enter otp"
-            placeholderTextColor={'#A9A9A9'}
-            maxLength={6}
-            keyboardType="number-pad"
-            onChangeText={e => {
-              setUserDetails({
-                ...userDetails,
-                otp: e,
-              });
-              setShowError({
-                ...showError,
-                otp: false,
-              });
-            }}
-            onBlur={() => {
-              if (!otpRegex.test(userDetails.otp)) {
-                setErrorMsg({
-                  ...errorMsg,
-                  otp: 'Enter valid otp',
-                });
-                setShowError({
-                  ...showError,
-                  otp: true,
-                });
-              } else {
-                setErrorMsg({
-                  ...errorMsg,
-                  otp: '',
+    <KeyboardAvoidingView
+      style={{flex: 1}}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}>
+      <ScrollView style={{flex: 1}}>
+        <View style={styles.container}>
+          <View
+            style={[
+              styles.subContainer,
+              {height: availableScreenHeight * 0.7},
+            ]}>
+            <YeboLogo
+              width={horizontalScale(100)}
+              height={verticalScale(100)}
+            />
+            <Text style={styles.vertifyotpText}>Verify OTP</Text>
+            <View style={styles.otpSent}>
+              <CheckCircle />
+              <Text style={styles.otpSentText}>
+                OTP has been sent to your mobile.
+              </Text>
+            </View>
+            <TextInput
+              ref={inputRef}
+              onFocus={() => {
+                handleFocus();
+              }}
+              style={styles.otpInput}
+              placeholder="Enter otp"
+              placeholderTextColor={'#A9A9A9'}
+              maxLength={6}
+              keyboardType="number-pad"
+              onChangeText={e => {
+                setUserDetails({
+                  ...userDetails,
+                  otp: e,
                 });
                 setShowError({
                   ...showError,
                   otp: false,
                 });
-              }
-            }}
-            value={userDetails.otp}
-          />
-          {showError.otp && (
-            <Text style={styles.errorText}>{errorMsg.otp}</Text>
-          )}
-          {errorMsg.ResponseError ? (
-            <Text style={styles.errorText}>{errorMsg.ResponseError}</Text>
-          ) : null}
-          <View style={styles.otpSentButton}>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => {
-                setSelectedOption(!selectedOption);
-                setShowError({
-                  ...showError,
-                  termsAndCondition: false,
-                });
-              }}>
-              <View style={styles.checkbox}>{selectedOption && <Check />}</View>
-            </TouchableOpacity>
-            <Text style={styles.otpText}>
-              I agree to the{' '}
-              <Text style={styles.termsAndConditionText}>
-                terms and conditions
+              }}
+              // onBlur={() => {
+              //   if (!otpRegex.test(userDetails.otp)) {
+              //     setErrorMsg({
+              //       ...errorMsg,
+              //       otp: 'Enter valid otp',
+              //     });
+              //     setShowError({
+              //       ...showError,
+              //       otp: true,
+              //     });
+              //   } else {
+              //     setErrorMsg({
+              //       ...errorMsg,
+              //       otp: '',
+              //     });
+              //     setShowError({
+              //       ...showError,
+              //       otp: false,
+              //     });
+              //   }
+              // }}
+              value={userDetails.otp}
+            />
+            {showError.otp && (
+              <Text style={styles.errorText}>{errorMsg.otp}</Text>
+            )}
+            {errorMsg.ResponseError ? (
+              <Text style={styles.errorText}>{errorMsg.ResponseError}</Text>
+            ) : null}
+            <View style={styles.otpSentButton}>
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  setSelectedOption(!selectedOption);
+                  setShowError({
+                    ...showError,
+                    termsAndCondition: false,
+                  });
+                }}>
+                <View style={styles.checkbox}>
+                  {selectedOption && (
+                    <Check
+                      width={horizontalScale(10)}
+                      height={verticalScale(10)}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.otpText}>
+                I agree to the{' '}
+                <Text style={styles.termsAndConditionText}>
+                  terms and conditions
+                </Text>
               </Text>
-            </Text>
+            </View>
+            {showError.termsAndCondition && (
+              <Text style={styles.errorText}>{errorMsg.termsAndCondition}</Text>
+            )}
+            <TouchableOpacity
+              style={styles.resendButton}
+              onPress={() => {
+                resendOtp();
+              }}>
+              <Text style={styles.resendOtpText}>Resend OTP</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                handleButtonClick();
+              }}
+              style={styles.verifyotpButton}>
+              <Text style={styles.verifyOtp}>Verify OTP</Text>
+            </TouchableOpacity>
           </View>
-          {showError.termsAndCondition && (
-            <Text style={styles.errorText}>{errorMsg.termsAndCondition}</Text>
-          )}
-          <TouchableOpacity style={styles.resendButton}>
-            <Text style={styles.resendOtpText}>Resend OTP</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              handleButtonClick();
-            }}
-            style={styles.verifyotpButton}>
-            <Text style={styles.verifyOtp}>Verify OTP</Text>
-          </TouchableOpacity>
+          <View
+            style={[
+              styles.imageContainer,
+              {height: availableScreenHeight * 0.3},
+            ]}>
+            <Image
+              source={require('../assets/images/bottomImage.png')}
+              style={{
+                width: '100%',
+                height: width / imageAspectRatio,
+                objectFit: 'contain',
+              }}
+            />
+          </View>
         </View>
-        <View style={styles.imageContainer}>
-          <Image
-            source={require('../assets/images/securityGuard.png')}
-            style={styles.image}
-          />
-        </View>
-      </View>
-      {loader && <Loader />}
-    </ScrollView>
+        {loader && <Loader />}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -213,42 +345,44 @@ const styles = StyleSheet.create({
   },
   subContainer: {
     alignItems: 'center',
-    marginVertical: 20,
-    flex: 0.7,
+    // marginTop: pixelSizeVertical(10),
+    // flex: 0.7,
     justifyContent: 'center',
   },
   vertifyotpText: {
-    fontSize: 16,
+    fontSize: fontPixel(16),
     fontFamily: fontFamily.regular,
     color: '#65276F',
   },
   otpSent: {
     flexDirection: 'row',
-    marginVertical: 20,
-    alignItems: 'center'
+    marginVertical: pixelSizeVertical(20),
+    alignItems: 'center',
   },
   otpInput: {
     backgroundColor: '#EFEFEF',
     width: horizontalScale(350),
-    height: verticalScale(50),
+    height: verticalScale(55),
     paddingLeft: 20,
-    marginBottom: 15,
+    marginBottom: pixelSizeVertical(15),
     color: '#65276F',
     borderRadius: 5,
+    fontSize: fontPixel(14),
   },
   termsAndConditionText: {
     textDecorationLine: 'underline',
-    fontSize: fontPixel(14),
+    fontSize: fontPixel(16),
     fontFamily: fontFamily.regular,
     color: '#65276F',
   },
   checkbox: {
-    width: 18,
-    height: 18,
+    width: SCREEN_HEIGHT * 0.026,
+    height: SCREEN_HEIGHT * 0.026,
     borderWidth: 1,
     borderColor: '#65276F',
     alignItems: 'center',
     justifyContent: 'center',
+    // padding: 10,
   },
   otpSentButton: {
     flexDirection: 'row',
@@ -258,23 +392,29 @@ const styles = StyleSheet.create({
   },
   otpText: {
     color: '#65276F',
-    fontSize: fontPixel(14),
+    fontSize: fontPixel(16),
+    fontFamily: fontFamily.medium,
+    paddingHorizontal: pixelSizeHorizontal(8),
+  },
+  otpSentText: {
+    color: '#65276F',
+    fontSize: fontPixel(16),
     fontFamily: fontFamily.medium,
     paddingHorizontal: 8,
   },
   resendButton: {
     width: horizontalScale(170),
-    height: verticalScale(45),
+    height: verticalScale(55),
     backgroundColor: '#C5197D',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
-    marginTop: 25,
-    marginBottom: 15,
+    marginTop: pixelSizeVertical(25),
+    marginBottom: pixelSizeVertical(15),
   },
   verifyotpButton: {
     width: horizontalScale(170),
-    height: verticalScale(45),
+    height: verticalScale(55),
     backgroundColor: '#454546',
     alignItems: 'center',
     justifyContent: 'center',
@@ -285,24 +425,31 @@ const styles = StyleSheet.create({
   resendOtpText: {
     color: 'white',
     fontFamily: fontFamily.regular,
-    fontSize: fontPixel(14)
+    fontSize: fontPixel(14),
   },
   verifyOtp: {
     color: 'white',
     fontFamily: fontFamily.regular,
-    fontSize: fontPixel(14)
+    fontSize: fontPixel(14),
   },
   imageContainer: {
-    flex: 0.34,
+    // flex: 0.35,
     justifyContent: 'flex-end',
   },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
+  // image: {
+  //   // width: '100%',
+  //   // height: '100%',
+  //   position: 'absolute',
+  //   bottom: pixelSizeVertical(0),
+  //   width: horizontalScale(400),
+  //   height: verticalScale(190),
+  //   alignSelf: 'center',
+  //   objectFit: 'scale-down',
+  // },
   errorText: {
     color: 'red',
     fontFamily: fontFamily.regular,
     alignSelf: 'center',
+    fontSize: fontPixel(13),
   },
 });

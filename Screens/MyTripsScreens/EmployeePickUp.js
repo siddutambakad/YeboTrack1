@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Back from '../../assets/images/VectorBack.svg';
 import Sos from '../../assets/images/sos.svg';
 import Bell from '../../assets/images/bellIcon.svg';
@@ -24,6 +24,9 @@ import Call from '../../assets/images/call.svg';
 import Location from '../../assets/images/location.svg';
 import ConformationModal from '../Components/ConformationModal';
 import CustomModal from '../Components/Modal';
+import {handleCallPress, openGoogleMap} from '../Utils/ReusableFunctions';
+import RN from 'react-native';
+const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const EmployeePickUp = ({navigation}) => {
   const [data, setData] = useState([
@@ -56,15 +59,12 @@ const EmployeePickUp = ({navigation}) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
-  const handleDialPress = () => {
-    const phoneNumber = '1234567890';
-    Linking.openURL(`tel:${phoneNumber}`);
-  };
   const openGoogleMaps = () => {
-    const latitude = '37.7749';
-    const longitude = '-122.4194';
-    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-    Linking.openURL(url);
+    openGoogleMap('37.7749', '-122.4194');
+  };
+
+  const handleDialPress = () => {
+    handleCallPress('123456789');
   };
   const removeItem = () => {
     if (selectedItemIndex !== null) {
@@ -89,23 +89,40 @@ const EmployeePickUp = ({navigation}) => {
     return formattedTime;
   };
 
+  useEffect(() => {
+    if (data.length === 0) {
+      navigation.navigate('MyTripDetail', {
+        otpVerified: true,
+        clickedTime: handleButtonClick(), // You might need to handle this part appropriately
+      });
+    }
+  }, [data]);
+
   const renderItems = ({item, index}) => {
     return (
-      <TouchableOpacity style={styles.cardContainer} onPress={() => {}}>
+      <View style={styles.cardContainer}>
         <View style={styles.employeesText}>
           <View style={{flex: 0.3, alignItems: 'center'}}>
             <Image source={item.image} style={styles.profileImage} />
             <Text style={styles.employeeName}>{item.employeeName}</Text>
-          </View>
-          <View style={{flex: 0.7}}>
-            <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginVertical: pixelSizeVertical(8),
+              }}>
               <TouchableOpacity onPress={handleDialPress}>
-                <Call />
+                <Call width={horizontalScale(45)} height={verticalScale(45)} />
               </TouchableOpacity>
               <TouchableOpacity onPress={openGoogleMaps}>
-                <Location />
+                <Location
+                  width={horizontalScale(45)}
+                  height={verticalScale(45)}
+                />
               </TouchableOpacity>
             </View>
+          </View>
+          <View style={{flex: 0.7}}>
             <View>
               <Text
                 style={{
@@ -144,7 +161,7 @@ const EmployeePickUp = ({navigation}) => {
             <Text style={styles.checkOutText}>Check In</Text>
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
   return (
@@ -164,10 +181,12 @@ const EmployeePickUp = ({navigation}) => {
           <TouchableOpacity style={{paddingRight: 20}}>
             <Sos width={horizontalScale(50)} height={verticalScale(50)} />
           </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {}}>
-            <Bell width={horizontalScale(50)} height={verticalScale(50)} fill={'#C5197D'} />
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+            <Bell
+              width={horizontalScale(50)}
+              height={verticalScale(50)}
+              fill={'#C5197D'}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -187,9 +206,12 @@ const EmployeePickUp = ({navigation}) => {
         }}
         onPressYes={() => {
           removeItem();
-          if (data.length === 1) {
-            navigation.navigate('UpcomingScreen');
-          }
+          // if (data.length === 0) {
+          //   navigation.navigate('MyTripDetail', {
+          //     otpVerified: true,
+          //     clickedTime: handleButtonClick(),
+          //   });
+          // }
         }}
       />
       <CustomModal
@@ -201,12 +223,12 @@ const EmployeePickUp = ({navigation}) => {
           handleButtonClick();
           setShowOtpModal(false);
           removeItem();
-          if (data.length === 1) {
-            navigation.navigate('MyTripDetail', {
-              otpVerified: true,
-              clickedTime: handleButtonClick(),
-            });
-          }
+          // if (data.length === 0) {
+          //   navigation.navigate('MyTripDetail', {
+          //     otpVerified: true,
+          //     clickedTime: handleButtonClick(),
+          //   });
+          // }
         }}
         onPressCancelButton={() => {
           setShowOtpModal(false);
@@ -269,8 +291,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileImage: {
-    width: 62,
-    height: 62,
+    width: SCREEN_HEIGHT * 0.06,
+    height: SCREEN_HEIGHT * 0.06,
+    borderRadius: (SCREEN_HEIGHT * 0.06) / 2,
   },
   employeeName: {
     fontFamily: FontFamily.semiBold,
@@ -280,7 +303,7 @@ const styles = StyleSheet.create({
   checkOutButton: {
     width: horizontalScale(120),
     backgroundColor: 'rgba(197, 25, 125, 1)',
-    height: 45,
+    height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 20,
