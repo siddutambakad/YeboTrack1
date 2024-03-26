@@ -13,71 +13,52 @@ import Cancel from '../assets/images/cancel.svg';
 // import {UpcomingLists} from './Context/AppContext';
 import ConformationModal from './Components/ConformationModal';
 import {fontPixel, horizontalScale, verticalScale} from './Utils/Dimensions';
+import {AppContext} from './Context/AppContext';
+import {formatDate} from './Utils/ReusableFunctions';
 
 const UpComingScreens = ({navigation}) => {
-  const [data, setData] = useState([
-    {
-      tripType: 'Upcoming',
-      ticketNo: '#00000988786',
-      distance: '25',
-      time: '23 mins',
-      date: '16-05-2024',
-      employeeStatus: 'Login',
-    },
-    {
-      tripType: 'Upcoming',
-      ticketNo: '#00000988786',
-      distance: '25',
-      time: '23 mins',
-      date: '16-05-2024',
-      employeeStatus: 'Logout',
-    },
-    {
-      tripType: 'Upcoming',
-      ticketNo: '#00000988786',
-      distance: '25',
-      time: '23 mins',
-      date: '16-05-2024',
-      employeeStatus: 'Login',
-    },
-    {
-      tripType: 'Upcoming',
-      ticketNo: '#00000988786',
-      distance: '25',
-      time: '23 mins',
-      date: '16-05-2024',
-      employeeStatus: 'Logout',
-    },
-  ]);
+  const {driverRoasterList} = useContext(AppContext);
+  console.log('upcomingRoasters', driverRoasterList.upcoming);
+
   const [showModal, setShowModal] = useState(false);
 
   const handleItemClick = item => {
-    if (item.employeeStatus === 'Login') {
+    console.log('item-------->>>>>', item?.idRoasterDays);
+    if (item.roasterRouteType === 'Pick-Up') {
       navigation.navigate('MyTripDetail', {
-        params: {items: item},
+        idRoasterDays: item?.idRoasterDays,
+        driverContactNo: item?.driverContactNo,
+        roastertype: item?.roasterType,
       });
-    } else if (item.employeeStatus === 'Logout') {
+    } else if (item.roasterRouteType === 'Drop') {
       // Navigate to a different screen for logout status
       navigation.navigate('MyLogoutTrip', {
-        params: {items: item},
+        idRoasterDays: item?.idRoasterDays,
       });
     }
   };
 
   const renderItems = ({item, index}) => {
+    console.log('item=====>>>', item);
     return (
       <TouchableOpacity
-        activeOpacity={0.9}
+        activeOpacity={0.6}
         onPress={() => {
           handleItemClick(item);
         }}>
         <View style={styles.headerText}>
-          <Text style={styles.upcomingText}>{item.tripType}</Text>
-          <Text style={styles.dateText}>{item.date}</Text>
+          <Text style={styles.upcomingText}>{item?.roasterStatusDesc}</Text>
+          <Text style={styles.dateText}>{formatDate(item?.roasterDate)}</Text>
         </View>
-        <Text style={styles.ticketNo}>{item.ticketNo}</Text>
-        <Text style={styles.distanceText}>{item.distance}</Text>
-        <Text style={styles.timeText}>{item.time}</Text>
+        <Text
+          style={
+            styles.ticketNo
+          }>{`Route Type: ${item?.roasterRouteType}`}</Text>
+        <Text
+          style={
+            styles.distanceText
+          }>{`Distance: ${item?.routeDistance}`}</Text>
+        <Text style={styles.timeText}>{`Time: ${item?.routeTime}`}</Text>
         <TouchableOpacity
           style={styles.cancelTripButton}
           onPress={() => {
@@ -100,12 +81,16 @@ const UpComingScreens = ({navigation}) => {
   };
   return (
     <View style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={renderItems}
-        style={{marginTop: 20}}
-        showsVerticalScrollIndicator={false}
-      />
+      {driverRoasterList.upcoming.length === 0 ? (
+        <Text style={styles.noDataFound}>No Data Found</Text>
+      ) : (
+        <FlatList
+          data={driverRoasterList.upcoming}
+          renderItem={renderItems}
+          style={{marginTop: 20}}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };
@@ -213,5 +198,11 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
     fontSize: 16,
     fontWeight: '600',
+  },
+  noDataFound: {
+    color: '#000',
+    fontFamily: FontFamily.medium,
+    fontSize: fontPixel(18),
+    textAlign: 'center',
   },
 });

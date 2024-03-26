@@ -35,6 +35,7 @@ import DroppedCheckInScreen from './LogoutMyTripScreens/DroppedCheckInScreen';
 import DropGuardScreen from './LogoutMyTripScreens/DropGuardScreen';
 import {AppContext} from './Context/AppContext';
 import AdhacScreeen from './AdhacScreen';
+import StartLoginTripSCreen from './MyTripsScreens/StartLoginTripScreen';
 
 const Stack = createStackNavigator();
 
@@ -63,6 +64,11 @@ function Auth({props, navigation}) {
             <Stack.Screen
               name="Driver"
               component={DriverHomeScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
               options={{headerShown: false}}
             />
             <Stack.Screen
@@ -125,6 +131,11 @@ function Auth({props, navigation}) {
               component={DropGuardScreen}
               options={{headerShown: false}}
             />
+            <Stack.Screen
+              name="StartTripLogin"
+              component={StartLoginTripSCreen}
+              options={{headerShown: false}}
+            />
           </>
         ) : (
           <>
@@ -140,90 +151,6 @@ function Auth({props, navigation}) {
             />
           </>
         )}
-
-        {/* <Stack.Screen
-          name="LoginPage"
-          component={LoginPage}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Otp"
-          component={OtpScreen}
-          options={{headerShown: false}}
-        /> */}
-
-        {/* <Stack.Screen
-          name="Driver"
-          component={DriverHomeScreen}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="MyTrip"
-          component={MyTripsScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="MyTripDetail"
-          component={MyTripDetails}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Location"
-          component={LocationReached}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DriveToOffice"
-          component={DriveToOffice}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="StopTrip"
-          component={StopTripScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="PickUp"
-          component={EmployeePickUp}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="MyLogoutTrip"
-          component={MyLogoutTripScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="PickUpEmployee"
-          component={PickUpEmployeeScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="StartTrip"
-          component={StartTripSCreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DroppedCheckIn"
-          component={DroppedCheckInScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DropGuard"
-          component={DropGuardScreen}
-          options={{headerShown: false}}
-        /> */}
-        {/* <Stack.Screen
-          name="AdhacScreeen"
-          component={AdhacScreeen}
-          options={{headerShown: false}}
-        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

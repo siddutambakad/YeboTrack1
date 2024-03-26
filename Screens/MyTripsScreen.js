@@ -99,14 +99,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  // bellButton: {
-  //   width: pixelSizeHorizontal(35),
-  //   height: pixelSizeVertical(44),
-  //   backgroundColor: '#FFFFFF',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   borderRadius: 30,
-  // },
   myTripNavi: {
     flex: 1,
     backgroundColor: 'rgba(246, 246, 246, 1)',

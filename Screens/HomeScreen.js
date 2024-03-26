@@ -6,19 +6,30 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Image,
 } from 'react-native';
 import React, {useState} from 'react';
 import YeboFinal from '../assets/images/yeboFinalLogo.svg';
-import Bell from '../assets/images/bell.svg';
-import BannerImage from '../assets/images/banner.svg';
+import Bell from '../assets/images/homeBellIcon.svg';
+// import BannerImage from '../assets/images/banner.svg';
 import Profile from '../assets/images/profilePic.svg';
 import Stats from '../assets/images/statsPic.svg';
 import CardProfile from '../assets/images/womenSafety.svg';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeHorizontal,
+  pixelSizeVertical,
+  responsiveBorderRadius,
+  verticalScale,
+} from './Utils/Dimensions';
+import FontFamily from './Styles/FontFamily';
 
 const HomeScreen = ({navigation}) => {
   const {height, width} = Dimensions.get('window');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [data, setData] = useState([1, 1, 1, 1, 1]);
+
   const renderItem = (item, index) => {
     return (
       <View
@@ -65,21 +76,13 @@ const HomeScreen = ({navigation}) => {
           alignItems: 'center',
           marginVertical: 10,
         }}>
-        <YeboFinal width={80} height={80} />
+        <YeboFinal width={horizontalScale(70)} height={verticalScale(70)} />
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
             navigation.navigate('Test');
-          }}
-          style={{
-            width: 60,
-            height: 60,
-            backgroundColor: '#C5197D',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 30,
           }}>
-          <Bell width={25} height={25} />
+          <Bell width={horizontalScale(50)} height={verticalScale(50)} />
         </TouchableOpacity>
       </View>
 
@@ -89,22 +92,46 @@ const HomeScreen = ({navigation}) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginHorizontal: 10,
-            marginVertical: 20,
-            paddingHorizontal: 10,
+            
+            width: Dimensions.get('window').width,
+            alignItems: 'center',
+            paddingHorizontal: pixelSizeHorizontal(15),
           }}>
-          <View style={{width: '50%'}}>
-            <Text style={{fontSize: 18, marginBottom: 10, color: '#66276E'}}>
-              Health warning for the cab userss
+          <View
+            style={{
+              width: Dimensions.get('window').width * 0.47,
+            }}>
+            <Text
+              style={{
+                fontSize: fontPixel(18),
+                marginBottom: pixelSizeVertical(10),
+                color: '#66276E',
+                fontFamily: FontFamily.semiBold,
+                textAlign: 'left',
+              }}>
+              Health warning for the cab users
             </Text>
-            <Text style={{fontSize: 16, color: 'black'}}>
+            <Text
+              style={{
+                fontSize: fontPixel(16),
+                color: 'black',
+                fontFamily: FontFamily.regular,
+                textAlign: 'left',
+              }}>
               The health & wellbeing of our transport user is our utmost
               priority More
             </Text>
           </View>
-          <View style={{width: '47%', height: 150}}>
-            <BannerImage />
-          </View>
+          {/* <View style={{width: Dimensions.get('window').width * 0.47, height: verticalScale(200), borderWidth: 1}}> */}
+          {/* <BannerImage /> */}
+          <Image source={require('../assets/images/bannerImage.png')} style={{
+            width: '45%',
+            height: '100%',
+            resizeMode: 'contain',
+            borderColor: 'red',
+            borderWidth: 2
+          }} />
+          {/* </View> */}
         </View>
         {/* my profile button starts */}
         <View
@@ -181,7 +208,8 @@ const HomeScreen = ({navigation}) => {
                     width: currentIndex == index ? 10 : 8,
                     height: currentIndex == index ? 10 : 8,
                     borderRadius: currentIndex == index ? 5 : 4,
-                    backgroundColor: currentIndex == index ? 'gray' : 'lightgray',
+                    backgroundColor:
+                      currentIndex == index ? 'gray' : 'lightgray',
                     marginLeft: 5,
                   }}
                 />

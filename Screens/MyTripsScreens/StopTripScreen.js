@@ -35,10 +35,7 @@ const StopTripScreen = ({navigation}) => {
             onPress={() => {
               navigation.goBack();
             }}>
-            <Back
-              width={horizontalScale(25)}
-              height={verticalScale(25)}
-            />
+            <Back width={horizontalScale(25)} height={verticalScale(25)} />
             <Text style={styles.backbuttonText}>My Trips</Text>
           </TouchableOpacity>
         </View>
@@ -59,52 +56,28 @@ const StopTripScreen = ({navigation}) => {
         </View>
       </View>
       <View style={styles.subContainer}>
-        <View
-          style={{
-            flex: 0.6,
-            justifyContent: 'flex-end',
-            marginBottom: 60,
-          }}>
+        <View style={styles.stopTripAndImage}>
           <View style={styles.startSubContainer}>
             <StopTrip
               width={actuatedNormalize(50)}
               height={actuatedNormalize(50)}
             />
           </View>
-          <Text
-            style={{
-              color: 'black',
-              fontFamily: FontFamily.medium,
-              fontSize: fontPixel(16),
-              alignSelf: 'center',
-              width: horizontalScale(150),
-              textAlign: 'center',
-            }}>
+          <Text style={styles.stopTripText}>
             You are about to stop the trip!
           </Text>
         </View>
         <View style={{flex: 0.4, alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('UpComing', {
+              navigation.navigate('Recent', {
                 // stopTrip: true,
                 // stopTripTime: formatTime(new Date()),
               });
             }}
-            style={{
-              width: horizontalScale(130),
-              height: verticalScale(50),
-              backgroundColor: 'rgba(197, 25, 125, 1)',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 8,
-            }}>
+            style={styles.endTripButton}>
             <Text
-              style={{
-                color: 'white',
-                fontFamily: FontFamily.regular,
-                fontSize: fontPixel(14),
-              }}>
+              style={styles.endtripText}>
               End Trip
             </Text>
           </TouchableOpacity>
@@ -144,14 +117,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  bellButton: {
-    // width: 50,
-    // height: 50,
-    // backgroundColor: '#FFFFFF',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // borderRadius: 30,
-  },
   subContainer: {
     flex: 1,
     backgroundColor: 'rgba(246, 246, 246, 1)',
@@ -159,9 +124,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: responsiveBorderRadius(50),
   },
   startSubContainer: {
-    // width: SCREEN_HEIGHT * 0.1,
-    // height: SCREEN_HEIGHT * 0.1,
-    // borderRadius: (SCREEN_HEIGHT * 0.1) / 2,
     width: actuatedNormalize(100),
     height: actuatedNormalize(100),
     borderRadius: responsiveBorderRadius(100),
@@ -170,5 +132,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
     alignSelf: 'center',
+  },
+  stopTripAndImage: {
+    flex: 0.6,
+    justifyContent: 'flex-end',
+    marginBottom: 60,
+  },
+  stopTripText: {
+    color: 'black',
+    fontFamily: FontFamily.medium,
+    fontSize: fontPixel(16),
+    alignSelf: 'center',
+    width: horizontalScale(150),
+    textAlign: 'center',
+  },
+  endTripButton: {
+    width: horizontalScale(130),
+    height: verticalScale(50),
+    backgroundColor: 'rgba(197, 25, 125, 1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  endtripText: {
+    color: 'white',
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(14),
   },
 });

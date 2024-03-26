@@ -9,7 +9,7 @@ import {
   PermissionsAndroid,
   Linking,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Profile from '../assets/images/profilePic.svg';
 import Camera from '../assets/images/Camera.svg';
 import Car from '../assets/images/Car.svg';
@@ -27,13 +27,15 @@ import AddPhotoModal from './Components/AddPhotoModal';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
 import RN from 'react-native';
+import {AppContext} from './Context/AppContext';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const DriverHomeScreen = ({navigation}) => {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
-  let permissionDeniedAlertShown = false;
+  const {driverDetails} = useContext(AppContext);
+  console.log('driverDetails', driverDetails);
   const handleMyTripsPress = () => {
     navigation.navigate('MyTrip');
   };
@@ -51,31 +53,25 @@ const DriverHomeScreen = ({navigation}) => {
         openCamera();
       } else {
         console.log('Camera permission denied');
-
-        if (!permissionDeniedAlertShown) {
-          permissionDeniedAlertShown = true;
-        } else {
-          Alert.alert(
-            'Alert!!',
-            'Please grant Camera permission to use this feature.',
-            [
-              {
-                text: 'Ask me later',
+        Alert.alert(
+          'Alert!!',
+          'Please grant Camera permission to use this feature.',
+          [
+            {
+              text: 'Ask me later',
+            },
+            {
+              text: 'Cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                openSettings();
               },
-              {
-                text: 'Cancel',
-              },
-              {
-                text: 'OK',
-                onPress: () => {
-                  openSettings();
-                },
-              },
-            ],
-            {cancelable: false},
-          );
-          console.log(granted, '===>>');
-        }
+            },
+          ],
+          {cancelable: false},
+        );
       }
     } catch (err) {
       console.warn(err);
@@ -90,30 +86,25 @@ const DriverHomeScreen = ({navigation}) => {
         openGallery();
       } else {
         console.log('Gallery permission denied');
-        if (!permissionDeniedAlertShown) {
-          permissionDeniedAlertShown = true;
-        } else {
-          Alert.alert(
-            'Alert!!',
-            'Please grant gallery permission to use this feature.',
-            [
-              {
-                text: 'Ask me Later',
+        Alert.alert(
+          'Alert!!',
+          'Please grant gallery permission to use this feature.',
+          [
+            {
+              text: 'Ask me Later',
+            },
+            {
+              text: 'Cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                openSettings();
               },
-              {
-                text: 'Cancel',
-              },
-              {
-                text: 'OK',
-                onPress: () => {
-                  openSettings();
-                },
-              },
-            ],
-            {cancelable: false},
-          );
-          console.log(granted, '===>>');
-        }
+            },
+          ],
+          {cancelable: false},
+        );
       }
     } catch (err) {
       console.warn(err);
@@ -179,8 +170,11 @@ const DriverHomeScreen = ({navigation}) => {
               style={styles.profileImage}
             />
           )}
-          <Text style={styles.jhonedoeText}>Jhon Doe</Text>
-          <Text style={styles.driverIdText}>Driver ID - #1234</Text>
+          <Text style={styles.jhonedoeText}>{driverDetails?.driverName}</Text>
+          <Text
+            style={
+              styles.driverIdText
+            }>{`Driver ID - ${driverDetails?.idDriver}`}</Text>
           <TouchableOpacity
             style={styles.addPhoto}
             onPress={() => {
@@ -359,12 +353,4 @@ const styles = StyleSheet.create({
     right: 10,
     top: 10,
   },
-  // headerIconButton: {
-  //   width: 60,
-  //   height: 60,
-  //   backgroundColor: '#FFFFFF',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   borderRadius: 30,
-  // },
 });

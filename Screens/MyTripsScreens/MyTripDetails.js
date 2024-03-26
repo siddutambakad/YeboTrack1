@@ -1,6 +1,8 @@
 import {
+  Alert,
   Dimensions,
   Linking,
+  PermissionsAndroid,
   ScrollView,
   StyleSheet,
   Text,
@@ -29,26 +31,45 @@ import StartTripModal from '../Components/StartTripModal';
 import BottomTab from '../Components/BottomTab';
 import StepIndicator from 'react-native-step-indicator-v2';
 import RN from 'react-native';
+import {APIS} from '../APIURLS/ApiUrls';
+import axios from 'axios';
+import Loader from '../Components/Loader';
+import {
+  convertedTime,
+  convertedTimeforEvent,
+  openSettings,
+} from '../Utils/ReusableFunctions';
+import Geolocation from '@react-native-community/geolocation';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const MyTripDetails = ({route, navigation}) => {
   const {
+    idRoasterDays,
     driveOfficeOtp,
     driveOfficeTime,
     stopTrip,
     stopTripTime,
     otpVerified,
     clickedTime,
+    driverContactNo,
+    roastertype,
   } = route.params;
   const [showStartTripModal, setShowStartTripModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showOtpForStartTrip, setShowOtpForStartTrip] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [modalPopupOptions, setModalPopupOptions] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
-  const [pickupEmployeeCompleted, setPickupEmployeeCompleted] = useState(false)
+  const [pickupEmployeeCompleted, setPickupEmployeeCompleted] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const [pickupGuard, setPickupGuard] = useState([]);
+  const [employeeDetails, setEmployeeDetails] = useState([]);
+  const [responseInfo, setResponseInfo] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  console.log('currentLocation', currentLocation);
 
   useEffect(() => {
     if (driveOfficeOtp) {
@@ -63,6 +84,44 @@ const MyTripDetails = ({route, navigation}) => {
     }
   }, [driveOfficeOtp, otpVerified, stopTrip]);
 
+  useEffect(() => {
+    getTripDetails(idRoasterDays);
+  }, [idRoasterDays]);
+
+  const getTripDetails = async driverId => {
+    setLoader(true);
+    try {
+      const apiUrl = `${APIS.getTripDeatils}/${driverId}`;
+      const response = await axios.get(apiUrl);
+      const responseData = response?.data;
+      setResponseInfo(responseData?.returnLst);
+      setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
+      setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
+    } catch (error) {
+      console.log('error from the tripdetail', error);
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  // const sendStartOtp = async () => {
+  //   try {
+  //     const sendStartOtpBody = {
+  //       roasterId: responseInfo?.idRoaster,
+  //       tripEventDtm: convertedTimeforEvent(),
+  //       eventGpsdtm: convertedTime(),
+  //       eventGpslocationLatLon: 'Driver Latitude,Longitude',
+  //       eventGpslocationName: 'Driver Location Name',
+  //       driverID: driverId,
+  //       mobileNo: pickupGuard?.mobileNo,
+  //     };
+  //     const response = await axios.post(APIS.getStartTripOtp, sendStartOtpBody);
+  //     setResponseData(response.data);
+  //   } catch (error) {
+  //     console.log('Error sending OTP:', error);
+  //   }
+  // };
+
   const handlePickupGuardClick = () => {
     setModalPopupOptions({
       button_text: 'Guard Check - In',
@@ -76,8 +135,10 @@ const MyTripDetails = ({route, navigation}) => {
   };
 
   const handlePickupEmployeeClick = () => {
-    navigation.navigate('PickUp');
-    setPickupEmployeeCompleted(true)
+    navigation.navigate('PickUp', {
+      employeeDetail: employeeDetails,
+    });
+    setPickupEmployeeCompleted(true);
   };
   const formatTime = time => {
     const hours = time.getHours();
@@ -94,11 +155,15 @@ const MyTripDetails = ({route, navigation}) => {
   };
 
   const handleStartTrip = () => {
-    setShowStartTripModal(true);
+    // setShowStartTripModal(true);
+    navigation.navigate('StartTripLogin', {
+      roasterId: responseInfo?.idRoaster,
+      roasterIdDays: idRoasterDays,
+      driverId: responseInfo?.idDriver,
+      driverNo: driverContactNo,
+      roasterRouteType: roastertype,
+    });
   };
-  // const handleDriveToOfficeClick = () => {
-  //   navigation.navigate('DriveToOffice');
-  // };
 
   const labels = [
     'Start Trip',
@@ -120,7 +185,7 @@ const MyTripDetails = ({route, navigation}) => {
     separatorUnFinishedColor: 'lightgray',
     stepIndicatorFinishedColor: 'gray',
     stepIndicatorUnFinishedColor: 'lightgray',
-    stepIndicatorCurrentColor: 'lightgray',
+    stepIndicatorCurrentColor: selectedPosition ? 'gray' : 'lightgray',
     stepIndicatorLabelFontSize: 0,
     currentStepIndicatorLabelFontSize: 0,
     labelColor: '#000',
@@ -138,6 +203,50 @@ const MyTripDetails = ({route, navigation}) => {
     // handleDriveToOfficeClick,
     () => navigation.navigate('StopTrip'),
   ];
+  // const requestLocationPermission = async () => {
+  //   try {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //     );
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       getLocation();
+  //     } else {
+  //       console.log('Gallery permission denied');
+  //       Alert.alert(
+  //         'Alert!!',
+  //         'Please grant gallery permission to use this feature.',
+  //         [
+  //           {
+  //             text: 'Ask me Later',
+  //           },
+  //           {
+  //             text: 'Cancel',
+  //           },
+  //           {
+  //             text: 'OK',
+  //             onPress: () => {
+  //               openSettings();
+  //             },
+  //           },
+  //         ],
+  //         {cancelable: false},
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //   }
+  // };
+  // const getLocation = () => {
+  //   Geolocation.getCurrentPosition(
+  //     position => {
+  //       const {latitude, longitude} = position.coords;
+  //       setCurrentLocation({latitude, longitude});
+  //       console.log('latitude, longitude', latitude, longitude);
+  //     },
+  //     error => console.log('error', error),
+  //   );
+  // };
+
   return (
     <View style={styles.container}>
       {/* header */}
@@ -182,15 +291,12 @@ const MyTripDetails = ({route, navigation}) => {
           </View>
           <Text style={styles.loginTripText}>Login Trip</Text>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginHorizontal: pixelSizeHorizontal(20),
-            }}>
+          {/* step integration starts */}
+          <View style={styles.stepIndicatorStyle}>
             <View>
               {labels.map((step, index) => (
                 <TouchableOpacity
+                  activeOpacity={1}
                   key={index}
                   onPress={() => {
                     if (index < selectedPosition) {
@@ -200,24 +306,8 @@ const MyTripDetails = ({route, navigation}) => {
                     }
                     stepActions[index]();
                   }}>
-                  <View
-                    style={{
-                      marginVertical: pixelSizeVertical(2.6),
-                      justifyContent: 'center',
-                      height: verticalScale(90),
-                      width: horizontalScale(50),
-                      marginRight: pixelSizeHorizontal(10),
-                    }}>
-                    <View
-                      style={{
-                        width: SCREEN_HEIGHT * 0.025,
-                        height: SCREEN_HEIGHT * 0.025,
-                        borderRadius: (SCREEN_HEIGHT * 0.025) / 2,
-                        borderColor: 'rgba(102, 39, 110, 1)',
-                        borderWidth: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
+                  <View style={styles.checkBoxStyles}>
+                    <View style={styles.checkBoxCircle}>
                       {index < selectedPosition ? (
                         <Check
                           width={horizontalScale(10)}
@@ -229,19 +319,21 @@ const MyTripDetails = ({route, navigation}) => {
                 </TouchableOpacity>
               ))}
             </View>
-            <View
-              style={{
-                height: '100%',
-                width: horizontalScale(200),
-              }}>
+            {/* main step bar */}
+            <View style={styles.mainStepIndiactor}>
               <StepIndicator
                 direction="vertical"
                 customStyles={customStyles}
-                currentPosition={selectedPosition}
+                currentPosition={
+                  selectedPosition === 0
+                    ? selectedPosition
+                    : selectedPosition - 1
+                }
                 stepCount={4}
                 labels={labels.map((item, index) => (
                   <Text
                     style={{
+                      paddingLeft: index < selectedPosition ? 20 : 10,
                       color: 'black',
                       fontFamily:
                         index > selectedPosition - 1
@@ -251,7 +343,6 @@ const MyTripDetails = ({route, navigation}) => {
                     {item}
                   </Text>
                 ))}
-                labelStyle={styles.labelStyle}
                 onPress={index => {
                   if (index < selectedPosition) {
                     return;
@@ -262,20 +353,11 @@ const MyTripDetails = ({route, navigation}) => {
                 }}
               />
             </View>
-            <View
-              style={{
-                borderWidth: 1,
-                width: horizontalScale(80),
-                borderColor: 'rgba(246, 246, 246, 1)',
-              }}>
+            {/* time showing label */}
+            <View style={styles.stepLabelsStyles}>
               {time.map((step, index) => (
                 <TouchableOpacity key={index} onPress={() => {}}>
-                  <View
-                    style={{
-                      marginVertical: pixelSizeVertical(2.6),
-                      justifyContent: 'center',
-                      height: verticalScale(90),
-                    }}>
+                  <View style={styles.labelTextStyles}>
                     <Text
                       style={{
                         color: 'black',
@@ -291,32 +373,18 @@ const MyTripDetails = ({route, navigation}) => {
               ))}
             </View>
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('UpComing');
-            }}
-            disabled={!pickupEmployeeCompleted}
-            activeOpacity={1}
-            style={{
-              width: horizontalScale(130),
-              height: verticalScale(50),
-              backgroundColor: 'rgba(197, 25, 125, 1)',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginVertical: pixelSizeVertical(15),
-              borderRadius: 6,
-              alignSelf: 'center',
-            }}>
-            <Text
-              style={{
-                color: 'white',
-                fontFamily: FontFamily.regular,
-                fontSize: fontPixel(16),
-              }}>
-              End Trip
-            </Text>
-          </TouchableOpacity>
-
+          {/* end trip button */}
+          {pickupEmployeeCompleted && (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('StopTrip');
+              }}
+              activeOpacity={1}
+              style={styles.endtripButton}>
+              <Text style={styles.endTripText}>End Trip</Text>
+            </TouchableOpacity>
+          )}
+          {/* starts trip modal */}
           <StartTripModal
             showConfirmModal={showStartTripModal}
             title={
@@ -324,13 +392,13 @@ const MyTripDetails = ({route, navigation}) => {
             }
             onPressOK={() => {
               setShowStartTripModal(false);
-              setSelectedPosition(1);
-              time.push(handleButtonClick());
+              // setShowOtpForStartTrip(true);
             }}
             onPressNo={() => {
               setShowStartTripModal(false);
             }}
           />
+          {/* guard pickup modal */}
           <PickupGuardModal
             showModal={showModal}
             onCloseModel={() => {
@@ -338,8 +406,11 @@ const MyTripDetails = ({route, navigation}) => {
               setShowModal(false);
             }}
             options={modalPopupOptions}
+            name={`${pickupGuard?.guardFullName}`}
+            // pickupTime={}
+            Address={`${pickupGuard?.address1}`}
           />
-
+          {/* conformation modal */}
           <ConformationModal
             title={'Are you sure you want to skip the employee pickup?'}
             onPressYes={() => {
@@ -350,10 +421,23 @@ const MyTripDetails = ({route, navigation}) => {
             }}
             showConfirmModal={showConfirmModal}
           />
+          {/* <CustomModal
+            visible={showOtpForStartTrip}
+            title={'Enter Otp'}
+            onClose={() => setShowOtpForStartTrip(false)}
+            onPressSubmitButton={() => {
+              setShowOtpForStartTrip(false);
+              setSelectedPosition(1);
+              time.push(handleButtonClick());
+            }}
+            onPressCancelButton={() => {
+              setShowOtpModal(false);
+            }}
+          /> */}
           {/* otp modal */}
           <CustomModal
             visible={showOtpModal}
-            title={'Enter check-in pin'}
+            title={'Enter Otp'}
             onClose={() => setShowOtpModal(false)}
             onPressSubmitButton={() => {
               setShowOtpModal(false);
@@ -364,9 +448,10 @@ const MyTripDetails = ({route, navigation}) => {
               setShowOtpModal(false);
             }}
           />
+
+          {loader && <Loader />}
         </ScrollView>
         <BottomTab activeTab="MyTrips" />
-        {/* <TabNavigator /> */}
       </View>
     </View>
   );
@@ -422,9 +507,54 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: pixelSizeVertical(8),
   },
-  labelStyle: {
-    marginVertical: 10,
-    borderWidth:3,
-    borderColor:'red' // Adjust this value to co
-  }
+  stepIndicatorStyle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: pixelSizeHorizontal(20),
+  },
+  checkBoxStyles: {
+    marginVertical: pixelSizeVertical(2.6),
+    justifyContent: 'center',
+    height: verticalScale(90),
+    width: horizontalScale(50),
+    marginRight: pixelSizeHorizontal(10),
+  },
+  checkBoxCircle: {
+    width: SCREEN_HEIGHT * 0.025,
+    height: SCREEN_HEIGHT * 0.025,
+    borderRadius: (SCREEN_HEIGHT * 0.025) / 2,
+    borderColor: 'rgba(102, 39, 110, 1)',
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mainStepIndiactor: {
+    height: '100%',
+    width: horizontalScale(200),
+  },
+  stepLabelsStyles: {
+    borderWidth: 1,
+    width: horizontalScale(80),
+    borderColor: 'rgba(246, 246, 246, 1)',
+  },
+  labelTextStyles: {
+    marginVertical: pixelSizeVertical(2.6),
+    justifyContent: 'center',
+    height: verticalScale(90),
+  },
+  endtripButton: {
+    width: horizontalScale(130),
+    height: verticalScale(50),
+    backgroundColor: 'rgba(197, 25, 125, 1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: pixelSizeVertical(15),
+    borderRadius: 6,
+    alignSelf: 'center',
+  },
+  endTripText: {
+    color: 'white',
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(16),
+  },
 });

@@ -1,13 +1,21 @@
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator, Image} from 'react-native';
 import React from 'react';
+import {horizontalScale, verticalScale} from '../Utils/Dimensions';
 
 const Loader = () => {
   return (
     <View style={styles.Loader}>
-      <ActivityIndicator
+      {/* <ActivityIndicator
         size={50}
         color={'#C5197D'}
-        animating={true}></ActivityIndicator>
+        animating={true}></ActivityIndicator> */}
+      <Image
+        source={require('../../assets/Gifs/lazyloader.gif')}
+        style={{
+          width: horizontalScale(70),
+          height: verticalScale(80),
+        }}
+      />
     </View>
   );
 };

@@ -24,7 +24,7 @@ import RN from 'react-native';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const PickupGuardModal = props => {
-  const {showModal, onCloseModel, options} = props;
+  const {showModal, onCloseModel, options, name, pickupTime, Address} = props;
   const handleContentClick = event => {
     event.stopPropagation();
   };
@@ -78,13 +78,10 @@ const PickupGuardModal = props => {
                 )}
               </View>
 
-              <Text style={styles.modalText1}>John Doe</Text>
-              <Text style={styles.modalText2}>Pickup Time - 10:13 am</Text>
+              <Text style={styles.modalText1}>{name}</Text>
+              <Text style={styles.modalText2}>{pickupTime}</Text>
               <Text style={styles.locationText}>Pickup Location</Text>
-              <Text style={styles.addressText}>
-                118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block,
-                Koramangala, Bengaluru, Karnataka 560095
-              </Text>
+              <Text style={styles.addressText}>{Address}</Text>
               <View
                 style={
                   options?.isSocialMediaRequired

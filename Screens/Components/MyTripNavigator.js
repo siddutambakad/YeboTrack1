@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import UpComingScreens from '../UpComingScreens';
 import OngoingScreen from '../OngoingScreen';
@@ -13,10 +13,13 @@ import {
   responsiveBorderRadius,
   verticalScale,
 } from '../Utils/Dimensions';
+import {APIS} from '../APIURLS/ApiUrls';
+import axios from 'axios';
 
 const Tab = createMaterialTopTabNavigator();
 
 const MyTripNavigator = () => {
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -31,11 +34,6 @@ const MyTripNavigator = () => {
           backgroundColor: 'rgba(246, 246, 246, 1)',
           elevation: 0,
           justifyContent: 'center',
-        },
-        tabBarItemStyle: {
-          // marginHorizontal: 16,
-          // justifyContent: 'flex-end',
-          // borderWidth: 2,
         },
         tabBarIndicatorStyle: {
           width: horizontalScale(100),

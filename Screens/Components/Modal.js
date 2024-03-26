@@ -107,27 +107,27 @@ const CustomModal = props => {
                     otp: false,
                   });
                 }}
-                onBlur={() => {
-                  if (!otpRegex.test(userDetails.otp)) {
-                    setErrorMsg({
-                      ...errorMsg,
-                      otp: 'Enter valid otp',
-                    });
-                    setShowError({
-                      ...showError,
-                      otp: true,
-                    });
-                  } else {
-                    setErrorMsg({
-                      ...errorMsg,
-                      otp: '',
-                    });
-                    setShowError({
-                      ...showError,
-                      otp: false,
-                    });
-                  }
-                }}
+                // onBlur={() => {
+                //   if (!otpRegex.test(userDetails.otp)) {
+                //     setErrorMsg({
+                //       ...errorMsg,
+                //       otp: 'Enter valid otp',
+                //     });
+                //     setShowError({
+                //       ...showError,
+                //       otp: true,
+                //     });
+                //   } else {
+                //     setErrorMsg({
+                //       ...errorMsg,
+                //       otp: '',
+                //     });
+                //     setShowError({
+                //       ...showError,
+                //       otp: false,
+                //     });
+                //   }
+                // }}
                 value={userDetails.otp}
               />
               {showError.otp && (

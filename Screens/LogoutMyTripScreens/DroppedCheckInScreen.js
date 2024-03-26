@@ -105,7 +105,7 @@ const DroppedCheckInScreen = ({navigation, props}) => {
       </View>
       <View style={styles.subContainer}>
         <View style={styles.container1}>
-          <Clock />
+          <Clock width={horizontalScale(100)} height={verticalScale(100)} />
           <View style={styles.timeAndMinutes}>
             <Text style={styles.timeText}>{formattedTime}</Text>
             <Text style={styles.minutesText}>mins</Text>
@@ -223,8 +223,8 @@ const styles = StyleSheet.create({
     marginLeft: pixelSizeHorizontal(30),
   },
   timeText: {
-    width: '30%',
-    height: verticalScale(50),
+    width: horizontalScale(120),
+    height: verticalScale(55),
     fontSize: fontPixel(30),
     color: 'black',
     fontFamily: FontFamily.medium,

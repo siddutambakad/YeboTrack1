@@ -7,13 +7,8 @@ import {
   TouchableOpacity,
   View,
   Alert,
-  KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
   Dimensions,
-  StatusBar,
-  Platform,
-  LogBox,
+  // LogBox,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
@@ -22,6 +17,7 @@ import Loader from './Components/Loader';
 import fontFamily from './Styles/FontFamily';
 import {
   fontPixel,
+  horizontalScale,
   pixelSizeHorizontal,
   pixelSizeVertical,
   responsiveBorderRadius,
@@ -30,23 +26,12 @@ import {
 import FontFamily from './Styles/FontFamily';
 
 const LoginPage = ({navigation}) => {
-  const {height, width, scale, fontScale} = Dimensions.get('window');
-  LogBox.ignoreAllLogs();
-  const StatusBarHeight =
-    Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+  // LogBox.ignoreAllLogs();
   const imageAspectRatio = 20 / 9;
-  const inputRef = useRef(null);
   const [loader, setLoader] = useState(false);
   const [userDetails, setUserDetails] = useState({
     PhoneNumber: '9886768385',
   });
-
-  const availableScreenHeight =
-    height > 550
-      ? width > 550
-        ? height - StatusBarHeight
-        : height
-      : height - StatusBarHeight;
 
   const [errorMsg, setErrorMsg] = useState({
     PhoneNumber: '',
@@ -76,7 +61,11 @@ const LoginPage = ({navigation}) => {
     try {
       const response = await axios.post(APIS.loginWithOtp, postLoginData);
       const otpResponse = response.data;
-      // console.log('otp sent', otpResponse);
+      console.log(
+        '\notpResponse',
+        JSON.stringify(otpResponse, null, 2),
+        '\n',
+      );
       navigation.navigate('Otp', {otpResponse: otpResponse});
     } catch (error) {
       if (error.response) {
@@ -114,94 +103,84 @@ const LoginPage = ({navigation}) => {
     }
   };
 
-  const handleFocus = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
   return (
-    <KeyboardAvoidingView
-      style={{flex: 1, backgroundColor: 'red'}}
-      behavior={Platform.OS === 'ios' ? 'padding' : null}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <View
-            style={[
-              styles.subContainer,
-              {height: availableScreenHeight * 0.7},
-            ]}>
-            <Image
-              source={require('../assets/images/yeboFinalLogo.png')}
-              style={styles.yebologo}
-            />
-            <Text style={styles.phoneNumberText}>Phone Number</Text>
-            <View style={styles.phoneNumberAndTextInput}>
-              <Text style={styles.countryText}>+91</Text>
-              <TextInput
-                ref={inputRef}
-                onFocus={handleFocus}
-                style={styles.phoneNumberInput}
-                maxLength={10}
-                keyboardType="number-pad"
-                onChangeText={e => {
-                  setUserDetails({
-                    ...userDetails,
-                    PhoneNumber: e,
-                  });
-                  setShowError({
-                    ...showError,
-                    PhoneNumber: false,
-                  });
-                  setErrorMsg({...errorMsg, ResponseError: ''});
-                }}
-                onBlur={() => {
-                  if (!phoneNumberRegex.test(userDetails.PhoneNumber)) {
-                    setErrorMsg({
-                      ...errorMsg,
-                      PhoneNumber: 'Enter valid PhoneNumber',
-                    });
-                    setShowError({
-                      ...showError,
-                      PhoneNumber: true,
-                    });
-                  }
-                }}
-                value={userDetails.PhoneNumber}
-              />
-            </View>
-            {showError.PhoneNumber && (
-              <Text style={styles.errorText}>
-                {errorMsg.PhoneNumber}
-                {errorMsg.ResponseError ? ` ${errorMsg.ResponseError}` : ''}
-              </Text>
-            )}
-            <TouchableOpacity
-              onPress={() => {
-                handleButtonClick();
-              }}
-              style={styles.getOtpButton}>
-              <Text style={styles.getOtpText}>Generate OTP</Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              height: availableScreenHeight * 0.3,
-              justifyContent: 'flex-end',
-            }}>
-            <Image
-              source={require('../assets/images/bottomImage.png')}
-              style={{
-                width: '100%',
-                height: width / imageAspectRatio,
-                objectFit: 'contain',
-              }}
-            />
-          </View>
-          {loader && <Loader />}
+
+    <ScrollView
+      style={{
+        height: Dimensions.get('window').height,
+        backgroundColor: 'red',
+      }}>
+      <View
+        style={{
+          backgroundColor: '#fff',
+          height: Dimensions.get('window').height,
+        }}>
+        <Image
+          source={require('../assets/images/yeboFinalLogo.png')}
+          style={styles.yebologo}
+        />
+
+        <Text style={styles.phoneNumberText}>Phone Number</Text>
+        <View style={styles.phoneNumberAndTextInput}>
+          <Text style={styles.countryText}>+91</Text>
+          <TextInput
+            // ref={inputRef}
+            style={styles.phoneNumberInput}
+            maxLength={10}
+            keyboardType="number-pad"
+            onChangeText={e => {
+              setUserDetails({
+                ...userDetails,
+                PhoneNumber: e,
+              });
+              setShowError({
+                ...showError,
+                PhoneNumber: false,
+              });
+              setErrorMsg({...errorMsg, ResponseError: ''});
+            }}
+            onBlur={() => {
+              if (!phoneNumberRegex.test(userDetails.PhoneNumber)) {
+                setErrorMsg({
+                  ...errorMsg,
+                  PhoneNumber: 'Enter valid PhoneNumber',
+                });
+                setShowError({
+                  ...showError,
+                  PhoneNumber: true,
+                });
+              }
+            }}
+            value={userDetails.PhoneNumber}
+          />
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+
+        {showError.PhoneNumber && (
+          <Text style={styles.errorText}>{errorMsg.PhoneNumber}</Text>
+        )}
+        {errorMsg.ResponseError ? (
+          <Text style={styles.errorText}>{errorMsg.ResponseError}</Text>
+        ) : null}
+        <TouchableOpacity
+          onPress={() => {
+            handleButtonClick();
+          }}
+          style={styles.getOtpButton}>
+          <Text style={styles.getOtpText}>Generate OTP</Text>
+        </TouchableOpacity>
+        <Image
+          source={require('../assets/images/bottomImage.png')}
+          style={{
+            width: '100%',
+            height: Dimensions.get('window').width / imageAspectRatio,
+            objectFit: 'contain',
+            position: 'absolute',
+            bottom: 0,
+          }}
+        />
+      </View>
+      {loader && <Loader />}
+    </ScrollView>
   );
 };
 
@@ -217,14 +196,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   yebologo: {
-    width: 100,
-    height: 100,
+    width: horizontalScale(80),
+    height: verticalScale(80),
     resizeMode: 'contain',
     alignSelf: 'center',
-    // marginTop: pixelSizeVertical(80),
+    marginTop: '30%',
   },
   phoneNumberText: {
-    marginHorizontal: 20,
+    marginHorizontal: pixelSizeHorizontal(20),
     marginVertical: 8,
     fontFamily: FontFamily.medium,
     fontSize: fontPixel(16),
@@ -233,7 +212,7 @@ const styles = StyleSheet.create({
   phoneNumberAndTextInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: pixelSizeHorizontal(20),
   },
   phoneNumberInput: {
     width: '80%',
@@ -271,15 +250,12 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
     fontSize: fontPixel(15),
   },
-  // imageContainer: {
-  //   flex: 0.35,
-  //   justifyContent: 'flex-end',
-  // },
   bottomImage: {},
   errorText: {
     color: 'red',
     alignSelf: 'flex-start',
-    marginHorizontal: pixelSizeHorizontal(20),
+    paddingLeft: pixelSizeHorizontal(20),
     fontFamily: FontFamily.regular,
+    fontSize: fontPixel(14)
   },
 });

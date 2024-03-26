@@ -2,12 +2,12 @@ import {FlatList, StyleSheet, Text, View} from 'react-native';
 import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
-import { UpcomingLists } from './Context/AppContext';
+import { AppContext, UpcomingLists } from './Context/AppContext';
 import { fontPixel } from './Utils/Dimensions';
 
 const RecentScreen = () => {
-  const [data, setData] = useState([1, 1, 1, 1, 1, 1, 1]);
-// const {data1} = useContext(UpcomingLists)
+  // const [data, setData] = useState([1, 1, 1, 1, 1, 1, 1]);
+const {driverRoasterList} = useContext(AppContext)
 
   const renderItems = (item, index) => {
     return (
@@ -49,7 +49,7 @@ const RecentScreen = () => {
   };
   return (
     <View style={{flex: 1, backgroundColor: 'rgba(246, 246, 246, 1)'}}>
-      <FlatList data={data} renderItem={renderItems} style={{marginTop: 20}} />
+      <FlatList data={driverRoasterList?.recent} renderItem={renderItems} style={{marginTop: 20}} />
     </View>
   );
 };

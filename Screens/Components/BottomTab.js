@@ -133,7 +133,7 @@ const BottomTab = props => {
             style={{
               borderTopWidth: activeTab == 'Profile' ? 3 : 0,
               width: horizontalScale(60),
-              top: pixelSizeVertical(-15),
+              top: pixelSizeVertical(-16),
               borderColor: 'rgba(197, 25, 125, 1)',
             }}></View>
           <Profile width={horizontalScale(25)} height={verticalScale(25)} />

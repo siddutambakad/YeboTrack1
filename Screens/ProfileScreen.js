@@ -22,35 +22,61 @@ import {
 import FontFamily from './Styles/FontFamily';
 import BottomTab from './Components/BottomTab';
 import ConformationModal from './Components/ConformationModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from './Components/Loader';
+import axios from 'axios';
+import {APIS} from './APIURLS/ApiUrls';
 
 const ProfileScreen = ({navigation}) => {
-  const {handleLogout} = useContext(AppContext);
+  const {handleLogout, driverId} = useContext(AppContext);
   const [showModal, setShowModal] = useState(false);
   const [userData, setUserData] = useState({});
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
-    retrieveOtpResponseData();
+    // retrieveOtpResponseData();
+    getDriversDetail(driverId);
   }, []);
 
-  const retrieveOtpResponseData = async () => {
-    setLoader(true);
+  // const retrieveOtpResponseData = async () => {
+  //   setLoader(true);
+  //   try {
+  //     const storedOtpResponseData = await AsyncStorage.getItem(
+  //       'otpResponseData',
+  //     );
+  //     if (storedOtpResponseData !== null) {
+  //       setUserData(JSON.parse(storedOtpResponseData?.idDriver));
+  //     }
+  //     console.log(
+  //       'storedOtpResponseData',
+  //       JSON.stringify(storedOtpResponseData?.idDriver, null, 2),
+  //       '\n',
+  //     );
+  //   } catch (error) {
+  //     console.error(
+  //       'Error retrieving otpResponseData from AsyncStorage:',
+  //       error,
+  //     );
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
+
+  const getDriversDetail = async driverId => {
+    setLoader(true)
     try {
-      const storedOtpResponseData = await AsyncStorage.getItem(
-        'otpResponseData',
+      const apiUrl = `${APIS.getDriversDetails}/${driverId}`
+      const responseData = await axios.get(apiUrl)
+      console.log(
+        '\nresponseData',
+        JSON.stringify(responseData.data?.returnLst, null, 2),
+        '\n',
       );
-      if (storedOtpResponseData !== null) {
-        setUserData(JSON.parse(storedOtpResponseData));
-      }
+      setUserData(responseData.data?.returnLst)
     } catch (error) {
-      console.error(
-        'Error retrieving otpResponseData from AsyncStorage:',
-        error,
-      );
+      console.log('error', error);
     } finally {
-      setLoader(false);
+      setLoader(false)
     }
   };
 
@@ -113,7 +139,7 @@ const ProfileScreen = ({navigation}) => {
               maxLength={10}
               keyboardType="number-pad"
               editable={false}
-              value={userData?.userLoginId}
+              value={userData?.driverContactNo}
             />
           </View>
           <Text style={styles.Licenseno}>License No.</Text>
@@ -131,10 +157,13 @@ const ProfileScreen = ({navigation}) => {
           />
           <ConformationModal
             onPressYes={() => {
-              setLoader(true)
+              setLoader(true);
               setShowModal(false);
               handleLogout();
-              navigation.navigate('LoginPage');
+              let ck = setTimeout(() => {
+                navigation.navigate('LoginPage');
+                clearTimeout(ck);
+              }, 800);
             }}
             onPressNo={() => {
               setShowModal(false);

@@ -1,6 +1,4 @@
 import {
-  Dimensions,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,7 +15,6 @@ import {
   horizontalScale,
   pixelSizeHorizontal,
   pixelSizeVertical,
-  responsiveBorderRadius,
   verticalScale,
 } from '../Utils/Dimensions';
 import FontFamily from '../Styles/FontFamily';
@@ -57,7 +54,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
-  const [dropEmployee, setDropEmployee] = useState(false)
+  const [dropEmployee, setDropEmployee] = useState(false);
 
   useEffect(() => {
     if (otpSubmitedForEmployee) {
@@ -158,8 +155,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   ];
 
   const customStyles = {
-    stepIndicatorSize: actuatedNormalize(20),
-    currentStepIndicatorSize: actuatedNormalize(20),
+    stepIndicatorSize: (26),
+    currentStepIndicatorSize: 26,
     separatorStrokeWidth: horizontalScale(4),
     currentStepStrokeWidth: 0,
     stepStrokeCurrentColor: 'lightgray',
@@ -236,12 +233,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
           </View>
           <Text style={styles.loginTripText}>Logout Trip</Text>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginHorizontal: pixelSizeHorizontal(20),
-            }}>
+          <View style={styles.stepInicatorStyles}>
+            {/* stepbar check box */}
             <View>
               {labels.map((step, index) => (
                 <TouchableOpacity
@@ -253,24 +246,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
                     }
                     stepActions[index]();
                   }}>
-                  <View
-                    style={{
-                      marginVertical: pixelSizeVertical(2.6),
-                      justifyContent: 'center',
-                      height: verticalScale(80),
-                      width: horizontalScale(50),
-                      marginRight: pixelSizeHorizontal(10),
-                    }}>
-                    <View
-                      style={{
-                        width: SCREEN_HEIGHT * 0.029,
-                        height: SCREEN_HEIGHT * 0.029,
-                        borderRadius: (SCREEN_HEIGHT * 0.029) / 2,
-                        borderColor: 'rgba(102, 39, 110, 1)',
-                        borderWidth: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
+                  <View style={styles.checkBoxStyles}>
+                    <View style={styles.checkCircleStyles}>
                       {index < selectedPosition ? (
                         <Check
                           width={horizontalScale(10)}
@@ -282,6 +259,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
                 </TouchableOpacity>
               ))}
             </View>
+            {/* main step bar */}
             <View
               style={{
                 height: '100%',
@@ -312,22 +290,11 @@ const MyLogoutTripScreen = ({route, navigation}) => {
                 }}
               />
             </View>
-
-            <View
-              style={{
-                width: horizontalScale(80),
-                borderWidth: 1,
-                borderColor: 'rgba(246, 246, 246, 1)',
-              }}>
+            {/* step bar time */}
+            <View style={styles.stepLabelStyle}>
               {time.map((step, index) => (
                 <TouchableOpacity key={index} onPress={() => {}}>
-                  <View
-                    style={{
-                      marginVertical: pixelSizeVertical(2.6),
-                      justifyContent: 'center',
-                      height: verticalScale(80),
-                      alignItems: 'center',
-                    }}>
+                  <View style={styles.steplabelText}>
                     <Text
                       style={{
                         color: 'black',
@@ -345,29 +312,12 @@ const MyLogoutTripScreen = ({route, navigation}) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-                navigation.navigate('UpComing')
+              navigation.navigate('UpComing');
             }}
             activeOpacity={1}
             disabled={!dropEmployee}
-            style={{
-              width: horizontalScale(130),
-              height: verticalScale(50),
-              backgroundColor: 'rgba(197, 25, 125, 1)',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: pixelSizeVertical(15),
-              marginBottom: pixelSizeVertical(30),
-              borderRadius: 6,
-              alignSelf: 'center',
-            }}>
-            <Text
-              style={{
-                color: 'white',
-                fontFamily: FontFamily.regular,
-                fontSize: fontPixel(16),
-              }}>
-              Stop Trip
-            </Text>
+            style={styles.stopTripButton}>
+            <Text style={styles.stopTripText}>Stop Trip</Text>
           </TouchableOpacity>
 
           <DriveToZoneModal
@@ -465,7 +415,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
           />
         </ScrollView>
         <BottomTab activeTab="MyTrips" />
-        {/* <TabNavigator /> */}
       </View>
     </View>
   );
@@ -521,5 +470,53 @@ const styles = StyleSheet.create({
     fontSize: fontPixel(16),
     alignSelf: 'center',
     marginTop: pixelSizeVertical(8),
+  },
+  stepInicatorStyles: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: pixelSizeHorizontal(20),
+  },
+  checkBoxStyles: {
+    marginVertical: pixelSizeVertical(2.6),
+    justifyContent: 'center',
+    height: verticalScale(80),
+    width: horizontalScale(50),
+    marginRight: pixelSizeHorizontal(10),
+  },
+  checkCircleStyles: {
+    width: SCREEN_HEIGHT * 0.028,
+    height: SCREEN_HEIGHT * 0.028,
+    borderRadius: (SCREEN_HEIGHT * 0.028) / 2,
+    borderColor: 'rgba(102, 39, 110, 1)',
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepLabelStyle: {
+    width: horizontalScale(80),
+    borderWidth: 1,
+    borderColor: 'rgba(246, 246, 246, 1)',
+  },
+  steplabelText: {
+    marginVertical: pixelSizeVertical(2.6),
+    justifyContent: 'center',
+    height: verticalScale(80),
+    alignItems: 'center',
+  },
+  stopTripButton: {
+    width: horizontalScale(130),
+    height: verticalScale(50),
+    backgroundColor: 'rgba(197, 25, 125, 1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: pixelSizeVertical(15),
+    marginBottom: pixelSizeVertical(30),
+    borderRadius: 6,
+    alignSelf: 'center',
+  },
+  stopTripText: {
+    color: 'white',
+    fontFamily: FontFamily.regular,
+    fontSize: fontPixel(16),
   },
 });

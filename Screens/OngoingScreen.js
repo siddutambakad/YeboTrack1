@@ -6,8 +6,9 @@ import {
   Modal,
   TouchableWithoutFeedback,
   ScrollView,
+  Dimensions,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Cars from '../assets/images/cars.svg';
 import FontFamily from './Styles/FontFamily';
 import Cancel from '../assets/images/cancel.svg';
@@ -19,57 +20,98 @@ import {
   pixelSizeVertical,
   verticalScale,
 } from './Utils/Dimensions';
+import {AppContext} from './Context/AppContext';
+import {formatDate} from './Utils/ReusableFunctions';
+import Loader from './Components/Loader';
+import RN from 'react-native';
+const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
-const OngoingScreen = () => {
+const OngoingScreen = ({navigation}) => {
   const [showModal, setShowModal] = useState(false);
+  const {
+    driverRoasterList: {onGoing},
+  } = useContext(AppContext);
+  // console.log('ongoingRoasters', ongoingRoasters);
+  const [loader, setLoader] = useState(true);
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setLoader(false);
+    }, 800);
+
+    return () => clearTimeout(delay);
+  }, []);
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Cars width={80} height={80} />
-      </View>
-      {/*slot starts */}
-      <View style={styles.slotAndDateText}>
-        <Text style={styles.slottext}>SLOT# : N/A</Text>
-        <Text style={styles.dateText}>16-10-2021</Text>
-      </View>
-      {/* ticket details*/}
-      <View style={styles.ticketNodetails}>
-        <View>
-          <Text style={styles.ticketNoText}>Ticket No</Text>
-          <Text style={styles.tripNoText}>Trip Type</Text>
-          <Text style={styles.noOfPeopleText}>No of people</Text>
-          <Text style={styles.distanceText}>Distance</Text>
-          <Text style={styles.timeText}>Time</Text>
+      {onGoing.length === 0 ? (
+        <View style={styles.noDataFoundContainer}>
+          <Text style={styles.noDataFoundText}>No Data for Ongoing Trips</Text>
         </View>
-        <View>
-          <Text style={styles.ticketText}>#000988786</Text>
-          <Text style={styles.rosterText}>Roster</Text>
-          <Text style={styles.numberOfPeopleText}>6</Text>
-          <Text style={styles.distanceMilesText}>2.4 miles</Text>
-          <Text style={styles.minutesText}>23mins</Text>
-        </View>
-      </View>
-      {/* total amount */}
-      <View style={styles.totalFare}>
-        <Text style={styles.totalFareText}>Total Fare</Text>
-        <Text style={styles.totalAmountText}>110$</Text>
-      </View>
-      <View style={styles.trackAndCancelButton}>
-        <TouchableOpacity
-          style={styles.trackButton}
-          onPress={() => {
-            setShowModal(true);
-          }}>
-          <Text style={styles.trackText}>Track Trip</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => {
-            setShowModal(true);
-          }}>
-          <Text style={styles.cancelTripText}>Cancel Trip</Text>
-        </TouchableOpacity>
-      </View>
+      ) : (
+        <>
+          <View style={styles.imageContainer}>
+            <Cars width={horizontalScale(80)} height={verticalScale(80)} />
+          </View>
+          <View style={{backgroundColor: 'rgba(246, 246, 246, 1)'}}>
+            {onGoing.map((roaster, index) => (
+              <>
+                <View key={index} style={styles.slotAndDateText}>
+                  <Text style={styles.slottext}>SLOT# : N/A</Text>
+                  <Text style={styles.dateText}>
+                    {formatDate(roaster?.roasterDate)}
+                  </Text>
+                </View>
+                <View style={styles.ticketNodetails}>
+                  <View>
+                    {/* <Text style={styles.ticketNoText}>Ticket No</Text> */}
+                    <Text style={styles.tripNoText}>Trip Type</Text>
+                    <Text style={styles.noOfPeopleText}>No of people</Text>
+                    <Text style={styles.distanceText}>Distance</Text>
+                    <Text style={styles.timeText}>Time</Text>
+                  </View>
+                  <View>
+                    {/* <Text style={styles.ticketText}>#000988786</Text> */}
+                    <Text style={styles.rosterText}>
+                      {roaster?.roasterRouteType}
+                    </Text>
+                    <Text style={styles.numberOfPeopleText}>
+                      {roaster?.noOfPeople}
+                    </Text>
+                    <Text style={styles.distanceMilesText}>
+                      {roaster?.routeDistance}
+                    </Text>
+                    <Text style={styles.minutesText}>{roaster?.routeTime}</Text>
+                  </View>
+                </View>
+              </>
+            ))}
+          </View>
+          <View style={styles.trackAndCancelButton}>
+            <TouchableOpacity
+              style={styles.trackButton}
+              onPress={() => {
+                if (onGoing.length > 0) {
+                  navigation.navigate('MyTripDetail', {
+                    idRoasterDays: onGoing[0].idRoasterDays,
+                    driverContactNo: onGoing[0].driverContactNo,
+                    roastertype: onGoing[0].roasterType,
+                    // Add other properties you want to send here
+                  });
+                }
+              }}>
+              <Text style={styles.trackText}>Track Trip</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => {
+                setShowModal(true);
+              }}>
+              <Text style={styles.cancelTripText}>Cancel Trip</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
       <Modal visible={showModal} animationType="fade" transparent={true}>
         <TouchableWithoutFeedback
           onPress={() => {
@@ -114,6 +156,7 @@ const OngoingScreen = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {loader && <Loader />}
     </ScrollView>
   );
 };
@@ -129,11 +172,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 20,
     backgroundColor: 'rgba(229, 229, 229, 1)',
-    width: 100,
-    height: 100,
+    width: SCREEN_HEIGHT * 0.15,
+    height: SCREEN_HEIGHT * 0.15,
+    borderRadius: (SCREEN_HEIGHT * 0.15) / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 50,
+    // borderRadius: 50,
   },
   slotAndDateText: {
     flexDirection: 'row',
@@ -176,7 +220,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: pixelSizeHorizontal(20),
-    marginTop: pixelSizeVertical(30),
   },
   cancelButton: {
     width: horizontalScale(170),
@@ -312,5 +355,15 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
     fontSize: fontPixel(16),
     fontWeight: '600',
+  },
+  noDataFoundContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: pixelSizeVertical(50),
+  },
+  noDataFoundText: {
+    fontSize: fontPixel(20),
+    fontFamily: FontFamily.semiBold,
+    color: 'black',
   },
 });

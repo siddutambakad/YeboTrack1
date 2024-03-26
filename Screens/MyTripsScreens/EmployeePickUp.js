@@ -28,49 +28,27 @@ import {handleCallPress, openGoogleMap} from '../Utils/ReusableFunctions';
 import RN from 'react-native';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
-const EmployeePickUp = ({navigation}) => {
-  const [data, setData] = useState([
-    {
-      employeeName: 'siddu',
-      employeeAddress:
-        '118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block, Koramangala, Bengaluru, Karnataka 560095',
-      image: require('../../assets/images/profile.png'),
-    },
-    {
-      employeeName: 'balu',
-      employeeAddress:
-        '118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block, Koramangala, Bengaluru, Karnataka 560095',
-      image: require('../../assets/images/profile.png'),
-    },
-    {
-      employeeName: 'ankit',
-      employeeAddress:
-        '118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block, Koramangala, Bengaluru, Karnataka 560095',
-      image: require('../../assets/images/profile.png'),
-    },
-    {
-      employeeName: 'mahesh',
-      employeeAddress:
-        '118, 80 Feet Rd, Above Bodyworks Spa, KHB Colony, 7th Block, Koramangala, Bengaluru, Karnataka 560095',
-      image: require('../../assets/images/profile.png'),
-    },
-  ]);
+const EmployeePickUp = ({navigation, route}) => {
+  const {employeeDetail} = route.params;
   const [showConformationModal, setShowConformationModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
+  const [updatedEmployeeDetail, setUpdatedEmployeeDetail] =
+    useState(employeeDetail);
 
-  const openGoogleMaps = () => {
-    openGoogleMap('37.7749', '-122.4194');
+  const openGoogleMaps = item => {
+    openGoogleMap(item?.pickUpLocation);
+    console.log('pickUpLocation', item?.pickUpLocation);
   };
 
-  const handleDialPress = () => {
-    handleCallPress('123456789');
+  const handleDialPress = item => {
+    handleCallPress(item?.employeeMobile);
   };
   const removeItem = () => {
     if (selectedItemIndex !== null) {
-      const newData = [...data];
+      const newData = [...updatedEmployeeDetail];
       newData.splice(selectedItemIndex, 1); // Remove the item at selectedItemIndex
-      setData(newData);
+      setUpdatedEmployeeDetail(newData); // Update the state with the new data
     }
     setShowConformationModal(false);
   };
@@ -90,20 +68,24 @@ const EmployeePickUp = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (data.length === 0) {
+    if (updatedEmployeeDetail.length === 0) {
+      const clickedTime = formatTime(new Date()); // Get the current time
       navigation.navigate('MyTripDetail', {
         otpVerified: true,
-        clickedTime: handleButtonClick(), // You might need to handle this part appropriately
+        clickedTime: clickedTime,
       });
     }
-  }, [data]);
+  }, [updatedEmployeeDetail]);
 
   const renderItems = ({item, index}) => {
     return (
       <View style={styles.cardContainer}>
         <View style={styles.employeesText}>
-          <View style={{flex: 0.3, alignItems: 'center'}}>
-            <Image source={item.image} style={styles.profileImage} />
+          <View style={{flex: 0.4, alignItems: 'center'}}>
+            <Image
+              source={require('../../assets/images/profile.png')}
+              style={styles.profileImage}
+            />
             <Text style={styles.employeeName}>{item.employeeName}</Text>
             <View
               style={{
@@ -111,10 +93,16 @@ const EmployeePickUp = ({navigation}) => {
                 justifyContent: 'flex-end',
                 marginVertical: pixelSizeVertical(8),
               }}>
-              <TouchableOpacity onPress={handleDialPress}>
+              <TouchableOpacity
+                onPress={() => {
+                  handleDialPress(item);
+                }}>
                 <Call width={horizontalScale(45)} height={verticalScale(45)} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={openGoogleMaps}>
+              <TouchableOpacity
+                onPress={() => {
+                  openGoogleMaps(item);
+                }}>
                 <Location
                   width={horizontalScale(45)}
                   height={verticalScale(45)}
@@ -122,16 +110,16 @@ const EmployeePickUp = ({navigation}) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={{flex: 0.7}}>
+          <View style={{flex: 0.6}}>
             <View>
               <Text
                 style={{
                   textAlign: 'left',
-                  fontSize: fontPixel(16),
+                  fontSize: fontPixel(14),
                   fontFamily: FontFamily.medium,
                   color: 'black',
                 }}>
-                {item.employeeAddress}
+                {item?.dropLocationName}
               </Text>
             </View>
           </View>
@@ -192,7 +180,7 @@ const EmployeePickUp = ({navigation}) => {
       </View>
       <View style={styles.subContainer}>
         <FlatList
-          data={data}
+          data={updatedEmployeeDetail}
           renderItem={renderItems}
           style={{marginTop: pixelSizeVertical(10)}}
         />
@@ -206,12 +194,6 @@ const EmployeePickUp = ({navigation}) => {
         }}
         onPressYes={() => {
           removeItem();
-          // if (data.length === 0) {
-          //   navigation.navigate('MyTripDetail', {
-          //     otpVerified: true,
-          //     clickedTime: handleButtonClick(),
-          //   });
-          // }
         }}
       />
       <CustomModal
@@ -223,12 +205,6 @@ const EmployeePickUp = ({navigation}) => {
           handleButtonClick();
           setShowOtpModal(false);
           removeItem();
-          // if (data.length === 0) {
-          //   navigation.navigate('MyTripDetail', {
-          //     otpVerified: true,
-          //     clickedTime: handleButtonClick(),
-          //   });
-          // }
         }}
         onPressCancelButton={() => {
           setShowOtpModal(false);
@@ -297,8 +273,9 @@ const styles = StyleSheet.create({
   },
   employeeName: {
     fontFamily: FontFamily.semiBold,
-    fontSize: fontPixel(18),
+    fontSize: fontPixel(14),
     color: 'black',
+    textAlign: 'center',
   },
   checkOutButton: {
     width: horizontalScale(120),

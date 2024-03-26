@@ -7,14 +7,9 @@ import {
   TextInput,
   Image,
   Alert,
-  useWindowDimensions,
   Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  StatusBar,
 } from 'react-native';
 import React, {useContext, useRef, useState} from 'react';
-import YeboLogo from '../assets/images/yeboFinalLogo.svg';
 import Check from '../assets/images/check.svg';
 import CheckCircle from '../assets/images/checked.svg';
 import Loader from './Components/Loader';
@@ -35,7 +30,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const OtpScreen = ({navigation, route}) => {
-  // const {height, width, scale, fontScale} = useWindowDimensions();
   const {height, width} = Dimensions.get('window');
   const imageAspectRatio = 20.5 / 9;
   const {otpResponse} = route.params;
@@ -130,10 +124,15 @@ const OtpScreen = ({navigation, route}) => {
       const response = await axios.post(APIS.verifyOtp, verifyData);
       const res_ponse = response.data;
       console.log('verified', res_ponse);
-      await setUserData(res_ponse);
-      // setOtpResponseData(res_ponse);
+      
+      if (res_ponse?.userRoleDesc === 'Driver') {
+        navigation.navigate('Driver');
+        // setDriverId(res_ponse.idDriver)
+        await setUserData(res_ponse);
+      } else {
+        navigation.navigate('Home');
+      }
       handleLogin();
-      navigation.navigate('Driver');
     } catch (error) {
       console.log('error', error);
       if (error.response) {
@@ -190,149 +189,100 @@ const OtpScreen = ({navigation, route}) => {
       console.log('otpResponseData saved successfully');
     } catch (error) {}
   };
-
-  const StatusBarHeight =
-    Platform.OS === 'android' ? StatusBar.currentHeight : 0;
-
-  const availableScreenHeight =
-    height > 550
-      ? width > 550
-        ? height - StatusBarHeight
-        : height
-      : height - StatusBarHeight;
   return (
-    <KeyboardAvoidingView
-      style={{flex: 1}}
-      behavior={Platform.OS === 'ios' ? 'padding' : null}>
-      <ScrollView style={{flex: 1}}>
-        <View style={styles.container}>
-          <View
-            style={[
-              styles.subContainer,
-              {height: availableScreenHeight * 0.7},
-            ]}>
-            <YeboLogo
-              width={horizontalScale(100)}
-              height={verticalScale(100)}
-            />
-            <Text style={styles.vertifyotpText}>Verify OTP</Text>
-            <View style={styles.otpSent}>
-              <CheckCircle />
-              <Text style={styles.otpSentText}>
-                OTP has been sent to your mobile.
-              </Text>
-            </View>
-            <TextInput
-              ref={inputRef}
-              onFocus={() => {
-                handleFocus();
-              }}
-              style={styles.otpInput}
-              placeholder="Enter otp"
-              placeholderTextColor={'#A9A9A9'}
-              maxLength={6}
-              keyboardType="number-pad"
-              onChangeText={e => {
-                setUserDetails({
-                  ...userDetails,
-                  otp: e,
-                });
-                setShowError({
-                  ...showError,
-                  otp: false,
-                });
-              }}
-              // onBlur={() => {
-              //   if (!otpRegex.test(userDetails.otp)) {
-              //     setErrorMsg({
-              //       ...errorMsg,
-              //       otp: 'Enter valid otp',
-              //     });
-              //     setShowError({
-              //       ...showError,
-              //       otp: true,
-              //     });
-              //   } else {
-              //     setErrorMsg({
-              //       ...errorMsg,
-              //       otp: '',
-              //     });
-              //     setShowError({
-              //       ...showError,
-              //       otp: false,
-              //     });
-              //   }
-              // }}
-              value={userDetails.otp}
-            />
-            {showError.otp && (
-              <Text style={styles.errorText}>{errorMsg.otp}</Text>
-            )}
-            {errorMsg.ResponseError ? (
-              <Text style={styles.errorText}>{errorMsg.ResponseError}</Text>
-            ) : null}
-            <View style={styles.otpSentButton}>
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => {
-                  setSelectedOption(!selectedOption);
-                  setShowError({
-                    ...showError,
-                    termsAndCondition: false,
-                  });
-                }}>
-                <View style={styles.checkbox}>
-                  {selectedOption && (
-                    <Check
-                      width={horizontalScale(10)}
-                      height={verticalScale(10)}
-                    />
-                  )}
-                </View>
-              </TouchableOpacity>
-              <Text style={styles.otpText}>
-                I agree to the{' '}
-                <Text style={styles.termsAndConditionText}>
-                  terms and conditions
-                </Text>
-              </Text>
-            </View>
-            {showError.termsAndCondition && (
-              <Text style={styles.errorText}>{errorMsg.termsAndCondition}</Text>
-            )}
-            <TouchableOpacity
-              style={styles.resendButton}
-              onPress={() => {
-                resendOtp();
-              }}>
-              <Text style={styles.resendOtpText}>Resend OTP</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                handleButtonClick();
-              }}
-              style={styles.verifyotpButton}>
-              <Text style={styles.verifyOtp}>Verify OTP</Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={[
-              styles.imageContainer,
-              {height: availableScreenHeight * 0.3},
-            ]}>
-            <Image
-              source={require('../assets/images/bottomImage.png')}
-              style={{
-                width: '100%',
-                height: width / imageAspectRatio,
-                objectFit: 'contain',
-              }}
-            />
-          </View>
+    <ScrollView
+      style={{height: Dimensions.get('window').height, backgroundColor: 'red'}}>
+      <View style={styles.container}>
+        <Image
+          source={require('../assets/images/yeboFinalLogo.png')}
+          style={styles.yebologo}
+        />
+        <Text style={styles.vertifyotpText}>Verify OTP</Text>
+        <View style={styles.otpSent}>
+          <CheckCircle />
+          <Text style={styles.otpSentText}>
+            OTP has been sent to your mobile.
+          </Text>
         </View>
-        {loader && <Loader />}
-      </ScrollView>
-    </KeyboardAvoidingView>
+        <TextInput
+          ref={inputRef}
+          onFocus={() => {
+            handleFocus();
+          }}
+          style={styles.otpInput}
+          placeholder="Enter otp"
+          placeholderTextColor={'#A9A9A9'}
+          maxLength={6}
+          keyboardType="number-pad"
+          onChangeText={e => {
+            setUserDetails({
+              ...userDetails,
+              otp: e,
+            });
+            setShowError({
+              ...showError,
+              otp: false,
+            });
+          }}
+          value={userDetails.otp}
+        />
+        {showError.otp && <Text style={styles.errorText}>{errorMsg.otp}</Text>}
+        {errorMsg.ResponseError ? (
+          <Text style={styles.errorText}>{errorMsg.ResponseError}</Text>
+        ) : null}
+        <View style={styles.otpSentButton}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              setSelectedOption(!selectedOption);
+              setShowError({
+                ...showError,
+                termsAndCondition: false,
+              });
+            }}>
+            <View style={styles.checkbox}>
+              {selectedOption && (
+                <Check width={horizontalScale(10)} height={verticalScale(10)} />
+              )}
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.otpText}>
+            I agree to the{' '}
+            <Text style={styles.termsAndConditionText}>
+              terms and conditions
+            </Text>
+          </Text>
+        </View>
+        {showError.termsAndCondition && (
+          <Text style={styles.errorText}>{errorMsg.termsAndCondition}</Text>
+        )}
+        <TouchableOpacity
+          style={styles.resendButton}
+          onPress={() => {
+            resendOtp();
+          }}>
+          <Text style={styles.resendOtpText}>Resend OTP</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            handleButtonClick();
+          }}
+          style={styles.verifyotpButton}>
+          <Text style={styles.verifyOtp}>Verify OTP</Text>
+        </TouchableOpacity>
+        <Image
+          source={require('../assets/images/bottomImage.png')}
+          style={{
+            width: '100%',
+            height: width / imageAspectRatio,
+            objectFit: 'contain',
+            position: 'absolute',
+            bottom: 0
+          }}
+        />
+      </View>
+      {loader && <Loader />}
+    </ScrollView>
   );
 };
 
@@ -340,13 +290,12 @@ export default OtpScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: 'white',
+    height: Dimensions.get('window').height,
+    alignItems: 'center',
   },
   subContainer: {
     alignItems: 'center',
-    // marginTop: pixelSizeVertical(10),
-    // flex: 0.7,
     justifyContent: 'center',
   },
   vertifyotpText: {
@@ -382,7 +331,6 @@ const styles = StyleSheet.create({
     borderColor: '#65276F',
     alignItems: 'center',
     justifyContent: 'center',
-    // padding: 10,
   },
   otpSentButton: {
     flexDirection: 'row',
@@ -432,24 +380,17 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     fontSize: fontPixel(14),
   },
-  imageContainer: {
-    // flex: 0.35,
-    justifyContent: 'flex-end',
-  },
-  // image: {
-  //   // width: '100%',
-  //   // height: '100%',
-  //   position: 'absolute',
-  //   bottom: pixelSizeVertical(0),
-  //   width: horizontalScale(400),
-  //   height: verticalScale(190),
-  //   alignSelf: 'center',
-  //   objectFit: 'scale-down',
-  // },
   errorText: {
     color: 'red',
     fontFamily: fontFamily.regular,
     alignSelf: 'center',
     fontSize: fontPixel(13),
+  },
+  yebologo: {
+    width: horizontalScale(80),
+    height: verticalScale(80),
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginTop: '15%',
   },
 });
