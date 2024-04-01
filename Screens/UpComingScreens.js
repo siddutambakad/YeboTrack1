@@ -18,28 +18,28 @@ import {formatDate} from './Utils/ReusableFunctions';
 
 const UpComingScreens = ({navigation}) => {
   const {driverRoasterList} = useContext(AppContext);
-  console.log('upcomingRoasters', driverRoasterList.upcoming);
 
   const [showModal, setShowModal] = useState(false);
 
   const handleItemClick = item => {
-    console.log('item-------->>>>>', item?.idRoasterDays);
     if (item.roasterRouteType === 'Pick-Up') {
       navigation.navigate('MyTripDetail', {
         idRoasterDays: item?.idRoasterDays,
         driverContactNo: item?.driverContactNo,
         roastertype: item?.roasterType,
+        // items: item
       });
     } else if (item.roasterRouteType === 'Drop') {
       // Navigate to a different screen for logout status
       navigation.navigate('MyLogoutTrip', {
         idRoasterDays: item?.idRoasterDays,
+        driverContactNo: item?.driverContactNo,
+        roastertype: item?.roasterType,
       });
     }
   };
 
   const renderItems = ({item, index}) => {
-    console.log('item=====>>>', item);
     return (
       <TouchableOpacity
         activeOpacity={0.6}

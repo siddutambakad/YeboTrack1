@@ -37,7 +37,10 @@ import Loader from '../Components/Loader';
 import {
   convertedTime,
   convertedTimeforEvent,
+  getCurrentLocation,
+  getLocationName,
   openSettings,
+  requestLocationPermission,
 } from '../Utils/ReusableFunctions';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -45,6 +48,7 @@ const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const MyTripDetails = ({route, navigation}) => {
   const {
+    resumeOngoingTrip,
     idRoasterDays,
     driveOfficeOtp,
     driveOfficeTime,
@@ -54,10 +58,16 @@ const MyTripDetails = ({route, navigation}) => {
     clickedTime,
     driverContactNo,
     roastertype,
+    otpVerifiedForStartTripScreen,
+    tripId,
+    guardId,
+    // items,
   } = route.params;
+    // console.log("🚀 ~ MyTripDetails---------->>>>>>>>> ~ items:", items)
+    // console.log("🚀 ~ MyTripDetails ~ tripId:", tripId)
+
   const [showStartTripModal, setShowStartTripModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showOtpForStartTrip, setShowOtpForStartTrip] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [modalPopupOptions, setModalPopupOptions] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -68,8 +78,11 @@ const MyTripDetails = ({route, navigation}) => {
   const [pickupGuard, setPickupGuard] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const [responseInfo, setResponseInfo] = useState([]);
-  const [currentLocation, setCurrentLocation] = useState(null);
-  console.log('currentLocation', currentLocation);
+  const [otpError, setOtpError] = useState({
+    isOtpError: false,
+    otpErrorMessage: '',
+  });
+  const [otpValidateResponse, setOtpValidateResponse] = useState([]);
 
   useEffect(() => {
     if (driveOfficeOtp) {
@@ -81,22 +94,49 @@ const MyTripDetails = ({route, navigation}) => {
     } else if (stopTrip) {
       setSelectedPosition(5);
       time.push(stopTripTime);
+    } else if (otpVerifiedForStartTripScreen) {
+      setShowStartTripModal(true);
     }
-  }, [driveOfficeOtp, otpVerified, stopTrip]);
+  }, [
+    driveOfficeOtp,
+    otpVerified,
+    stopTrip,
+    otpVerifiedForStartTripScreen,
+    resumeOngoingTrip,
+  ]);
+
+  useEffect(() => {
+    if (resumeOngoingTrip) {
+      getTripDetails(idRoasterDays);
+    }
+  }, [idRoasterDays]);
 
   useEffect(() => {
     getTripDetails(idRoasterDays);
   }, [idRoasterDays]);
 
-  const getTripDetails = async driverId => {
+  const stepperPointChanger = tripDetail => {
+    const dt = new Map([
+      ['Not-Started', 0],
+      ['Trip-Start', 1],
+      ['Guard-Check-In', 2],
+      ['Onboarding Completed', 3],
+      ['Trip-End', 4],
+    ]);
+    setSelectedPosition(dt.get(tripDetail?.tripStatusDesc));
+  };
+
+  const getTripDetails = async idRoasterDays => {
     setLoader(true);
     try {
-      const apiUrl = `${APIS.getTripDeatils}/${driverId}`;
+      const apiUrl = `${APIS.getTripDeatils}/${idRoasterDays}`;
       const response = await axios.get(apiUrl);
       const responseData = response?.data;
+      stepperPointChanger(responseData?.returnLst?.tripDetail);
       setResponseInfo(responseData?.returnLst);
       setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
       setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
+     
     } catch (error) {
       console.log('error from the tripdetail', error);
     } finally {
@@ -104,21 +144,182 @@ const MyTripDetails = ({route, navigation}) => {
     }
   };
 
-  // const sendStartOtp = async () => {
+  const sendOtpForGuard = async () => {
+    setLoader(true);
+    setOtpError({
+      isOtpError: false,
+      otpErrorMessage: '',
+    });
+    try {
+      await requestLocationPermission();
+      const currentLocation = await getCurrentLocation();
+      const {latitude, longitude} = currentLocation;
+
+      const locationName = await getLocationName(latitude, longitude);
+      const apiUrl = `${APIS.sendOtpForGuard}`;
+      const requestBodyForGuard = {
+        roasterId: responseInfo?.idRoaster,
+        tripId: resumeOngoingTrip ? responseInfo.tripDetail?.idTrip : tripId,
+        idRoasterDays: idRoasterDays,
+        tripEventDtm: convertedTimeforEvent(),
+        eventGpsdtm: convertedTime(),
+        eventGpslocationLatLon: `${latitude},${longitude}`,
+        eventGpslocationName: locationName,
+        guardID: resumeOngoingTrip ? pickupGuard?.idGuard : guardId,
+        mobileNo: pickupGuard?.mobileNo,
+      };
+      console.log(
+        '\nsendrequestBodyForGuard:',
+        JSON.stringify(requestBodyForGuard, null, 2),
+        '\n',
+      );
+
+      axios
+        .post(apiUrl, requestBodyForGuard)
+        .then(response => {
+          console.log('===response', JSON.stringify(response, null, 2));
+          setOtpValidateResponse(response.data?.returnLst);
+          setShowOtpModal(true);
+        })
+        .catch(error => {
+          if (error?.response) {
+            console.log(
+              '===rerror1',
+              JSON.stringify(error?.response?.data, null, 2),
+            );
+            console.log('===rerror2', error?.response?.status);
+          }
+        });
+    } catch (error) {
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  const validateOtpForGuard = async Otp => {
+    setLoader(true);
+    try {
+      await requestLocationPermission();
+      const currentLocation = await getCurrentLocation();
+      const {latitude, longitude} = currentLocation;
+
+      const locationName = await getLocationName(latitude, longitude);
+
+      const apiUrl = `${APIS.validateOtpForGuard}`;
+      const requestBodyForGuard = {
+        tripId: otpValidateResponse?.tripId,
+        roasterId: otpValidateResponse?.idRoaster,
+        idRoasterDays: idRoasterDays,
+        guardID: otpValidateResponse?.guardId,
+        mobileNo: otpValidateResponse?.mobileNo,
+        tripOtp: Otp,
+        guardOTPGPSDTM: convertedTime(),
+        guardOTPGPSLocationLatLon: `${latitude},${longitude}`,
+        guardOTPGPSLocationName: locationName,
+      };
+      console.log(
+        '\notprequestBodyForGuard:',
+        JSON.stringify(requestBodyForGuard, null, 2),
+        '\n',
+      );
+      const response = await axios.post(
+        APIS.sendOtpForGuard,
+        requestBodyForGuard,
+      );
+      console.log('response===>', response);
+      if (response.data.statusCode === 200) {
+        setOtpError({
+          isOtpError: false,
+          otpErrorMessage: '',
+        });
+      } else {
+        setOtpError({
+          isOtpError: true,
+          otpErrorMessage: 'Incorrect Otp',
+        });
+      }
+    } catch (error) {
+      console.log(
+        '\nError validateing OTP:',
+        JSON.stringify(error?.message, null, 2),
+        '\n',
+      );
+      setOtpError({
+        isOtpError: true,
+        otpErrorMessage: 'Incorrect Otp',
+      });
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  // const requestLocationPermission = async () => {
   //   try {
-  //     const sendStartOtpBody = {
-  //       roasterId: responseInfo?.idRoaster,
-  //       tripEventDtm: convertedTimeforEvent(),
-  //       eventGpsdtm: convertedTime(),
-  //       eventGpslocationLatLon: 'Driver Latitude,Longitude',
-  //       eventGpslocationName: 'Driver Location Name',
-  //       driverID: driverId,
-  //       mobileNo: pickupGuard?.mobileNo,
-  //     };
-  //     const response = await axios.post(APIS.getStartTripOtp, sendStartOtpBody);
-  //     setResponseData(response.data);
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //     );
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       getCurrentLocation();
+  //     } else {
+  //       console.log('Gallery permission denied');
+  //       Alert.alert(
+  //         'Alert!!',
+  //         'Please grant gallery permission to use this feature.',
+  //         [
+  //           {
+  //             text: 'Ask me Later',
+  //           },
+  //           {
+  //             text: 'Cancel',
+  //           },
+  //           {
+  //             text: 'OK',
+  //             onPress: () => {
+  //               openSettings();
+  //             },
+  //           },
+  //         ],
+  //         {cancelable: false},
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //   }
+  // };
+
+  // const getCurrentLocation = () => {
+  //   return new Promise((resolve, reject) => {
+  //     Geolocation.getCurrentPosition(
+  //       position => {
+  //         const {latitude, longitude} = position.coords;
+  //         resolve({latitude, longitude});
+  //       },
+  //       error => {
+  //         console.log('Error getting current location:', error);
+  //         reject(error);
+  //       },
+  //     );
+  //   });
+  // };
+  // const getLocationName = async (latitude, longitude) => {
+  //   try {
+  //     const apiKey = 'AIzaSyAol1uOPzQnphvxtIatoLH-Ayw6OUwRpbA';
+  //     const response = await axios.get(
+  //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
+  //     );
+
+  //     // Parse the response
+  //     const {results} = response.data;
+  //     if (results && results.length > 0) {
+  //       // Extract the formatted address or other relevant information
+  //       const locationName = results[0].formatted_address;
+  //       return locationName;
+  //     } else {
+  //       return 'Unknown Location';
+  //     }
   //   } catch (error) {
-  //     console.log('Error sending OTP:', error);
+  //     console.error('Error fetching location:', error);
+  //     return 'Unknown Location';
   //   }
   // };
 
@@ -127,7 +328,8 @@ const MyTripDetails = ({route, navigation}) => {
       button_text: 'Guard Check - In',
       button_action: () => {
         setShowModal(false);
-        setShowOtpModal(true);
+        // setShowOtpModal(true);
+        sendOtpForGuard();
       },
       isSocialMediaRequired: false,
     });
@@ -137,8 +339,20 @@ const MyTripDetails = ({route, navigation}) => {
   const handlePickupEmployeeClick = () => {
     navigation.navigate('PickUp', {
       employeeDetail: employeeDetails,
+      tripId: tripId,
     });
     setPickupEmployeeCompleted(true);
+  };
+
+  const handleEndTripClick = () => {
+    navigation.navigate('StopTrip', {
+      roasterId: responseInfo?.idRoaster,
+      tripId: tripId,
+      tripId: responseInfo?.tripDetail?.idTrip,
+      idRoasterDays: idRoasterDays,
+      driverId: responseInfo?.idDriver,
+      mobileNo: driverContactNo,
+    });
   };
   const formatTime = time => {
     const hours = time.getHours();
@@ -200,52 +414,8 @@ const MyTripDetails = ({route, navigation}) => {
     handleStartTrip,
     handlePickupGuardClick,
     handlePickupEmployeeClick,
-    // handleDriveToOfficeClick,
-    () => navigation.navigate('StopTrip'),
+    handleEndTripClick,
   ];
-  // const requestLocationPermission = async () => {
-  //   try {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //     );
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       getLocation();
-  //     } else {
-  //       console.log('Gallery permission denied');
-  //       Alert.alert(
-  //         'Alert!!',
-  //         'Please grant gallery permission to use this feature.',
-  //         [
-  //           {
-  //             text: 'Ask me Later',
-  //           },
-  //           {
-  //             text: 'Cancel',
-  //           },
-  //           {
-  //             text: 'OK',
-  //             onPress: () => {
-  //               openSettings();
-  //             },
-  //           },
-  //         ],
-  //         {cancelable: false},
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.warn(err);
-  //   }
-  // };
-  // const getLocation = () => {
-  //   Geolocation.getCurrentPosition(
-  //     position => {
-  //       const {latitude, longitude} = position.coords;
-  //       setCurrentLocation({latitude, longitude});
-  //       console.log('latitude, longitude', latitude, longitude);
-  //     },
-  //     error => console.log('error', error),
-  //   );
-  // };
 
   return (
     <View style={styles.container}>
@@ -392,6 +562,8 @@ const MyTripDetails = ({route, navigation}) => {
             }
             onPressOK={() => {
               setShowStartTripModal(false);
+              setSelectedPosition(1);
+              time.push(handleButtonClick());
               // setShowOtpForStartTrip(true);
             }}
             onPressNo={() => {
@@ -421,25 +593,15 @@ const MyTripDetails = ({route, navigation}) => {
             }}
             showConfirmModal={showConfirmModal}
           />
-          {/* <CustomModal
-            visible={showOtpForStartTrip}
-            title={'Enter Otp'}
-            onClose={() => setShowOtpForStartTrip(false)}
-            onPressSubmitButton={() => {
-              setShowOtpForStartTrip(false);
-              setSelectedPosition(1);
-              time.push(handleButtonClick());
-            }}
-            onPressCancelButton={() => {
-              setShowOtpModal(false);
-            }}
-          /> */}
+
           {/* otp modal */}
           <CustomModal
             visible={showOtpModal}
             title={'Enter Otp'}
             onClose={() => setShowOtpModal(false)}
-            onPressSubmitButton={() => {
+            onPressSubmitButton={async e => {
+              // setOtp(e);
+              validateOtpForGuard(e);
               setShowOtpModal(false);
               setSelectedPosition(2);
               time.push(handleButtonClick());
@@ -447,6 +609,8 @@ const MyTripDetails = ({route, navigation}) => {
             onPressCancelButton={() => {
               setShowOtpModal(false);
             }}
+            isOtpError={otpError.isOtpError}
+            OTPErrorMessage={otpError.otpErrorMessage}
           />
 
           {loader && <Loader />}

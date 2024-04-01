@@ -80,7 +80,7 @@ const PickupGuardModal = props => {
 
               <Text style={styles.modalText1}>{name}</Text>
               <Text style={styles.modalText2}>{pickupTime}</Text>
-              <Text style={styles.locationText}>Pickup Location</Text>
+              {/* <Text style={styles.locationText}>Pickup Location</Text> */}
               <Text style={styles.addressText}>{Address}</Text>
               <View
                 style={

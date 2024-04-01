@@ -2,34 +2,30 @@ import {FlatList, StyleSheet, Text, View} from 'react-native';
 import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
-import { AppContext, UpcomingLists } from './Context/AppContext';
-import { fontPixel } from './Utils/Dimensions';
+import {AppContext, UpcomingLists} from './Context/AppContext';
+import {fontPixel} from './Utils/Dimensions';
+import {formatDate} from './Utils/ReusableFunctions';
+import {useFocusEffect} from '@react-navigation/native';
 
 const RecentScreen = () => {
-  // const [data, setData] = useState([1, 1, 1, 1, 1, 1, 1]);
-const {driverRoasterList} = useContext(AppContext)
+  const {
+    driverRoasterList: {recent},
+  } = useContext(AppContext);
 
-  const renderItems = (item, index) => {
+  useFocusEffect(React.useCallback(() => {}, [recent]));
+
+  const renderItems = ({item, index}) => {
     return (
       <View style={{marginVertical: 10, marginHorizontal: 20}}>
-        <Text
-          style={styles.ticketNoText}>
-          Ticket no. - 00052386-1
+        <Text style={styles.ticketNoText}>
+          {`Ticket no. - ${item?.idRoaster}`}
         </Text>
-        <Text
-          style={styles.dateAndTimeText}>
-          13March 2021 12:30 PM
+        <Text style={styles.dateAndTimeText}>
+          {`Date: ${formatDate(item?.roasterDate)}`}
         </Text>
-        <Text
-          style={styles.dbTestText}>
-          debTest
-        </Text>
-        <View
-          style={styles.rateing}>
-          <Text
-            style={styles.rateingText}>
-            OR O5 1234
-          </Text>
+        <Text style={styles.dbTestText}>{`${item?.fleetAgencyName}`}</Text>
+        <View style={styles.rateing}>
+          <Text style={styles.rateingText}>OR O5 1234</Text>
           <Rating
             type="star"
             tintColor="#F6F6F6"
@@ -49,7 +45,24 @@ const {driverRoasterList} = useContext(AppContext)
   };
   return (
     <View style={{flex: 1, backgroundColor: 'rgba(246, 246, 246, 1)'}}>
-      <FlatList data={driverRoasterList?.recent} renderItem={renderItems} style={{marginTop: 20}} />
+      {recent.length === 0 ? (
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <Text
+            style={{
+              fontFamily: FontFamily.medium,
+              fontSize: fontPixel(18),
+              color: 'black',
+            }}>
+            No Recent Trips
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={recent}
+          renderItem={renderItems}
+          style={{marginTop: 20}}
+        />
+      )}
     </View>
   );
 };

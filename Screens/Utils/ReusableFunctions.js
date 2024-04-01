@@ -1,4 +1,6 @@
-import {Linking, Platform} from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
+import axios from 'axios';
+import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
 export const handleCallPress = phoneNumber => {
   Linking.openURL(`tel:${phoneNumber}`);
@@ -48,5 +50,76 @@ export const openSettings = () => {
     Linking.openSettings();
   } else {
     Linking.openURL('app-settings:');
+  }
+};
+
+export const requestLocationPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      getCurrentLocation();
+    } else {
+      console.log('Location permission denied');
+      Alert.alert(
+        'Alert!!',
+        'Please grant location permission to use this feature.',
+        [
+          {
+            text: 'Ask me Later',
+          },
+          {
+            text: 'Cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              openSettings();
+            },
+          },
+        ],
+        { cancelable: false },
+      );
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+};
+
+export const getCurrentLocation = () => {
+  return new Promise((resolve, reject) => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        resolve({ latitude, longitude });
+      },
+      error => {
+        console.log('Error getting current location:', error);
+        reject(error);
+      },
+    );
+  });
+};
+
+export const getLocationName = async (latitude, longitude) => {
+  try {
+    const apiKey = 'AIzaSyAol1uOPzQnphvxtIatoLH-Ayw6OUwRpbA';
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
+    );
+
+    // Parse the response
+    const { results } = response.data;
+    if (results && results.length > 0) {
+      // Extract the formatted address or other relevant information
+      const locationName = results[0].formatted_address;
+      return locationName;
+    } else {
+      return 'Unknown Location';
+    }
+  } catch (error) {
+    console.error('Error fetching location:', error);
+    return 'Unknown Location';
   }
 };

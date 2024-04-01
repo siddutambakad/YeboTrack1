@@ -25,11 +25,13 @@ const CustomModal = props => {
     onPressSubmitButton,
     onPressCancelButton,
     title,
-    options,
+    isOtpError,
+    OTPErrorMessage,
   } = props;
 
   const handleCancelButton = () => {
     onPressCancelButton();
+    setUserDetails({});
   };
 
   const [userDetails, setUserDetails] = useState({
@@ -56,7 +58,7 @@ const CustomModal = props => {
       });
       setUserDetails('');
       setErrorMsg({});
-      onPressSubmitButton();
+      onPressSubmitButton(userDetails.otp);
     }
   };
 
@@ -107,32 +109,15 @@ const CustomModal = props => {
                     otp: false,
                   });
                 }}
-                // onBlur={() => {
-                //   if (!otpRegex.test(userDetails.otp)) {
-                //     setErrorMsg({
-                //       ...errorMsg,
-                //       otp: 'Enter valid otp',
-                //     });
-                //     setShowError({
-                //       ...showError,
-                //       otp: true,
-                //     });
-                //   } else {
-                //     setErrorMsg({
-                //       ...errorMsg,
-                //       otp: '',
-                //     });
-                //     setShowError({
-                //       ...showError,
-                //       otp: false,
-                //     });
-                //   }
-                // }}
                 value={userDetails.otp}
               />
+              {isOtpError && (
+                <Text style={styles.errorText}>{OTPErrorMessage}</Text>
+              )}
               {showError.otp && (
                 <Text style={styles.errorText}>{errorMsg.otp}</Text>
               )}
+
               <View
                 style={{
                   flexDirection: 'row',

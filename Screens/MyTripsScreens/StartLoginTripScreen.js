@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import StopTrip from '../../assets/images/stopTrip.svg';
 import Bell from '../../assets/images/bellIcon.svg';
 import Sos from '../../assets/images/sos.svg';
@@ -28,21 +28,13 @@ import Loader from '../Components/Loader';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
+// const driverID = 11;
+
 const StartLoginTripSCreen = ({navigation, route}) => {
   const {roasterId, roasterIdDays, driverId, driverNo, roasterRouteType} =
     route.params;
-  console.log(
-    'roasterId',
-    roasterId,
-    'roasterIdDays',
-    roasterIdDays,
-    'driverId',
-    driverId,
-    'driverNo',
-    driverNo,
-    'roasterRouteType',
-    roasterRouteType,
-  );
+  console.log('roasterIdDays', roasterIdDays);
+
   const formatTime = time => {
     const hours = time.getHours();
     const minutes = time.getMinutes();
@@ -51,11 +43,22 @@ const StartLoginTripSCreen = ({navigation, route}) => {
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
     return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
   };
+
   const [showOtpForStartTrip, setShowOtpForStartTrip] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState({
+    isOtpError: false,
+    otpErrorMessage: '',
+  });
+  const [otpResponse, setOtpResponse] = useState([]);
 
   const sendStartOtp = async () => {
     setLoader(true);
+    setOtpError({
+      isOtpError: false,
+      otpErrorMessage: '',
+    });
     try {
       await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
@@ -64,7 +67,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
 
       const sendStartOtpBody = {
-        roasterId: roasterId,
+        roasterId,
         roasterDaysId: roasterIdDays,
         tripEventDtm: convertedTimeforEvent(),
         eventGpsdtm: convertedTime(),
@@ -72,7 +75,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         eventGpslocationName: locationName,
         driverID: driverId,
         mobileNo: driverNo,
-        roasterRouteType: roasterRouteType,
+        roasterRouteType,
       };
       console.log(
         '\nsendStartOtpBody',
@@ -80,19 +83,79 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         '\n',
       );
       const response = await axios.post(APIS.getStartTripOtp, sendStartOtpBody);
-      console.log(
-        '\nresponse',
-        JSON.stringify(response.data, null, 2),
-        '\n',
-      );
-      showOtpForStartTrip(true)
-
+      console.log('\nresponse', JSON.stringify(response.data, null, 2), '\n');
+      setOtpResponse(response.data?.returnLst);
+      setShowOtpForStartTrip(true);
     } catch (error) {
       console.log(
         '\nError sending OTP:',
         JSON.stringify(error?.message, null, 2),
         '\n',
       );
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  const validateOtp = async OTP => {
+    setLoader(true);
+    try {
+      const currentLocation = await getCurrentLocation();
+      const {latitude, longitude} = currentLocation;
+
+      const locationName = await getLocationName(latitude, longitude);
+      const validateOtpBody = {
+        roasterId: otpResponse?.roasterId,
+        idRoasterDays: otpResponse?.roasterDaysId,
+        driverID: otpResponse?.driverID,
+        mobileNo: otpResponse?.mobileNo,
+        tripOtp: OTP,
+        tripOdoMtrStart: '000000',
+        tripStartGpsdtm: convertedTime(),
+        tripStartGpslocationLatLon: `${latitude},${longitude}`,
+        tripStartGpslocationName: locationName,
+        roasterRouteType: roasterRouteType,
+      };
+      const apiUrl = `${APIS.validateStartTripOtp}`;
+      const responseData = await axios.post(apiUrl, validateOtpBody);
+      console.log(
+        '\nvalidateOtp',
+        JSON.stringify(responseData.data, null, 2),
+        '\n',
+      );
+      if (responseData.data.statusCode === 200) {
+        setOtpError({
+          isOtpError: false,
+          otpErrorMessage: '',
+        });
+        navigation.navigate('MyTripDetail', {
+          otpVerifiedForStartTripScreen: true,
+          starttripTime: formatTime(new Date()),
+          tripId: responseData.data.returnLst?.tripId,
+          guardId: responseData.data.returnLst?.guardId,
+          idRoasterDays: responseData.data.returnLst?.idRoasterDays,
+        });
+        console.log(
+          'tripId: responseData.data.returnLst?.tripId,',
+          responseData.data.returnLst?.tripId,
+        );
+        setShowOtpForStartTrip(false);
+      } else {
+        setOtpError({
+          isOtpError: true,
+          otpErrorMessage: 'Incorrect Otp',
+        });
+      }
+    } catch (error) {
+      console.log(
+        '\nError validateing OTP:',
+        JSON.stringify(error?.message, null, 2),
+        '\n',
+      );
+      setOtpError({
+        isOtpError: true,
+        otpErrorMessage: 'Incorrect Otp',
+      });
     } finally {
       setLoader(false);
     }
@@ -131,6 +194,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
       console.warn(err);
     }
   };
+
   const getCurrentLocation = () => {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
@@ -216,10 +280,6 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         <View style={{flex: 0.4, alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => {
-              // navigation.navigate('MyTripDetail', {
-              //   startTrip: true,
-              //   startTripTime: formatTime(new Date()),
-              // });
               sendStartOtp();
             }}
             style={{
@@ -244,15 +304,15 @@ const StartLoginTripSCreen = ({navigation, route}) => {
             visible={showOtpForStartTrip}
             title={'Enter Otp'}
             onClose={() => setShowOtpForStartTrip(false)}
-            onPressSubmitButton={() => {
-              setShowOtpForStartTrip(false);
-              // setSelectedPosition(1);
-              // time.push(handleButtonClick());
+            onPressSubmitButton={e => {
+              setOtp(e);
+              validateOtp(e);
             }}
             onPressCancelButton={() => {
-              // setShowOtpModal(false);
               setShowOtpForStartTrip(false);
             }}
+            isOtpError={otpError.isOtpError}
+            OTPErrorMessage={otpError.otpErrorMessage}
           />
         </View>
         <BottomTab activeTab="MyTrips" />
@@ -291,14 +351,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  bellButton: {
-    // width: 50,
-    // height: 50,
-    // backgroundColor: '#FFFFFF',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // borderRadius: 30,
-  },
+  bellButton: {},
   subContainer: {
     flex: 1,
     backgroundColor: 'rgba(246, 246, 246, 1)',

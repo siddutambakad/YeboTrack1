@@ -25,7 +25,7 @@ import {
 } from './Utils/Dimensions';
 import AddPhotoModal from './Components/AddPhotoModal';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
+// import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
 import RN from 'react-native';
 import {AppContext} from './Context/AppContext';
 
@@ -35,7 +35,6 @@ const DriverHomeScreen = ({navigation}) => {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
   const {driverDetails} = useContext(AppContext);
-  console.log('driverDetails', driverDetails);
   const handleMyTripsPress = () => {
     navigation.navigate('MyTrip');
   };

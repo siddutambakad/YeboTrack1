@@ -31,7 +31,7 @@ const OngoingScreen = ({navigation}) => {
   const {
     driverRoasterList: {onGoing},
   } = useContext(AppContext);
-  // console.log('ongoingRoasters', ongoingRoasters);
+  console.log("🚀 ~ OngoingScreen ~ onGoing:", onGoing)
   const [loader, setLoader] = useState(true);
 
   useEffect(() => {
@@ -90,29 +90,30 @@ const OngoingScreen = ({navigation}) => {
             <TouchableOpacity
               style={styles.trackButton}
               onPress={() => {
-                if (onGoing.length > 0) {
-                  navigation.navigate('MyTripDetail', {
-                    idRoasterDays: onGoing[0].idRoasterDays,
-                    driverContactNo: onGoing[0].driverContactNo,
-                    roastertype: onGoing[0].roasterType,
-                    // Add other properties you want to send here
-                  });
-                }
+                  if (onGoing[0].roasterType === 1) {
+                    navigation.navigate('MyTripDetail', {
+                      resumeOngoingTrip: true,
+                      idRoasterDays: onGoing[0].idRoasterDays,
+                      driverContactNo: onGoing[0].driverContactNo,
+                      roasterType: onGoing[0].roasterType,
+                    });
+                  } else {
+                    navigation.navigate('MyLogoutTrip', {
+                      resumeOngoingTrip: true,
+                      idRoasterDays: onGoing[0].idRoasterDays,
+                      driverContactNo: onGoing[0].driverContactNo,
+                      roasterType: onGoing[0].roasterType,
+                    });
+                  }
+                  
               }}>
               <Text style={styles.trackText}>Track Trip</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setShowModal(true);
-              }}>
-              <Text style={styles.cancelTripText}>Cancel Trip</Text>
             </TouchableOpacity>
           </View>
         </>
       )}
 
-      <Modal visible={showModal} animationType="fade" transparent={true}>
+      {/* <Modal visible={showModal} animationType="fade" transparent={true}>
         <TouchableWithoutFeedback
           onPress={() => {
             setShowModal(false);
@@ -155,11 +156,12 @@ const OngoingScreen = ({navigation}) => {
             </View>
           </View>
         </TouchableWithoutFeedback>
-      </Modal>
+      </Modal> */}
       {loader && <Loader />}
     </ScrollView>
   );
 };
+ 
 
 export default OngoingScreen;
 
@@ -217,8 +219,8 @@ const styles = StyleSheet.create({
     paddingRight: 55,
   },
   trackAndCancelButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    // flexDirection: 'row',
+    // justifyContent: 'space-between',
     marginHorizontal: pixelSizeHorizontal(20),
   },
   cancelButton: {
@@ -236,13 +238,13 @@ const styles = StyleSheet.create({
     fontSize: fontPixel(12),
   },
   trackButton: {
-    width: horizontalScale(170),
-    height: verticalScale(50),
+    width: horizontalScale(175),
+    height: verticalScale(55),
     backgroundColor: 'rgba(197, 25, 125, 1)',
     alignItems: 'center',
     justifyContent: 'center',
     // marginVertical: 30,
-    // alignSelf: 'center',
+    alignSelf: 'center',
     borderRadius: 8,
   },
   trackText: {
