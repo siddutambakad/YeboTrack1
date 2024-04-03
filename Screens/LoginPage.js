@@ -122,7 +122,9 @@ const LoginPage = ({navigation}) => {
 
         <Text style={styles.phoneNumberText}>Phone Number</Text>
         <View style={styles.phoneNumberAndTextInput}>
+          <View style={styles.countriesText}>
           <Text style={styles.countryText}>+91</Text>
+          </View>
           <TextInput
             // ref={inputRef}
             style={styles.phoneNumberInput}
@@ -224,15 +226,17 @@ const styles = StyleSheet.create({
     color: '#65276F',
     fontSize: fontPixel(16),
   },
-  countryText: {
+  countriesText: {
     width: '20%',
     backgroundColor: 'lightgray',
     height: verticalScale(55),
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    color: 'black',
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countryText: {
+    color: 'black',
     fontSize: fontPixel(16),
   },
   getOtpButton: {

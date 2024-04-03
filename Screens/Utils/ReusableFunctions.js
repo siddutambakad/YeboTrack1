@@ -1,13 +1,14 @@
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
-import {Linking, PermissionsAndroid, Platform} from 'react-native';
+import {Alert, Linking, PermissionsAndroid, Platform} from 'react-native';
 
 export const handleCallPress = phoneNumber => {
   Linking.openURL(`tel:${phoneNumber}`);
 };
 
 export const openGoogleMap = (latitude, longitude) => {
-  const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  // const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  const url = `geo:${latitude},${longitude}?q=my_location`;
   Linking.openURL(url);
 };
 
@@ -79,7 +80,7 @@ export const requestLocationPermission = async () => {
             },
           },
         ],
-        { cancelable: false },
+        {cancelable: false},
       );
     }
   } catch (err) {
@@ -91,13 +92,14 @@ export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
     Geolocation.getCurrentPosition(
       position => {
-        const { latitude, longitude } = position.coords;
-        resolve({ latitude, longitude });
+        const {latitude, longitude} = position.coords;
+        resolve({latitude, longitude});
       },
       error => {
         console.log('Error getting current location:', error);
         reject(error);
       },
+      {enableHighAccuracy: true},
     );
   });
 };
@@ -110,7 +112,7 @@ export const getLocationName = async (latitude, longitude) => {
     );
 
     // Parse the response
-    const { results } = response.data;
+    const {results} = response.data;
     if (results && results.length > 0) {
       // Extract the formatted address or other relevant information
       const locationName = results[0].formatted_address;

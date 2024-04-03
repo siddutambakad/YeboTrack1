@@ -126,9 +126,12 @@ const OtpScreen = ({navigation, route}) => {
       console.log('verified', res_ponse);
       
       if (res_ponse?.userRoleDesc === 'Driver') {
-        navigation.navigate('Driver');
         // setDriverId(res_ponse.idDriver)
         await setUserData(res_ponse);
+        let ck = setTimeout(() => {
+          navigation.navigate('Driver');
+          clearTimeout(ck);
+        }, 800);
       } else {
         navigation.navigate('Home');
       }

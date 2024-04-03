@@ -35,6 +35,16 @@
 	<string/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+	<key>NSCameraUsageDescription</key>
+  	<string>YeboTrack Wants Access The Camera</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+  	<string>YeboTrack Wants Access The Gallery</string>
+  	<key>NSPhotoLibraryAddUsageDescription</key>
+  	<string>YeboTrack Wants Access The PhotoGallery</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+  	<string>YeboTrack Wants to Access the Location</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>YeboTrack Wants Access The MediaGallery</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

@@ -7,6 +7,8 @@ import {
   View,
   TouchableWithoutFeedback,
   Image,
+  SafeAreaView,
+  Dimensions,
 } from 'react-native';
 import React, {useContext, useState} from 'react';
 import Back from '../assets/images/VectorBack.svg';
@@ -32,41 +34,43 @@ import BottomTab from './Components/BottomTab';
 
 const MyTripsScreen = ({navigation}) => {
   return (
-    <View style={styles.container}>
-      {/* header starts */}
-      <View style={styles.header}>
-        <View>
-          <TouchableOpacity
-            style={styles.backbutton}
-            onPress={() => {
-              navigation.navigate('Driver');
-            }}>
-            <Back width={horizontalScale(24)} height={verticalScale(24)} />
-            <Text style={styles.backbuttonText}>My Trips</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={{flex: 1, backgroundColor: 'rgba(102, 39, 110, 1)'}}>
+        {/* header starts */}
+        <View style={styles.header}>
+          <View>
+            <TouchableOpacity
+              style={styles.backbutton}
+              onPress={() => {
+                navigation.navigate('Driver');
+              }}>
+              <Back width={horizontalScale(24)} height={verticalScale(24)} />
+              <Text style={styles.backbuttonText}>My Trips</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.subMainHeader}>
+            <TouchableOpacity style={{paddingRight: 20}}>
+              <Sos width={horizontalScale(50)} height={verticalScale(50)} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {}}
+              style={styles.bellButton}>
+              <Bell
+                width={horizontalScale(50)}
+                height={verticalScale(50)}
+                fill={'#C5197D'}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.subMainHeader}>
-          <TouchableOpacity style={{paddingRight: 20}}>
-            <Sos width={horizontalScale(50)} height={verticalScale(50)} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => {}}
-            style={styles.bellButton}>
-            <Bell
-              width={horizontalScale(50)}
-              height={verticalScale(50)}
-              fill={'#C5197D'}
-            />
-          </TouchableOpacity>
+        {/* sub container starts */}
+        <View style={styles.myTripNavi}>
+          <MyTripNavigator />
+          <BottomTab activeTab="MyTrips" />
         </View>
       </View>
-      {/* sub container starts */}
-      <View style={styles.myTripNavi}>
-        <MyTripNavigator />
-        <BottomTab activeTab="MyTrips" />
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -74,10 +78,11 @@ export default MyTripsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(102, 39, 110, 1)',
-    flex: 1,
+    backgroundColor: 'white',
+    height: Dimensions.get('window').height,
   },
   header: {
+    // backgroundColor: 'rgba(102, 39, 110, 1)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

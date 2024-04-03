@@ -63,8 +63,8 @@ const MyTripDetails = ({route, navigation}) => {
     guardId,
     // items,
   } = route.params;
-    // console.log("🚀 ~ MyTripDetails---------->>>>>>>>> ~ items:", items)
-    // console.log("🚀 ~ MyTripDetails ~ tripId:", tripId)
+  // console.log("🚀 ~ MyTripDetails---------->>>>>>>>> ~ items:", items)
+  console.log('🚀 ~ MyTripDetails ~ tripId:', tripId);
 
   const [showStartTripModal, setShowStartTripModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -83,17 +83,18 @@ const MyTripDetails = ({route, navigation}) => {
     otpErrorMessage: '',
   });
   const [otpValidateResponse, setOtpValidateResponse] = useState([]);
+  console.log('🚀 ~ MyTripDetails ~ otpValidateResponse:', otpValidateResponse);
 
   useEffect(() => {
     if (driveOfficeOtp) {
       setSelectedPosition(4);
-      time.push(driveOfficeTime);
+      // time.push(driveOfficeTime);
     } else if (otpVerified) {
-      time.push(clickedTime);
+      // time.push(clickedTime);
       setSelectedPosition(3);
     } else if (stopTrip) {
       setSelectedPosition(5);
-      time.push(stopTripTime);
+      // time.push(stopTripTime);
     } else if (otpVerifiedForStartTripScreen) {
       setShowStartTripModal(true);
     }
@@ -109,7 +110,7 @@ const MyTripDetails = ({route, navigation}) => {
     if (resumeOngoingTrip) {
       getTripDetails(idRoasterDays);
     }
-  }, [idRoasterDays]);
+  }, [resumeOngoingTrip]);
 
   useEffect(() => {
     getTripDetails(idRoasterDays);
@@ -124,6 +125,10 @@ const MyTripDetails = ({route, navigation}) => {
       ['Trip-End', 4],
     ]);
     setSelectedPosition(dt.get(tripDetail?.tripStatusDesc));
+
+    if (dt.get(tripDetail?.tripStatusDesc) >= 3) {
+      setPickupEmployeeCompleted(true);
+    }
   };
 
   const getTripDetails = async idRoasterDays => {
@@ -136,7 +141,6 @@ const MyTripDetails = ({route, navigation}) => {
       setResponseInfo(responseData?.returnLst);
       setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
       setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
-     
     } catch (error) {
       console.log('error from the tripdetail', error);
     } finally {
@@ -150,8 +154,8 @@ const MyTripDetails = ({route, navigation}) => {
       isOtpError: false,
       otpErrorMessage: '',
     });
+    await requestLocationPermission();
     try {
-      await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
 
@@ -187,7 +191,10 @@ const MyTripDetails = ({route, navigation}) => {
               '===rerror1',
               JSON.stringify(error?.response?.data, null, 2),
             );
-            console.log('===rerror2', error?.response?.status);
+            if (error?.response?.data?.statusMessage === 'Record Exists') {
+              setOtpValidateResponse(error?.response?.data?.returnLst);
+              setShowOtpModal(true);
+            }
           }
         });
     } catch (error) {
@@ -222,10 +229,7 @@ const MyTripDetails = ({route, navigation}) => {
         JSON.stringify(requestBodyForGuard, null, 2),
         '\n',
       );
-      const response = await axios.post(
-        APIS.sendOtpForGuard,
-        requestBodyForGuard,
-      );
+      const response = await axios.post(apiUrl, requestBodyForGuard);
       console.log('response===>', response);
       if (response.data.statusCode === 200) {
         setOtpError({
@@ -253,76 +257,6 @@ const MyTripDetails = ({route, navigation}) => {
     }
   };
 
-  // const requestLocationPermission = async () => {
-  //   try {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //     );
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       getCurrentLocation();
-  //     } else {
-  //       console.log('Gallery permission denied');
-  //       Alert.alert(
-  //         'Alert!!',
-  //         'Please grant gallery permission to use this feature.',
-  //         [
-  //           {
-  //             text: 'Ask me Later',
-  //           },
-  //           {
-  //             text: 'Cancel',
-  //           },
-  //           {
-  //             text: 'OK',
-  //             onPress: () => {
-  //               openSettings();
-  //             },
-  //           },
-  //         ],
-  //         {cancelable: false},
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.warn(err);
-  //   }
-  // };
-
-  // const getCurrentLocation = () => {
-  //   return new Promise((resolve, reject) => {
-  //     Geolocation.getCurrentPosition(
-  //       position => {
-  //         const {latitude, longitude} = position.coords;
-  //         resolve({latitude, longitude});
-  //       },
-  //       error => {
-  //         console.log('Error getting current location:', error);
-  //         reject(error);
-  //       },
-  //     );
-  //   });
-  // };
-  // const getLocationName = async (latitude, longitude) => {
-  //   try {
-  //     const apiKey = 'AIzaSyAol1uOPzQnphvxtIatoLH-Ayw6OUwRpbA';
-  //     const response = await axios.get(
-  //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
-  //     );
-
-  //     // Parse the response
-  //     const {results} = response.data;
-  //     if (results && results.length > 0) {
-  //       // Extract the formatted address or other relevant information
-  //       const locationName = results[0].formatted_address;
-  //       return locationName;
-  //     } else {
-  //       return 'Unknown Location';
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching location:', error);
-  //     return 'Unknown Location';
-  //   }
-  // };
-
   const handlePickupGuardClick = () => {
     setModalPopupOptions({
       button_text: 'Guard Check - In',
@@ -333,15 +267,17 @@ const MyTripDetails = ({route, navigation}) => {
       },
       isSocialMediaRequired: false,
     });
+    requestLocationPermission();
     setShowModal(true);
   };
 
   const handlePickupEmployeeClick = () => {
+    setPickupEmployeeCompleted(true);
     navigation.navigate('PickUp', {
       employeeDetail: employeeDetails,
       tripId: tripId,
+      tripType: responseInfo?.tripDetail?.tripType
     });
-    setPickupEmployeeCompleted(true);
   };
 
   const handleEndTripClick = () => {
@@ -353,19 +289,6 @@ const MyTripDetails = ({route, navigation}) => {
       driverId: responseInfo?.idDriver,
       mobileNo: driverContactNo,
     });
-  };
-  const formatTime = time => {
-    const hours = time.getHours();
-    const minutes = time.getMinutes();
-    const amOrPm = hours >= 12 ? 'pm' : 'am';
-    const formattedHours = hours % 12 || 12; // Convert 0 to 12
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-  };
-  const handleButtonClick = () => {
-    const currentTime = new Date();
-    const formattedTime = formatTime(currentTime);
-    return formattedTime;
   };
 
   const handleStartTrip = () => {
@@ -547,7 +470,14 @@ const MyTripDetails = ({route, navigation}) => {
           {pickupEmployeeCompleted && (
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('StopTrip');
+                navigation.navigate('StopTrip', {
+                  roasterId: responseInfo?.idRoaster,
+                  tripId: tripId,
+                  tripId: responseInfo?.tripDetail?.idTrip,
+                  idRoasterDays: idRoasterDays,
+                  driverId: responseInfo?.idDriver,
+                  mobileNo: driverContactNo,
+                });
               }}
               activeOpacity={1}
               style={styles.endtripButton}>
@@ -563,7 +493,7 @@ const MyTripDetails = ({route, navigation}) => {
             onPressOK={() => {
               setShowStartTripModal(false);
               setSelectedPosition(1);
-              time.push(handleButtonClick());
+              // time.push(handleButtonClick());
               // setShowOtpForStartTrip(true);
             }}
             onPressNo={() => {
@@ -604,7 +534,7 @@ const MyTripDetails = ({route, navigation}) => {
               validateOtpForGuard(e);
               setShowOtpModal(false);
               setSelectedPosition(2);
-              time.push(handleButtonClick());
+              // time.push(handleButtonClick());
             }}
             onPressCancelButton={() => {
               setShowOtpModal(false);

@@ -42,24 +42,15 @@ import Loader from '../Components/Loader';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const EmployeePickUp = ({navigation, route}) => {
-  const {employeeDetail, tripId} = route.params;
-  // console.log('🚀 ~ EmployeePickUp ~ employeeDetail:', employeeDetail);
-  // console.log(
-  //   '\nemployeeDetail',
-  //   JSON.stringify(employeeDetail, null, 2),
-  //   '\n',
-  // );
-  // console.log(
-  //   '\ntripId',
-  //   JSON.stringify(tripId, null, 2),
-  //   '\n',
-  // );
+  const {employeeDetail, tripId, tripType} = route.params;
+  console.log("🚀 ~ EmployeePickUp ~ tripType:", tripType)
 
   const [showConformationModal, setShowConformationModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
   const [updatedEmployeeDetail, setUpdatedEmployeeDetail] =
     useState(employeeDetail);
+   
   const [loader, setLoader] = useState(false);
   const [checkinResponse, setCheckInResponse] = useState([]);
   const [otpError, setOtpError] = useState({
@@ -67,6 +58,7 @@ const EmployeePickUp = ({navigation, route}) => {
     otpErrorMessage: '',
   });
   const [tripIds, setTripIds] = useState(null);
+  const [idRoasterDays, setIdRoasterDays] = useState(null);
 
   const openGoogleMaps = item => {
     openGoogleMap(item?.pickUpLocation);
@@ -85,19 +77,23 @@ const EmployeePickUp = ({navigation, route}) => {
   };
 
   useEffect(() => {
+    console.log('hi1');
     if (updatedEmployeeDetail.length === 0) {
-      if (employeeDetail.roasterRoutetype === 1) {
-        navigation.navigate('MyTripDetail', {
-          otpVerified: true,
-          // clickedTime: clickedTime,
-          tripId: tripIds,
-        });
-      } else {
-        navigation.navigate('MyLogoutTrip', {
-          otpVerified: true,
-          // clickedTime: clickedTime,
-          tripId: tripIds,
-        });
+      console.log('hi2');
+      if (updatedEmployeeDetail.roasterRoutetypeDesc === 'PickUp') {
+        // navigation.navigate('MyTripDetail', {
+        //   otpVerified: true,
+        //   tripId: tripIds,
+        //   idRoasterDays: idRoasterDays,
+        // });
+        console.log('hi3');
+      } else if (employeeDetail.roasterRoutetypeDesc === 'Drop') {
+        // navigation.navigate('MyLogoutTrip', {
+        //   otpVerified: true,
+        //   tripId: tripIds,
+        //   idRoasterDays: idRoasterDays,
+        // });
+        console.log('hello');
       }
     }
   }, [updatedEmployeeDetail]);
@@ -178,6 +174,7 @@ const EmployeePickUp = ({navigation, route}) => {
       );
       const tripId = response.data.returnLst?.tripId;
       setTripIds(tripId);
+      setIdRoasterDays(response.data?.returnLst?.idRoasterDays);
       if (response.data.statusCode === 200) {
         setOtpError({
           isOtpError: false,
@@ -196,17 +193,17 @@ const EmployeePickUp = ({navigation, route}) => {
     }
   };
 
-  const skipEmployeeOtp = async item => {
+  const skipEmployeeOtp = async (item, _tripId) => {
     setLoader(true);
     try {
-      const apiUrl = `${APIS.sendSkipEmpCheckIn}`;
       await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
 
       const locationName = await getLocationName(latitude, longitude);
+      const apiUrl = `${APIS.sendSkipEmpCheckIn}`;
       const skipRequestBody = {
-        tripId: tripId,
+        tripId: _tripId,
         roasterId: item?.idRoaster,
         roasterDetailId: item?.idRoasterDetails,
         tripEventDtm: convertedTimeforEvent(),
@@ -227,6 +224,7 @@ const EmployeePickUp = ({navigation, route}) => {
       const tripId = skipResponse.data.returnLst?.tripId;
 
       setTripIds(tripId);
+      setIdRoasterDays(skipResponse.data?.returnLst?.idRoasterDays);
       removeItem();
       setShowConformationModal(false);
     } catch (error) {
@@ -278,7 +276,7 @@ const EmployeePickUp = ({navigation, route}) => {
                   fontFamily: FontFamily.medium,
                   color: 'black',
                 }}>
-                {item?.dropLocationName}
+                {item?.pickUpLocationName}
               </Text>
             </View>
           </View>
@@ -302,7 +300,6 @@ const EmployeePickUp = ({navigation, route}) => {
           <TouchableOpacity
             style={styles.checkOutButton}
             onPress={() => {
-              // setShowOtpModal(true);
               sendOtpForEmployeeCheckIn(item);
               setSelectedItemIndex(index);
             }}>
@@ -354,8 +351,7 @@ const EmployeePickUp = ({navigation, route}) => {
           setShowConformationModal(false);
         }}
         onPressYes={() => {
-          // removeItem();
-          skipEmployeeOtp(updatedEmployeeDetail[selectedItemIndex]);
+          skipEmployeeOtp(updatedEmployeeDetail[selectedItemIndex], tripId);
           setShowConformationModal(false);
         }}
       />
@@ -365,7 +361,6 @@ const EmployeePickUp = ({navigation, route}) => {
           setShowOtpModal(false);
         }}
         onPressSubmitButton={enteredOtp => {
-          // handleButtonClick();
           validateOtpForEmployee(
             enteredOtp,
             updatedEmployeeDetail[selectedItemIndex],

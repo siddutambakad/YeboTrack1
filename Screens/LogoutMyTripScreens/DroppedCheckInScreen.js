@@ -1,4 +1,5 @@
 import {
+  FlatList,
   Image,
   Linking,
   StyleSheet,
@@ -24,58 +25,102 @@ import {
 import CustomModal from '../Components/Modal';
 import BottomTab from '../Components/BottomTab';
 import RN from 'react-native';
-import { handleCallPress, openGoogleMap } from '../Utils/ReusableFunctions';
+import {handleCallPress, openGoogleMap} from '../Utils/ReusableFunctions';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
-const DroppedCheckInScreen = ({navigation, props}) => {
-  const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otpSubmitedForEmployee, setOtpSubmitedForEmployee] = useState(false);
-  const [runningTime, setRunningTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(true);
+const DroppedCheckInScreen = ({navigation, route}) => {
+  const {employeeDetails} = route.params;
 
-  useEffect(() => {
-    let interval;
+  const [updatedEmployeeDetail, setUpdatedEmployeeDetail] =
+    useState(employeeDetails);
 
-    if (isRunning) {
-      interval = setInterval(() => {
-        setRunningTime(prevTime => prevTime + 1);
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [isRunning]);
-
-  const formatTime = time => {
-    const hours = time.getHours();
-    const minutes = time.getMinutes();
-    const amOrPm = hours >= 12 ? 'pm' : 'am';
-    const formattedHours = hours % 12 || 12; // Convert 0 to 12
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
+  const openGoogleMaps = item => {
+    // console.log("🚀 ~ openGoogleMaps ~ item:", `${item?.pickUpLocation}`)
+    const location = item?.dropLocation ? `${item.dropLocation}` : '';
+    openGoogleMap(location);
   };
-  const handleButtonClick = () => {
-    const currentTime = new Date();
-    const time = formatTime(currentTime);
-    navigation.navigate('MyLogoutTrip', {
-      DroppedEmployee: true,
-      droppedTime: time,
-    });
-  };
-  // Format the running time into minutes and seconds
-  const minutes = Math.floor(runningTime / 60);
-  const seconds = runningTime % 60;
-  const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds
-    .toString()
-    .padStart(2, '0')}`;
 
-    const openGoogleMaps = () => {
-      openGoogleMap('37.7749', '-122.4194');
-    };
-  
-    const handleDialPress = () => {
-      handleCallPress('123456789');
-    };
+  const handleDialPress = item => {
+    handleCallPress(`${item?.employeeMobile}`);
+  };
+
+  const renderItems = ({item, index}) => {
+    return (
+      <View style={styles.cardContainer}>
+        <View style={styles.employeesText}>
+          <View style={{flex: 0.4, alignItems: 'center'}}>
+            <Image
+              source={require('../../assets/images/profile.png')}
+              style={styles.profileImage}
+            />
+            <Text style={styles.employeeName}>{item.employeeName}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginVertical: pixelSizeVertical(8),
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  handleDialPress(item);
+                }}>
+                <Call width={horizontalScale(45)} height={verticalScale(45)} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  openGoogleMaps(item);
+                }}>
+                <Location
+                  width={horizontalScale(45)}
+                  height={verticalScale(45)}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={{flex: 0.6}}>
+            <View>
+              <Text
+                style={{
+                  textAlign: 'left',
+                  fontSize: fontPixel(14),
+                  fontFamily: FontFamily.medium,
+                  color: 'black',
+                }}>
+                {item?.dropLocationName}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: pixelSizeHorizontal(20),
+          }}>
+          <TouchableOpacity
+            style={styles.checkOutButton}
+            onPress={() => {
+              setShowConformationModal(true);
+              setSelectedItemIndex(index);
+            }}>
+            <Text style={styles.checkOutText}>Break</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.checkOutButton}
+            onPress={() => {
+              // setShowOtpModal(true);
+              sendOtpForEmployeeCheckIn(item);
+              setSelectedItemIndex(index);
+            }}>
+            <Text style={styles.checkOutText}>Check Out</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -104,70 +149,12 @@ const DroppedCheckInScreen = ({navigation, props}) => {
         </View>
       </View>
       <View style={styles.subContainer}>
-        <View style={styles.container1}>
-          <Clock width={horizontalScale(100)} height={verticalScale(100)} />
-          <View style={styles.timeAndMinutes}>
-            <Text style={styles.timeText}>{formattedTime}</Text>
-            <Text style={styles.minutesText}>mins</Text>
-          </View>
-          <Text style={styles.waitingText}>Waiting for employee check-in</Text>
-        </View>
-        <View style={styles.container2}>
-          <View style={styles.mainContainer}>
-            <View style={styles.imageAndCall}>
-              <Image
-                source={require('../../assets/images/profile.png')}
-                style={styles.profileImage}
-              />
-              <View style={{paddingLeft: 10}}>
-                <Text style={styles.profileText}>John Doe</Text>
-                <Text style={styles.pickupTimeText}>
-                  Pickup Time - 10:13 am
-                </Text>
-              </View>
-            </View>
-            <View style={styles.callAndLocation}>
-              <TouchableOpacity
-                onPress={() => {
-                  handleDialPress();
-                }}>
-                <Call width={horizontalScale(45)} height={verticalScale(45)} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  openGoogleMaps();
-                }}>
-                <Location
-                  width={horizontalScale(45)}
-                  height={verticalScale(45)}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.checkInButton}
-            onPress={() => {
-              setShowOtpModal(true);
-            }}>
-            <Text style={styles.checkInText}>Check In</Text>
-          </TouchableOpacity>
-        </View>
-        <BottomTab activeTab="MyTrips" />
-        <CustomModal
-          visible={showOtpModal}
-          title={'Enter check-in pin'}
-          onClose={() => setShowOtpModal(false)}
-          onPressSubmitButton={() => {
-            setShowOtpModal(false);
-            setOtpSubmitedForEmployee(true);
-            handleButtonClick();
-            setIsRunning(false);
-          }}
-          onPressCancelButton={() => {
-            setShowOtpModal(false);
-          }}
+        <FlatList
+          data={updatedEmployeeDetail}
+          renderItem={renderItems}
+          style={{marginTop: pixelSizeVertical(10)}}
         />
+        <BottomTab activeTab="MyTrips" />
       </View>
     </View>
   );
@@ -202,14 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  bellButton: {
-    // width: 50,
-    // height: 50,
-    // backgroundColor: '#FFFFFF',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // borderRadius: 30,
-  },
+  bellButton: {},
   subContainer: {
     flex: 1,
     backgroundColor: 'rgba(246, 246, 246, 1)',
@@ -256,43 +236,44 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     flex: 0.5,
   },
-  container2: {flex: 0.5},
-  mainContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: 25,
+
+  cardContainer: {
+    width: '90%',
+    backgroundColor: 'white',
     marginVertical: 20,
+    alignSelf: 'center',
+    borderRadius: 20,
+    paddingHorizontal: pixelSizeHorizontal(20),
+    paddingVertical: pixelSizeVertical(20),
   },
-  imageAndCall: {
+  employeesText: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    // width: '100%',
+    flex: 1,
   },
-  profileText: {
-    color: 'black',
+  profileImage: {
+    width: SCREEN_HEIGHT * 0.06,
+    height: SCREEN_HEIGHT * 0.06,
+    borderRadius: (SCREEN_HEIGHT * 0.06) / 2,
+  },
+  employeeName: {
     fontFamily: FontFamily.semiBold,
     fontSize: fontPixel(14),
-  },
-  pickupTimeText: {
     color: 'black',
-    fontFamily: FontFamily.regular,
-    fontSize: fontPixel(12),
+    textAlign: 'center',
   },
-  callAndLocation: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkInButton: {
-    width: horizontalScale(130),
-    height: verticalScale(50),
+  checkOutButton: {
+    width: horizontalScale(120),
     backgroundColor: 'rgba(197, 25, 125, 1)',
+    height: verticalScale(45),
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50,
-    borderRadius: 6,
-    alignSelf: 'center',
+    marginVertical: 20,
+    // marginRight: 20,
+    borderRadius: 8,
   },
-  checkInText: {
+  checkOutText: {
     color: 'white',
     fontFamily: FontFamily.regular,
     fontSize: fontPixel(14),

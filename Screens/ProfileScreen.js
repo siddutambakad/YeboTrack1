@@ -1,4 +1,5 @@
 import {
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -63,119 +64,123 @@ const ProfileScreen = ({navigation}) => {
   // };
 
   const getDriversDetail = async driverId => {
-    setLoader(true)
+    setLoader(true);
     try {
-      const apiUrl = `${APIS.getDriversDetails}/${driverId}`
-      const responseData = await axios.get(apiUrl)
+      const apiUrl = `${APIS.getDriversDetails}/${driverId}`;
+      const responseData = await axios.get(apiUrl);
       console.log(
         '\nresponseData',
         JSON.stringify(responseData.data?.returnLst, null, 2),
         '\n',
       );
-      setUserData(responseData.data?.returnLst)
+      setUserData(responseData.data?.returnLst);
     } catch (error) {
       console.log('error', error);
     } finally {
-      setLoader(false)
+      setLoader(false);
     }
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: 'rgba(102, 39, 110, 1)'}}>
-      <View style={styles.header}>
-        <View>
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.backbutton}
-            onPress={() => {
-              navigation.navigate('Driver');
-            }}>
-            <Back
-              width={pixelSizeHorizontal(25)}
-              height={pixelSizeVertical(25)}
-            />
-            <Text style={styles.backbuttonText}>My Profile</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.subMainHeader}>
-          <TouchableOpacity
-            style={{paddingRight: 20}}
-            onPress={() => {
-              setShowModal(true);
-            }}>
-            <Logout
-              width={pixelSizeHorizontal(30)}
-              height={pixelSizeVertical(30)}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={1} onPress={() => {}}>
-            <Bell
-              width={pixelSizeHorizontal(50)}
-              height={pixelSizeVertical(50)}
-              fill={'#C5197D'}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.subContainer}>
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: pixelSizeHorizontal(20),
-            paddingVertical: pixelSizeVertical(30),
-            marginTop: pixelSizeVertical(20),
-            flexGrow: 1,
-          }}>
-          <Text style={styles.firstName}>First name</Text>
-          <TextInput
-            editable={false}
-            value={userData?.driverName}
-            style={styles.firstNameInputField}
-          />
-          <Text style={styles.phoneNumber}>Phone Number</Text>
-          <View style={styles.phoneNumberAndTextInput}>
-            <Text style={styles.countryText}>+91</Text>
-            <TextInput
-              style={styles.phoneNumberInput}
-              maxLength={10}
-              keyboardType="number-pad"
-              editable={false}
-              value={userData?.driverContactNo}
-            />
+    <SafeAreaView style={{flex: 1}}>
+      <View style={{flex: 1, backgroundColor: 'rgba(102, 39, 110, 1)'}}>
+        <View style={styles.header}>
+          <View>
+            <TouchableOpacity
+              activeOpacity={1}
+              style={styles.backbutton}
+              onPress={() => {
+                navigation.navigate('Driver');
+              }}>
+              <Back
+                width={pixelSizeHorizontal(25)}
+                height={pixelSizeVertical(25)}
+              />
+              <Text style={styles.backbuttonText}>My Profile</Text>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.Licenseno}>License No.</Text>
-          <TextInput
-            editable={false}
-            value={userData?.licenseNo}
-            style={styles.licenseNoInputField}
-          />
-          <Text style={styles.Address}>Address</Text>
-          <TextInput
-            multiline={true}
-            value={userData?.permanentAddress}
-            style={styles.addressInputField}
-            editable={false}
-          />
-          <ConformationModal
-            onPressYes={() => {
-              setLoader(true);
-              setShowModal(false);
-              handleLogout();
-              let ck = setTimeout(() => {
-                navigation.navigate('LoginPage');
-                clearTimeout(ck);
-              }, 800);
-            }}
-            onPressNo={() => {
-              setShowModal(false);
-            }}
-            title={'Are you sure you Want to Logout?'}
-            showConfirmModal={showModal}
-          />
-        </ScrollView>
-        <BottomTab activeTab="Profile" />
+          <View style={styles.subMainHeader}>
+            <TouchableOpacity
+              style={{paddingRight: 20}}
+              onPress={() => {
+                setShowModal(true);
+              }}>
+              <Logout
+                width={pixelSizeHorizontal(30)}
+                height={pixelSizeVertical(30)}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+              <Bell
+                width={pixelSizeHorizontal(50)}
+                height={pixelSizeVertical(50)}
+                fill={'#C5197D'}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.subContainer}>
+          <ScrollView
+            contentContainerStyle={{
+              paddingHorizontal: pixelSizeHorizontal(20),
+              paddingVertical: pixelSizeVertical(30),
+              marginTop: pixelSizeVertical(20),
+              flexGrow: 1,
+            }}>
+            <Text style={styles.firstName}>First name</Text>
+            <TextInput
+              editable={false}
+              value={userData?.driverName}
+              style={styles.firstNameInputField}
+            />
+            <Text style={styles.phoneNumber}>Phone Number</Text>
+            <View style={styles.phoneNumberAndTextInput}>
+              <View style={styles.countriesText}>
+                <Text style={styles.countryText}>+91</Text>
+              </View>
+              <TextInput
+                style={styles.phoneNumberInput}
+                maxLength={10}
+                keyboardType="number-pad"
+                editable={false}
+                value={userData?.driverContactNo}
+              />
+            </View>
+            <Text style={styles.Licenseno}>License No.</Text>
+            <TextInput
+              editable={false}
+              value={userData?.licenseNo}
+              style={styles.licenseNoInputField}
+            />
+            <Text style={styles.Address}>Address</Text>
+            <TextInput
+              multiline={true}
+              value={userData?.permanentAddress}
+              style={styles.addressInputField}
+              editable={false}
+            />
+            <ConformationModal
+              onPressYes={() => {
+                setLoader(true);
+                setShowModal(false);
+                handleLogout();
+                let ck = setTimeout(() => {
+                  navigation.navigate('LoginPage');
+                  clearTimeout(ck);
+                }, 800);
+              }}
+              onPressNo={() => {
+                setShowModal(false);
+              }}
+              title={'Are you sure you Want to Logout?'}
+              showConfirmModal={showModal}
+            />
+          </ScrollView>
+          <BottomTab activeTab="Profile" />
+        </View>
       </View>
       {loader && <Loader />}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -227,6 +232,11 @@ const styles = StyleSheet.create({
     color: '#65276F',
     paddingHorizontal: pixelSizeHorizontal(10),
     fontSize: fontPixel(16),
+    shadowColor: 'lightgray',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    overflow: 'visible',
   },
   phoneNumber: {
     fontSize: fontPixel(16),
@@ -249,6 +259,11 @@ const styles = StyleSheet.create({
     color: '#65276F',
     paddingHorizontal: pixelSizeHorizontal(10),
     fontSize: fontPixel(16),
+    shadowColor: 'lightgray',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    overflow: 'visible',
   },
   Address: {
     fontSize: fontPixel(16),
@@ -267,6 +282,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: pixelSizeHorizontal(10),
     color: '#65276F',
     fontSize: fontPixel(16),
+    shadowColor: 'lightgray',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    overflow: 'visible',
   },
   phoneNumberAndTextInput: {
     flexDirection: 'row',
@@ -284,19 +304,31 @@ const styles = StyleSheet.create({
     fontSize: fontPixel(16),
     elevation: 8,
     zIndex: -1,
+    shadowColor: 'lightgray',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    overflow: 'visible',
   },
   countryText: {
+    color: 'black',
+    fontSize: fontPixel(16),
+  },
+  countriesText: {
     width: horizontalScale(70),
     backgroundColor: '#EDEDED',
     height: verticalScale(60),
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    color: 'black',
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
-    fontSize: fontPixel(16),
     elevation: 8,
     zIndex: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: 'lightgray',
+    shadowOffset: {width: 0, height: -5},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    overflow: 'visible',
   },
   errorText: {
     color: 'red',

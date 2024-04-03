@@ -28,25 +28,24 @@ import Loader from '../Components/Loader';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
-// const driverID = 11;
 
 const StartLoginTripSCreen = ({navigation, route}) => {
   const {roasterId, roasterIdDays, driverId, driverNo, roasterRouteType} =
     route.params;
   console.log('roasterIdDays', roasterIdDays);
 
-  const formatTime = time => {
-    const hours = time.getHours();
-    const minutes = time.getMinutes();
-    const amOrPm = hours >= 12 ? 'pm' : 'am';
-    const formattedHours = hours % 12 || 12; // Convert 0 to 12
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-  };
+  // const formatTime = time => {
+  //   const hours = time.getHours();
+  //   const minutes = time.getMinutes();
+  //   const amOrPm = hours >= 12 ? 'pm' : 'am';
+  //   const formattedHours = hours % 12 || 12; // Convert 0 to 12
+  //   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+  //   return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
+  // };
 
   const [showOtpForStartTrip, setShowOtpForStartTrip] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [otp, setOtp] = useState('');
+  // const [otp, setOtp] = useState('');
   const [otpError, setOtpError] = useState({
     isOtpError: false,
     otpErrorMessage: '',
@@ -67,7 +66,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
 
       const sendStartOtpBody = {
-        roasterId,
+        roasterId: roasterId,
         roasterDaysId: roasterIdDays,
         tripEventDtm: convertedTimeforEvent(),
         eventGpsdtm: convertedTime(),
@@ -92,6 +91,11 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         JSON.stringify(error?.message, null, 2),
         '\n',
       );
+      if (error.response.data.statusMessage === 'Record Exists') {
+        setShowOtpForStartTrip(true);
+      } else {
+        setShowOtpForStartTrip(false);
+      }
     } finally {
       setLoader(false);
     }
@@ -117,6 +121,11 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         roasterRouteType: roasterRouteType,
       };
       const apiUrl = `${APIS.validateStartTripOtp}`;
+      console.log(
+        '\nvalidateOtpBody',
+        JSON.stringify(validateOtpBody, null, 2),
+        '\n',
+      );
       const responseData = await axios.post(apiUrl, validateOtpBody);
       console.log(
         '\nvalidateOtp',
@@ -130,7 +139,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         });
         navigation.navigate('MyTripDetail', {
           otpVerifiedForStartTripScreen: true,
-          starttripTime: formatTime(new Date()),
+          // starttripTime: formatTime(new Date()),
           tripId: responseData.data.returnLst?.tripId,
           guardId: responseData.data.returnLst?.guardId,
           idRoasterDays: responseData.data.returnLst?.idRoasterDays,
@@ -305,7 +314,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
             title={'Enter Otp'}
             onClose={() => setShowOtpForStartTrip(false)}
             onPressSubmitButton={e => {
-              setOtp(e);
+              // setOtp(e);
               validateOtp(e);
             }}
             onPressCancelButton={() => {

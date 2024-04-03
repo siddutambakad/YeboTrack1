@@ -55,6 +55,11 @@ const BottomTab = props => {
         // position: 'absolute',
         // bottom: 0,
         elevation: 5,
+        shadowColor: 'lightgray',
+        shadowOffset: {width: 0, height: -5},
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        overflow: 'visible',
       }}>
       <View
         style={{

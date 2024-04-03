@@ -6,14 +6,33 @@ import {AppContext, UpcomingLists} from './Context/AppContext';
 import {fontPixel} from './Utils/Dimensions';
 import {formatDate} from './Utils/ReusableFunctions';
 import {useFocusEffect} from '@react-navigation/native';
+import Loader from './Components/Loader';
 
 const RecentScreen = () => {
   const {
     driverRoasterList: {recent},
   } = useContext(AppContext);
+  const [loader, setLoader] = useState(true);
 
-  useFocusEffect(React.useCallback(() => {}, [recent]));
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadData = async () => {
+        try {
+          await new Promise(resolve => setTimeout(resolve, 800));
 
+          setLoader(false);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      loadData();
+
+      // Cleanup function
+      return () => {
+        clearTimeout(loadData);
+      };
+    }, [recent]),
+  );
   const renderItems = ({item, index}) => {
     return (
       <View style={{marginVertical: 10, marginHorizontal: 20}}>
@@ -63,6 +82,7 @@ const RecentScreen = () => {
           style={{marginTop: 20}}
         />
       )}
+      {loader && <Loader />}
     </View>
   );
 };

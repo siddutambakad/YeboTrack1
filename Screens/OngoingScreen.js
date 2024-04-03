@@ -15,32 +15,69 @@ import Cancel from '../assets/images/cancel.svg';
 import {
   fontPixel,
   horizontalScale,
-  moderateScale,
   pixelSizeHorizontal,
   pixelSizeVertical,
   verticalScale,
 } from './Utils/Dimensions';
 import {AppContext} from './Context/AppContext';
-import {formatDate} from './Utils/ReusableFunctions';
+import {
+  formatDate,
+  getCurrentLocation,
+  getLocationName,
+} from './Utils/ReusableFunctions';
 import Loader from './Components/Loader';
 import RN from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const OngoingScreen = ({navigation}) => {
-  const [showModal, setShowModal] = useState(false);
-  const {
-    driverRoasterList: {onGoing},
-  } = useContext(AppContext);
-  console.log("🚀 ~ OngoingScreen ~ onGoing:", onGoing)
+  // const {
+  //   driverRoasterList: {onGoing},
+  // } = useContext(AppContext);
   const [loader, setLoader] = useState(true);
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      setLoader(false);
-    }, 800);
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const loadData = async () => {
+  //       try {
+  //         await new Promise(resolve => setTimeout(resolve, 800));
 
-    return () => clearTimeout(delay);
-  }, []);
+  //         setLoader(false);
+  //       } catch (error) {
+  //         console.error('Error fetching data:', error);
+  //       }
+  //     };
+  //     loadData();
+
+  //     return () => {
+  //       clearTimeout(loadData);
+  //     };
+  //   }, [onGoing]),
+  // );
+
+  const {driverRoasterList} = useContext(AppContext);
+  // console.log('🚀 ~ OngoingScreen ~ driverRoasterList:', driverRoasterList);
+  const [onGoing, setOnGoing] = useState([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadData = async () => {
+        try {
+          setLoader(true);
+          await new Promise(resolve => setTimeout(resolve, 800));
+         
+          setOnGoing(driverRoasterList.onGoing);
+          setLoader(false); // Set loader to false after data is loaded
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      loadData();
+      return () => {
+      };
+    }, [driverRoasterList]),
+  );
+
   return (
     <ScrollView style={styles.container}>
       {onGoing.length === 0 ? (
@@ -90,78 +127,31 @@ const OngoingScreen = ({navigation}) => {
             <TouchableOpacity
               style={styles.trackButton}
               onPress={() => {
-                  if (onGoing[0].roasterType === 1) {
-                    navigation.navigate('MyTripDetail', {
-                      resumeOngoingTrip: true,
-                      idRoasterDays: onGoing[0].idRoasterDays,
-                      driverContactNo: onGoing[0].driverContactNo,
-                      roasterType: onGoing[0].roasterType,
-                    });
-                  } else {
-                    navigation.navigate('MyLogoutTrip', {
-                      resumeOngoingTrip: true,
-                      idRoasterDays: onGoing[0].idRoasterDays,
-                      driverContactNo: onGoing[0].driverContactNo,
-                      roasterType: onGoing[0].roasterType,
-                    });
-                  }
-                  
+                if (onGoing[0].roasterType === 1) {
+                  navigation.navigate('MyTripDetail', {
+                    resumeOngoingTrip: true,
+                    idRoasterDays: onGoing[0].idRoasterDays,
+                    driverContactNo: onGoing[0].driverContactNo,
+                    roasterType: onGoing[0].roasterType,
+                  });
+                } else {
+                  navigation.navigate('MyLogoutTrip', {
+                    resumeOngoingTrip: true,
+                    idRoasterDays: onGoing[0].idRoasterDays,
+                    driverContactNo: onGoing[0].driverContactNo,
+                    roasterType: onGoing[0].roasterType,
+                  });
+                }
               }}>
               <Text style={styles.trackText}>Track Trip</Text>
             </TouchableOpacity>
           </View>
         </>
       )}
-
-      {/* <Modal visible={showModal} animationType="fade" transparent={true}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowModal(false);
-          }}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity
-                style={{alignSelf: 'flex-end', padding: 8}}
-                onPress={() => {
-                  setShowModal(false);
-                }}>
-                <Cancel />
-              </TouchableOpacity>
-              <Text style={styles.modalText}>
-                {'Are you sure you want to cancel the trip?'}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-evenly',
-                  width: '100%',
-                  paddingHorizontal: pixelSizeHorizontal(20),
-                  marginBottom: pixelSizeVertical(30),
-                }}>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    setShowModal(false);
-                  }}>
-                  <Text style={styles.modalButtonText}>Yes</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButtonNo}
-                  onPress={() => {
-                    setShowModal(false);
-                  }}>
-                  <Text style={styles.modalButtonNoText}>No</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal> */}
       {loader && <Loader />}
     </ScrollView>
   );
 };
- 
 
 export default OngoingScreen;
 
@@ -249,7 +239,7 @@ const styles = StyleSheet.create({
   },
   trackText: {
     color: 'white',
-    fontSize: fontPixel(12),
+    fontSize: fontPixel(14),
   },
   ticketNodetails: {
     flexDirection: 'row',

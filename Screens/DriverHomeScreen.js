@@ -8,6 +8,8 @@ import {
   Alert,
   PermissionsAndroid,
   Linking,
+  Platform,
+  SafeAreaView,
 } from 'react-native';
 import React, {useContext, useState} from 'react';
 import Profile from '../assets/images/profilePic.svg';
@@ -25,7 +27,7 @@ import {
 } from './Utils/Dimensions';
 import AddPhotoModal from './Components/AddPhotoModal';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-// import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
+import {check, PERMISSIONS, RESULTS, request, openSettings} from 'react-native-permissions';
 import RN from 'react-native';
 import {AppContext} from './Context/AppContext';
 
@@ -43,75 +45,177 @@ const DriverHomeScreen = ({navigation}) => {
     navigation.navigate('Profile');
   };
 
+  // const requestCameraPermission = async () => {
+  //   try {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.CAMERA,
+  //     );
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       openCamera();
+  //     } else {
+  //       console.log('Camera permission denied');
+  //       Alert.alert(
+  //         'Alert!!',
+  //         'Please grant Camera permission to use this feature.',
+  //         [
+  //           {
+  //             text: 'Ask me later',
+  //           },
+  //           {
+  //             text: 'Cancel',
+  //           },
+  //           {
+  //             text: 'OK',
+  //             onPress: () => {
+  //               openSettings();
+  //             },
+  //           },
+  //         ],
+  //         {cancelable: false},
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //   }
+  // };
+
   const requestCameraPermission = async () => {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
+      const permission = await check(
+        Platform.OS === 'android'
+          ? PERMISSIONS.ANDROID.CAMERA
+          : PERMISSIONS.IOS.CAMERA,
       );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      if (permission === RESULTS.GRANTED) {
         openCamera();
       } else {
-        console.log('Camera permission denied');
-        Alert.alert(
-          'Alert!!',
-          'Please grant Camera permission to use this feature.',
-          [
-            {
-              text: 'Ask me later',
-            },
-            {
-              text: 'Cancel',
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                openSettings();
-              },
-            },
-          ],
-          {cancelable: false},
+        const result = await request(
+          Platform.OS === 'android'
+            ? PERMISSIONS.ANDROID.CAMERA
+            : PERMISSIONS.IOS.CAMERA,
         );
+        if (result === RESULTS.GRANTED) {
+          openCamera();
+        } else {
+          console.log('Camera permission denied');
+          Alert.alert(
+            'Alert!!',
+            'Please grant camera permission to take photos.',
+            [
+              {text: 'Ask Me Later'},
+              {text: 'Cancel'},
+              {text: 'Ok', onPress: () => openSettings()},
+            ],
+            {cancelable: false},
+          );
+        }
       }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
-  const requestGalleryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        openGallery();
-      } else {
-        console.log('Gallery permission denied');
-        Alert.alert(
-          'Alert!!',
-          'Please grant gallery permission to use this feature.',
-          [
-            {
-              text: 'Ask me Later',
-            },
-            {
-              text: 'Cancel',
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                openSettings();
-              },
-            },
-          ],
-          {cancelable: false},
-        );
-      }
-    } catch (err) {
-      console.warn(err);
+    } catch (error) {
+      console.error('Error requesting camera permission:', error);
     }
   };
 
+  const requestGalleryPermission = async () => {
+    try {
+      const permission = await check(
+        Platform.OS === 'android'
+          ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+          : PERMISSIONS.IOS.MEDIA_LIBRARY,
+      );
+      if (permission === RESULTS.GRANTED) {
+        openGallery();
+      } else {
+        const result = await request(
+          Platform.OS === 'android'
+            ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+            : PERMISSIONS.IOS.PHOTO_LIBRARY,
+        );
+        if (result === RESULTS.GRANTED) {
+          openGallery();
+        } else {
+          console.log('gallery permission denied');
+          Alert.alert(
+            'Alert!!',
+            'Please grant gallery permission to select photos.',
+            [
+              {text: 'Ask Me Later'},
+              {text: 'Cancel'},
+              {text: 'Ok', onPress: () => openSettings()},
+            ],
+            {cancelable: false},
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error requesting camera permission:', error);
+    }
+  };
+
+  // const openSettings = () => {
+  //   Linking.openSettings();
+  // };
+
+  // const requestPermission = async (
+  //   permissionType,
+  //   permissionMessage,
+  //   openFunction,
+  // ) => {
+  //   try {
+  //     const permission = await check(
+  //       Platform.OS === 'android' ? permissionType.android : permissionType.ios,
+  //     );
+  //     if (permission === RESULTS.GRANTED) {
+  //       openFunction();
+  //     } else {
+  //       const result = await request(
+  //         Platform.OS === 'android'
+  //           ? permissionType.android
+  //           : permissionType.ios,
+  //       );
+  //       if (result === RESULTS.GRANTED) {
+  //         openFunction();
+  //       } else {
+  //         console.log(`${permissionMessage} permission denied`);
+  //         Alert.alert(
+  //           'Alert!!',
+  //           `Please grant ${permissionMessage} permission to proceed.`,
+  //           [
+  //             {text: 'Ask Me Later'},
+  //             {text: 'Cancel'},
+  //             {text: 'Ok', onPress: openSettings},
+  //           ],
+  //           {cancelable: false},
+  //         );
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error(`Error requesting ${permissionMessage} permission:`, error);
+  //   }
+  // };
+
+  // const requestCameraPermission = async () => {
+  //   await requestPermission(
+  //     {
+  //       android: PERMISSIONS.ANDROID.CAMERA,
+  //       ios: PERMISSIONS.IOS.CAMERA,
+  //     },
+  //     'camera',
+  //     openCamera,
+  //   );
+  // };
+
+  // const requestGalleryPermission = async () => {
+  //   await requestPermission(
+  //     {
+  //       android: PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
+  //       ios: PERMISSIONS.IOS.PHOTO_LIBRARY,
+  //     },
+  //     'gallery',
+  //     openGallery,
+  //   );
+  // };
+
   const openSettings = () => {
-    // Open app settings for Android or app info page for iOS
     if (Platform.OS === 'android') {
       Linking.openSettings();
     } else {
@@ -154,7 +258,7 @@ const DriverHomeScreen = ({navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Image
         source={require('../assets/images/imageBack.png')}
         style={styles.imageback}
@@ -213,18 +317,17 @@ const DriverHomeScreen = ({navigation}) => {
         </View>
       </View>
       {/*header strats */}
-      <View style={styles.headerIcon}>
+      <SafeAreaView style={styles.headerIconButton}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {}}
-          style={styles.headerIconButton}>
-          <Bell
-            width={horizontalScale(55)}
-            height={verticalScale(55)}
-            fill={'#C5197D'}
-          />
+          onPress={() => {
+            console.log('clicked--->>>');
+          }}
+          // style={styles.headerIconButton}
+        >
+          <Bell width={horizontalScale(55)} height={verticalScale(55)} />
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
       <AddPhotoModal
         onOpenGallery={() => {
           requestGalleryPermission();
@@ -242,7 +345,7 @@ const DriverHomeScreen = ({navigation}) => {
           setShowPhotoModal(false);
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -317,6 +420,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: pixelSizeHorizontal(30),
     borderRadius: 8,
     elevation: 10,
+    shadowColor: '#171717',
+    shadowOffset: {width: -2, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   myTripsText: {
     color: 'black',
@@ -336,6 +443,10 @@ const styles = StyleSheet.create({
     marginTop: 25,
     borderRadius: 8,
     elevation: 10,
+    shadowColor: '#171717',
+    shadowOffset: {width: -2, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   myProfileText: {
     color: 'black',
@@ -343,13 +454,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.regular,
     paddingLeft: pixelSizeHorizontal(-12),
   },
-  headerIcon: {
+  headerIconButton: {
     alignSelf: 'flex-end',
     marginHorizontal: 20,
     alignItems: 'center',
     marginVertical: 20,
     position: 'absolute',
     right: 10,
-    top: 10,
+    top: Platform.OS === 'ios' ? 60 : 10,
   },
 });

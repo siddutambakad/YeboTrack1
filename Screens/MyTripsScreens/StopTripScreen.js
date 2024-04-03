@@ -22,7 +22,7 @@ import RN from 'react-native';
 import {actuatedNormalize} from '../Utils/PixelScaling';
 import CustomModal from '../Components/Modal';
 import {APIS} from '../APIURLS/ApiUrls';
-import {convertedTime, convertedTimeforEvent} from '../Utils/ReusableFunctions';
+import {convertedTime, convertedTimeforEvent, getCurrentLocation, getLocationName, requestLocationPermission} from '../Utils/ReusableFunctions';
 import axios from 'axios';
 import Loader from '../Components/Loader';
 import Geolocation from '@react-native-community/geolocation';
@@ -30,18 +30,18 @@ const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const StopTripScreen = ({navigation, route}) => {
   const {roasterId, tripId, idRoasterDays, driverId, mobileNo} = route.params;
-  // console.log(
-  //   'roasterId',
-  //   roasterId,
-  //   'tripId',
-  //   tripId,
-  //   'idRoasterDays',
-  //   idRoasterDays,
-  //   'driverId',
-  //   driverId,
-  //   'mobileNo',
-  //   mobileNo,
-  // );
+  console.log(
+    'roasterId',
+    roasterId,
+    'tripId',
+    tripId,
+    'idRoasterDays',
+    idRoasterDays,
+    'driverId',
+    driverId,
+    'mobileNo',
+    mobileNo,
+  );
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpError, setOtpError] = useState({
     isOtpError: false,
@@ -49,14 +49,14 @@ const StopTripScreen = ({navigation, route}) => {
   });
   const [loader, setLoader] = useState(false);
 
-  const formatTime = time => {
-    const hours = time.getHours();
-    const minutes = time.getMinutes();
-    const amOrPm = hours >= 12 ? 'pm' : 'am';
-    const formattedHours = hours % 12 || 12; // Convert 0 to 12
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-  };
+  // const formatTime = time => {
+  //   const hours = time.getHours();
+  //   const minutes = time.getMinutes();
+  //   const amOrPm = hours >= 12 ? 'pm' : 'am';
+  //   const formattedHours = hours % 12 || 12; // Convert 0 to 12
+  //   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+  //   return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
+  // };
 
   const sendOtpForEndTrip = async () => {
     setLoader(true);
@@ -82,6 +82,11 @@ const StopTripScreen = ({navigation, route}) => {
         driverID: driverId,
         mobileNo: mobileNo,
       };
+      console.log(
+        '\nendTripRequestBody:',
+        JSON.stringify(endTripRequestBody, null, 2),
+        '\n',
+      );
       const response = await axios.post(apiUrl, endTripRequestBody);
       console.log(
         '\nresponse:',
@@ -149,75 +154,6 @@ const StopTripScreen = ({navigation, route}) => {
     }
   };
 
-  const requestLocationPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        getCurrentLocation();
-      } else {
-        console.log('Gallery permission denied');
-        Alert.alert(
-          'Alert!!',
-          'Please grant gallery permission to use this feature.',
-          [
-            {
-              text: 'Ask me Later',
-            },
-            {
-              text: 'Cancel',
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                openSettings();
-              },
-            },
-          ],
-          {cancelable: false},
-        );
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
-
-  const getCurrentLocation = () => {
-    return new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(
-        position => {
-          const {latitude, longitude} = position.coords;
-          resolve({latitude, longitude});
-        },
-        error => {
-          console.log('Error getting current location:', error);
-          reject(error);
-        },
-      );
-    });
-  };
-  const getLocationName = async (latitude, longitude) => {
-    try {
-      const apiKey = 'AIzaSyAol1uOPzQnphvxtIatoLH-Ayw6OUwRpbA';
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
-      );
-
-      // Parse the response
-      const {results} = response.data;
-      if (results && results.length > 0) {
-        // Extract the formatted address or other relevant information
-        const locationName = results[0].formatted_address;
-        return locationName;
-      } else {
-        return 'Unknown Location';
-      }
-    } catch (error) {
-      console.error('Error fetching location:', error);
-      return 'Unknown Location';
-    }
-  };
 
   return (
     <View style={styles.container}>

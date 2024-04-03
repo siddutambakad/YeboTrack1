@@ -66,28 +66,28 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   console.log('🚀 ~ MyLogoutTripScreen ~ roastertype:', roastertype);
   console.log('🚀 ~ MyLogoutTripScreen ~ driverContactNo:', driverContactNo);
   console.log('🚀 ~ MyLogoutTripScreen ~ idRoasterDays:', idRoasterDays);
-  // const [showLocationReachedModal, setShowLocationReachedModal] =
-  //   useState(false);
-  // const [showModal, setShowModal] = useState(false);
-  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  // const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [pickUpGuardModal, setPickUpGuardModal] = useState(false);
-  // const [showOtpModal, setShowOtpModal] = useState(false);
   const [modalPopupOptions, setModalPopupOptions] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
-  const [dropEmployee, setDropEmployee] = useState(false);
   const [loader, setLoader] = useState(true);
   const [pickupGuard, setPickupGuard] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const [responseInfo, setResponseInfo] = useState([]);
   const [showStartOtp, setShowStartOtp] = useState(false);
-  const [showGuardOtpModal, setShowGuardOtpModal] = useState([])
-  // const [responseData, setResponseData] = useState([]);
+  const [showGuardOtpModal, setShowGuardOtpModal] = useState([]);
   const [otpError, setOtpError] = useState({
     isOtpError: false,
     otpErrorMessage: '',
   });
+  const [validatedStartTripId, setValidatedStartTripId] = useState([]);
+  console.log(
+    '🚀 ~ MyLogoutTripScreen ~ validatedStartTripId:',
+    validatedStartTripId,
+  );
+  const [responseGuardData, setResponseGuardData] = useState([]);
 
   useEffect(() => {
     // if (otpSubmitedForEmployee) {
@@ -174,7 +174,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       const response = responseData.data;
       console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
       setShowStartOtp(true);
-      // setResponseData(response?.returnLst);
     } catch (error) {
       console.log('🚀 ~ startTripForDrop ~ error:', error);
     } finally {
@@ -204,6 +203,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       };
       const responseData = await axios.post(apiUrl, validateStartTrip);
       const response = responseData?.data;
+      setValidatedStartTripId(response?.returnLst?.tripId);
       console.log('response====>>>', JSON.stringify(response), 2);
       if (response.statusCode === 200) {
         setOtpError({
@@ -249,9 +249,10 @@ const MyLogoutTripScreen = ({route, navigation}) => {
         '\n',
       );
       const apiResponse = await axios.post(apiUrl, requestBodyGuard);
-      const response = apiResponse.data;
+      const response = apiResponse.data?.returnLst;
       console.log('🚀 ~ sendGuardOtp ~ response:', response);
-      setShowGuardOtpModal(true)
+      setResponseGuardData(response?.returnLst);
+      setShowGuardOtpModal(true);
     } catch (error) {
       console.log('🚀 ~ sendGuardOtp ~ error:', error);
     } finally {
@@ -259,7 +260,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     }
   };
 
-  const validateSendGuardOtp = async () => {
+  const validateSendGuardOtp = async OTP => {
     setLoader(true);
     try {
       const apiUrl = `${APIS.sendOtpForGuard}`;
@@ -269,17 +270,33 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       const locationName = await getLocationName(latitude, longitude);
 
       const requestBodyGuard = {
-        tripId: 0,
-        roasterId: 0,
-        idRoasterDays: 0,
-        guardID: 0,
-        mobileNo: 'string',
-        tripOtp: 'string',
-        guardOTPGPSDTM: 'string',
-        guardOTPGPSLocationLatLon: 'string',
-        guardOTPGPSLocationName: 'string',
+        tripId: responseGuardData?.tripId,
+        roasterId: responseGuardData?.idRoaster,
+        idRoasterDays: idRoasterDays,
+        guardID: responseGuardData?.idGuard,
+        mobileNo: responseGuardData?.mobileNo,
+        tripOtp: OTP,
+        guardOTPGPSDTM: convertedTime(),
+        guardOTPGPSLocationLatLon: `${latitude},${longitude}`,
+        guardOTPGPSLocationName: locationName,
       };
-    } catch (error) {}
+      console.log(
+        '\nrequestBodyGuard',
+        JSON.stringify(requestBodyGuard, null, 2),
+        '\n',
+      );
+      const response = await axios.post(apiUrl, requestBodyGuard);
+      const responseData = response.data;
+      console.log(
+        '\nresponseDataFor Otp guard',
+        JSON.stringify(responseData, null, 2),
+        '\n',
+      );
+    } catch (error) {
+      console.log('\nerror', JSON.stringify(error, null, 2), '\n');
+    } finally {
+      setLoader(false);
+    }
   };
 
   const handleStartTrip = () => {
@@ -291,7 +308,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       button_text: 'Check- in',
       button_action: () => {
         sendGuardOtp();
-        setPickUpGuardModal(false);
+        // setPickUpGuardModal(false);
         // setShowOtpModal(true);
       },
       isSocialMediaRequired: false,
@@ -299,16 +316,25 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     setPickUpGuardModal(true);
   };
   const handleDropGuard = () => {
-    setModalPopupOptions({
-      button_text: 'Check- in',
-      button_action: () => {
-        setPickUpGuardModal(false);
-        navigation.navigate('DropGuard');
-        // setShowOtpModal(true);
-      },
-      isSocialMediaRequired: false,
+    // setModalPopupOptions({
+    //   button_text: 'Check- in',
+    //   button_action: () => {
+    //     setPickUpGuardModal(false);
+    //     navigation.navigate('DropGuard');
+    //     // setShowOtpModal(true);
+    //   },
+    //   isSocialMediaRequired: false,
+    // });
+    // setPickUpGuardModal(true);
+
+    navigation.navigate('StopTrip', {
+      roasterId: responseInfo?.idRoaster,
+      tripId: tripId,
+      tripId: responseInfo?.tripDetail?.idTrip,
+      idRoasterDays: idRoasterDays,
+      driverId: responseInfo?.idDriver,
+      mobileNo: driverContactNo,
     });
-    setPickUpGuardModal(true);
   };
 
   const handlePickupEmployeeClick = () => {
@@ -316,24 +342,28 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     navigation.navigate('PickUp', {
       employeeDetail: employeeDetails,
       tripId: responseInfo?.tripDetail?.idTrip,
+      validatedStartOtp: validatedStartTripId,
     });
   };
   const handleDropEmployee = () => {
-    setModalPopupOptions({
-      button_text: 'Skip Location',
-      button_action: () => {
-        setPickUpGuardModal(false);
-        setShowConfirmModal(true);
-      },
-      button_text2: 'Dropped',
-      button_action2: () => {
-        setPickUpGuardModal(false);
-        setDropEmployee(true);
-        navigation.navigate('DroppedCheckIn');
-      },
-      isSocialMediaRequired: true,
+    // setModalPopupOptions({
+    //   button_text: 'Skip Location',
+    //   button_action: () => {
+    //     setPickUpGuardModal(false);
+    //     setShowConfirmModal(true);
+    //   },
+    //   button_text2: 'Dropped',
+    //   button_action2: () => {
+    //     setPickUpGuardModal(false);
+    //     setDropEmployee(true);
+    //     navigation.navigate('DroppedCheckIn');
+    //   },
+    //   isSocialMediaRequired: true,
+    // });
+    // setPickUpGuardModal(true);
+    navigation.navigate('DroppedCheckIn', {
+      employeeDetails: employeeDetails,
     });
-    setPickUpGuardModal(true);
   };
   // const formatTime = time => {
   //   const hours = time.getHours();
@@ -353,13 +383,13 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   //   navigation.navigate('StartTrip');
   // };
 
-  const openGoogleMaps = () => {
-    openGoogleMap('37.7749', '-122.4194');
-  };
+  // const openGoogleMaps = () => {
+  //   openGoogleMap('37.7749', '-122.4194');
+  // };
 
-  const handleDialPress = () => {
-    handleCallPress('123456789');
-  };
+  // const handleDialPress = () => {
+  //   handleCallPress('123456789');
+  // };
 
   const labels = [
     'Start Trip',
@@ -397,10 +427,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     handleStartTrip,
     handlePickupEmployeeClick,
     handlePickupGuardClick,
-    // handleStartTrip,
     handleDropEmployee,
     handleDropGuard,
-    // () => navigation.navigate('StopTrip'),
   ];
   return (
     <View style={styles.container}>
@@ -458,6 +486,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
                   onPress={() => {
                     if (index < selectedPosition) {
                       return;
+                    } else if (index > selectedPosition) {
+                      return;
                     }
                     stepActions[index]();
                   }}>
@@ -500,6 +530,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
                 onPress={index => {
                   if (index < selectedPosition) {
                     return;
+                  } else if (index > selectedPosition) {
+                    return;
                   }
                   stepActions[index]();
                 }}
@@ -527,54 +559,23 @@ const MyLogoutTripScreen = ({route, navigation}) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('UpComing');
+              // navigation.navigate('UpComing');
+              navigation.navigate('StopTrip', {
+                roasterId: responseInfo?.idRoaster,
+                tripId: tripId,
+                tripId: responseInfo?.tripDetail?.idTrip,
+                idRoasterDays: idRoasterDays,
+                driverId: responseInfo?.idDriver,
+                mobileNo: driverContactNo,
+              });
             }}
             activeOpacity={1}
-            disabled={!dropEmployee}
+            // disabled={!dropEmployee}
             style={styles.stopTripButton}>
             <Text style={styles.stopTripText}>End Trip</Text>
           </TouchableOpacity>
 
-          {/* <DriveToZoneModal
-            showModal={showModal}
-            onCloseModel={() => {
-              setShowModal(false);
-            }}
-            onPressCheckIn={() => {
-              setShowLocationReachedModal(true);
-              setShowModal(false);
-            }}
-            onPressLocation={() => {
-              openGoogleMaps();
-            }}
-          /> */}
-
-          {/* <StartTripModal
-            showConfirmModal={showLocationReachedModal}
-            title={
-              otpSubmitedForEmployee
-                ? 'Employee checked-in successfully!'
-                : startTrip
-                ? 'Female employee should not travel alone in this trip without a guard.'
-                : 'Office reach event updated successfully!'
-            }
-            onPressOK={() => {
-              if (otpSubmitedForEmployee) {
-                setSelectedPosition(2);
-                setShowLocationReachedModal(false);
-                time.push(pickUpTime);
-              } else if (startTrip) {
-                setSelectedPosition(4);
-                setShowLocationReachedModal(false);
-              } else {
-                setShowLocationReachedModal(false);
-                setSelectedPosition(1);
-                time.push(handleButtonClick());
-              }
-            }}
-          /> */}
-
-          <EmployeeCheckInModal
+          {/* <EmployeeCheckInModal
             showEmployeeModal={showEmployeeModal}
             onPressOutside={() => {
               setShowEmployeeModal(false);
@@ -593,18 +594,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
               openGoogleMaps();
             }}
             title={'Waiting for employee check-in'}
-          />
-          <PickupGuardModal
-            showModal={pickUpGuardModal}
-            onCloseModel={() => {
-              setModalPopupOptions({});
-              setPickUpGuardModal(false);
-            }}
-            options={modalPopupOptions}
-            name={`${pickupGuard?.guardFullName}`}
-            // pickupTime={}
-            Address={`${pickupGuard?.address1}`}
-          />
+          /> */}
 
           <ConformationModal
             title={'Are you sure you want to skip the location pickup?'}
@@ -616,21 +606,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
             }}
             showConfirmModal={showConfirmModal}
           />
-          {/* otp modal */}
-          {/* <CustomModal
-            visible={showOtpModal}
-            title={'Enter check-in pin'}
-            onClose={() => setShowOtpModal(false)}
-            onPressSubmitButton={() => {
-              setShowOtpModal(false);
-              setSelectedPosition(3);
-              time.push(handleButtonClick());
-            }}
-            onPressCancelButton={() => {
-              setShowOtpModal(false);
-              setPickUpGuardModal(true);
-            }}
-          /> */}
+
           <CustomModal
             visible={showStartOtp}
             title={'Enter Otp'}
@@ -645,12 +621,12 @@ const MyLogoutTripScreen = ({route, navigation}) => {
             isOtpError={otpError.isOtpError}
             OTPErrorMessage={otpError.otpErrorMessage}
           />
-           <CustomModal
+          <CustomModal
             visible={showGuardOtpModal}
             title={'Enter Guard Otp'}
             onClose={() => setShowGuardOtpModal(false)}
             onPressSubmitButton={e => {
-              // validateStartOtp(e);
+              validateSendGuardOtp(e);
               setShowGuardOtpModal(false);
             }}
             onPressCancelButton={e => {
