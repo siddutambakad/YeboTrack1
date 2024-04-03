@@ -56,7 +56,6 @@ const OngoingScreen = ({navigation}) => {
   // );
 
   const {driverRoasterList} = useContext(AppContext);
-  // console.log('🚀 ~ OngoingScreen ~ driverRoasterList:', driverRoasterList);
   const [onGoing, setOnGoing] = useState([]);
 
   useFocusEffect(
@@ -65,7 +64,7 @@ const OngoingScreen = ({navigation}) => {
         try {
           setLoader(true);
           await new Promise(resolve => setTimeout(resolve, 800));
-         
+
           setOnGoing(driverRoasterList.onGoing);
           setLoader(false); // Set loader to false after data is loaded
         } catch (error) {
@@ -73,13 +72,16 @@ const OngoingScreen = ({navigation}) => {
         }
       };
       loadData();
-      return () => {
-      };
+      return () => {};
     }, [driverRoasterList]),
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        {justifyContent: onGoing.length === 0 ? 'center' : null},
+      ]}>
       {onGoing.length === 0 ? (
         <View style={styles.noDataFoundContainer}>
           <Text style={styles.noDataFoundText}>No Data for Ongoing Trips</Text>
@@ -158,6 +160,7 @@ export default OngoingScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // height: Dimensions.get('window').height,
     backgroundColor: 'rgba(246, 246, 246, 1)',
   },
   imageContainer: {
@@ -185,47 +188,11 @@ const styles = StyleSheet.create({
   },
   dateText: {
     color: 'black',
-    fontWeight: '600',
     fontFamily: FontFamily.semiBold,
     fontSize: fontPixel(16),
-  },
-  totalFare: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: pixelSizeHorizontal(20),
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  totalFareText: {
-    color: 'rgba(102, 39, 110, 1)',
-    fontSize: fontPixel(16),
-    fontFamily: FontFamily.semiBold,
-  },
-  totalAmountText: {
-    color: 'rgba(102, 39, 110, 1)',
-    fontWeight: '600',
-    fontFamily: FontFamily.semiBold,
-    fontSize: fontPixel(16),
-    paddingRight: 55,
   },
   trackAndCancelButton: {
-    // flexDirection: 'row',
-    // justifyContent: 'space-between',
     marginHorizontal: pixelSizeHorizontal(20),
-  },
-  cancelButton: {
-    width: horizontalScale(170),
-    height: verticalScale(50),
-    backgroundColor: 'rgba(197, 25, 125, 1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    // marginVertical: 30,
-    // alignSelf: 'center',
-    borderRadius: 8,
-  },
-  cancelTripText: {
-    color: 'white',
-    fontSize: fontPixel(12),
   },
   trackButton: {
     width: horizontalScale(175),
@@ -248,11 +215,6 @@ const styles = StyleSheet.create({
     marginHorizontal: pixelSizeHorizontal(20),
     marginBottom: pixelSizeVertical(10),
   },
-  ticketNoText: {
-    color: 'black',
-    fontSize: fontPixel(16),
-    fontFamily: FontFamily.semiBold,
-  },
   tripNoText: {
     color: 'black',
     fontSize: fontPixel(16),
@@ -269,11 +231,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.semiBold,
   },
   timeText: {
-    color: 'black',
-    fontSize: fontPixel(16),
-    fontFamily: FontFamily.semiBold,
-  },
-  ticketText: {
     color: 'black',
     fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
@@ -297,56 +254,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: fontPixel(16),
     fontFamily: FontFamily.semiBold,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-  modalContent: {
-    backgroundColor: '#FFF8F2',
-    borderRadius: 10,
-    // height: verticalScale(180),
-    width: horizontalScale(350),
-    alignItems: 'center',
-    padding: 15,
-  },
-  modalText: {
-    padding: 15,
-    color: '#454545',
-    fontFamily: FontFamily.regular,
-    fontSize: fontPixel(18),
-    textAlign: 'left',
-    paddingHorizontal: pixelSizeHorizontal(30),
-    // width: '100%'
-  },
-  modalButtonText: {
-    color: '#FFF8F2',
-    fontFamily: FontFamily.regular,
-    fontSize: fontPixel(16),
-  },
-  modalButton: {
-    backgroundColor: '#C5197D',
-    borderRadius: 3,
-    width: horizontalScale(110),
-    height: verticalScale(45),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalButtonNo: {
-    backgroundColor: '#454546',
-    borderRadius: 3,
-    width: horizontalScale(110),
-    height: verticalScale(45),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalButtonNoText: {
-    color: '#FFF8F2',
-    fontFamily: FontFamily.regular,
-    fontSize: fontPixel(16),
-    fontWeight: '600',
   },
   noDataFoundContainer: {
     alignItems: 'center',

@@ -7,18 +7,16 @@ import OtpScreen from './OtpScreen';
 import HomeScreen from './HomeScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MyTripsScreen from './MyTripsScreen';
-// import HelpDescScreen from './HelpDescScreen';
-// import Adhac from '../assets/images/Adhac.svg';
 import Car from '../assets/images/Car.svg';
-// import HelpDesc from '../assets/images/HelpDesc.svg';
 import Home from '../assets/images/Home.svg';
-// import AdhacScreen from './AdhacScreen';
+import Adhac from '../assets/images/Adhac.svg';
+import Help from '../assets/images/HelpDesc.svg';
 import DriverHomeScreen from './DriverHomeScreen';
 import ProfileScreen from './ProfileScreen';
 import Profile from '../assets/images/Profile.svg';
 import FontFamily from './Styles/FontFamily';
 import StartTrip from './LoginTrips/StartTrip';
-import HelpDescScreen from './HelpDescScreen';
+import HelpDescScreen from './UserScreens/HelpDescScreen';
 import MyTripDetails from './MyTripsScreens/MyTripDetails';
 import LocationReached from './MyTripsScreens/LocationReached';
 import DriveToOffice from './MyTripsScreens/DriveToOffice';
@@ -34,10 +32,20 @@ import StartTripSCreen from './LogoutMyTripScreens/StartTripSCreen';
 import DroppedCheckInScreen from './LogoutMyTripScreens/DroppedCheckInScreen';
 import DropGuardScreen from './LogoutMyTripScreens/DropGuardScreen';
 import {AppContext} from './Context/AppContext';
-import AdhacScreeen from './AdhacScreen';
+import AdhacScreeen from '../Screens/UserScreens/AdhacScreen';
+import UsersMyTripScreen from './UserScreens/UsersMyTripScreen';
 import StartLoginTripSCreen from './MyTripsScreens/StartLoginTripScreen';
+import {Text, View} from 'react-native';
+import {
+  fontPixel,
+  horizontalScale,
+  pixelSizeVertical,
+  responsiveBorderRadius,
+  verticalScale,
+} from './Utils/Dimensions';
 
 const Stack = createStackNavigator();
+const BottomTab = createBottomTabNavigator();
 
 function Auth({props, navigation}) {
   const [showSplash, setShowSplash] = useState(true);
@@ -61,14 +69,14 @@ function Auth({props, navigation}) {
 
         {isLoggedIn ? (
           <>
-            <Stack.Screen
+            {/* <Stack.Screen
               name="Driver"
               component={DriverHomeScreen}
               options={{headerShown: false}}
-            />
+            /> */}
             <Stack.Screen
               name="Home"
-              component={HomeScreen}
+              component={BottomtabNavigator}
               options={{headerShown: false}}
             />
             <Stack.Screen
@@ -153,6 +161,178 @@ function Auth({props, navigation}) {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+function BottomtabNavigator() {
+  return (
+    <BottomTab.Navigator
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          height: verticalScale(75),
+          borderTopLeftRadius: responsiveBorderRadius(30),
+          borderTopRightRadius: responsiveBorderRadius(30),
+          elevation: 8,
+        },
+      }}>
+      <BottomTab.Screen
+        name="Home "
+        component={HomeScreen}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <View
+              style={{
+                width: horizontalScale(80),
+                height: verticalScale(60),
+                alignItems: 'center',
+              }}>
+              {focused && (
+                <View
+                  style={{
+                    borderTopWidth: 3,
+                    width: horizontalScale(50),
+                    height: verticalScale(4),
+                    borderColor: '#C5197D',
+                    marginTop: pixelSizeVertical(-8),
+                  }}></View>
+              )}
+              <View style={{marginTop: pixelSizeVertical(8)}}>
+                <Home width={horizontalScale(30)} height={verticalScale(30)} />
+              </View>
+              <Text
+                style={{
+                  color: '#C5197D',
+                  fontFamily: focused
+                    ? FontFamily.semiBold
+                    : FontFamily.regular,
+                  fontSize: focused ? fontPixel(16) : fontPixel(14),
+                }}>
+                Home
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="My Trips"
+        component={UsersMyTripScreen}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <View
+              style={{
+                width: horizontalScale(80),
+                height: verticalScale(60),
+                alignItems: 'center',
+              }}>
+              {focused && (
+                <View
+                  style={{
+                    borderTopWidth: 3,
+                    width: horizontalScale(50),
+                    height: verticalScale(4),
+                    borderColor: '#C5197D',
+                    marginTop: pixelSizeVertical(-8),
+                  }}></View>
+              )}
+              <View style={{marginTop: pixelSizeVertical(8)}}>
+                <Car width={horizontalScale(35)} height={verticalScale(35)} />
+              </View>
+              <Text
+                style={{
+                  color: '#C5197D',
+                  fontFamily: focused
+                    ? FontFamily.semiBold
+                    : FontFamily.regular,
+                  fontSize: focused ? fontPixel(16) : fontPixel(14),
+                }}>
+                My Trips
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Adhac"
+        component={AdhacScreeen}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <View
+              style={{
+                width: horizontalScale(80),
+                height: verticalScale(60),
+                alignItems: 'center',
+              }}>
+              {focused && (
+                <View
+                  style={{
+                    borderTopWidth: 3,
+                    width: horizontalScale(50),
+                    height: verticalScale(4),
+                    borderColor: '#C5197D',
+                    marginTop: pixelSizeVertical(-8),
+                  }}></View>
+              )}
+              <View style={{marginTop: pixelSizeVertical(8)}}>
+                <Adhac width={horizontalScale(30)} height={verticalScale(30)} />
+              </View>
+              <Text
+                style={{
+                  color: '#C5197D',
+                  fontFamily: focused
+                    ? FontFamily.semiBold
+                    : FontFamily.regular,
+                  fontSize: focused ? fontPixel(16) : fontPixel(14),
+                }}>
+                Adhac
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="HelpDesc"
+        component={HelpDescScreen}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <View
+              style={{
+                width: horizontalScale(80),
+                height: verticalScale(60),
+                alignItems: 'center',
+              }}>
+              {focused && (
+                <View
+                  style={{
+                    borderTopWidth: 3,
+                    width: horizontalScale(50),
+                    height: verticalScale(4),
+                    borderColor: '#C5197D',
+                    marginTop: pixelSizeVertical(-8),
+                  }}></View>
+              )}
+              <View style={{marginTop: pixelSizeVertical(8)}}>
+                <Help width={horizontalScale(30)} height={verticalScale(30)} />
+              </View>
+              <Text
+                style={{
+                  color: '#C5197D',
+                  fontFamily: focused
+                    ? FontFamily.semiBold
+                    : FontFamily.regular,
+                  fontSize: focused ? fontPixel(16) : fontPixel(14),
+                }}>
+                Adhac
+              </Text>
+            </View>
+          ),
+        }}
+      />
+    </BottomTab.Navigator>
   );
 }
 

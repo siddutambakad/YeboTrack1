@@ -123,13 +123,14 @@ const OtpScreen = ({navigation, route}) => {
     try {
       const response = await axios.post(APIS.verifyOtp, verifyData);
       const res_ponse = response.data;
-      console.log('verified', res_ponse);
+      // console.log('verified', res_ponse);
       
       if (res_ponse?.userRoleDesc === 'Driver') {
         // setDriverId(res_ponse.idDriver)
         await setUserData(res_ponse);
         let ck = setTimeout(() => {
-          navigation.navigate('Driver');
+          // navigation.navigate('Driver');
+          navigation.navigate('Home');
           clearTimeout(ck);
         }, 800);
       } else {

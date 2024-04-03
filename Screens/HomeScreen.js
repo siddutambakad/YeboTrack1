@@ -7,6 +7,7 @@ import {
   View,
   Dimensions,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import React, {useState} from 'react';
 import YeboFinal from '../assets/images/yeboFinalLogo.svg';
@@ -30,35 +31,57 @@ const HomeScreen = ({navigation}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [data, setData] = useState([1, 1, 1, 1, 1]);
 
-  const renderItem = (item, index) => {
+  const renderItem = ({item, index}) => {
     return (
       <View
         style={{
           backgroundColor: 'white',
           borderRadius: 8,
-          width: width - 50,
-          height: 175,
-          marginHorizontal: 14,
+          width: width * 0.9,
+          marginLeft: pixelSizeHorizontal(13),
+          marginRight: pixelSizeHorizontal(13),
+          marginBottom: pixelSizeVertical(10),
           elevation: 10,
+          shadowColor: '#171717',
+          shadowOffset: {width: 2, height: 4},
+          shadowOpacity: 0.2,
+          shadowRadius: 3,
           alignItems: 'center',
           justifyContent: 'center',
-          flex: 1,
         }}>
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginVertical: 20,
-            marginHorizontal: 20,
+            padding: pixelSizeVertical(16),
+            height: 'auto',
           }}>
-          <CardProfile />
-          <View style={{width: '80%', marginLeft: 10}}>
-            <Text style={{color: 'black', marginTop: 10, fontSize: 18}}>
+          <CardProfile width={horizontalScale(50)} height={verticalScale(50)} />
+          <View
+            style={{
+              width: '80%',
+              height: 'auto',
+              marginLeft: pixelSizeHorizontal(10),
+            }}>
+            <Text
+              style={{
+                color: '#66276E',
+                marginTop: pixelSizeVertical(10),
+                fontSize: fontPixel(20),
+                fontFamily: FontFamily.semiBold,
+              }}>
               Women Employee Saftey
             </Text>
-            <Text style={{color: 'black', marginTop: 15, fontSize: 16}}>
+            <Text
+              style={{
+                color: 'black',
+                paddingBottom: pixelSizeVertical(10),
+                fontSize: fontPixel(16),
+                fontFamily: FontFamily.regular,
+                textAlign: 'left',
+              }}>
               Board the cab during dark hours only if there are male colleagues
-              or a guard already present in the cab
+              or a guard already present in the cab.
             </Text>
           </View>
         </View>
@@ -66,7 +89,7 @@ const HomeScreen = ({navigation}) => {
     );
   };
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{height: height, backgroundColor: 'white'}}>
       {/*header strats */}
       <View
         style={{
@@ -80,22 +103,21 @@ const HomeScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            navigation.navigate('Test');
+            // navigation.navigate('Test');
           }}>
           <Bell width={horizontalScale(50)} height={verticalScale(50)} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={{flex: 1, backgroundColor: 'white'}}>
+      <ScrollView style={{flex: 1}} contentContainerStyle={{height: height}}>
         {/* banner starts */}
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            
             width: Dimensions.get('window').width,
             alignItems: 'center',
-            paddingHorizontal: pixelSizeHorizontal(15),
+            paddingHorizontal: pixelSizeHorizontal(20),
           }}>
           <View
             style={{
@@ -122,103 +144,137 @@ const HomeScreen = ({navigation}) => {
               priority More
             </Text>
           </View>
-          {/* <View style={{width: Dimensions.get('window').width * 0.47, height: verticalScale(200), borderWidth: 1}}> */}
           {/* <BannerImage /> */}
-          <Image source={require('../assets/images/bannerImage.png')} style={{
-            width: '45%',
-            height: '100%',
-            resizeMode: 'contain',
-            borderColor: 'red',
-            borderWidth: 2
-          }} />
+          <Image
+            source={require('../assets/images/bannerImage.png')}
+            style={{
+              width: '45%',
+              height: '100%',
+              resizeMode: 'contain',
+            }}
+          />
           {/* </View> */}
         </View>
         {/* my profile button starts */}
         <View
           style={{
-            flex: 1,
             backgroundColor: '#F6F6F6',
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-            marginTop: 20,
+            borderTopLeftRadius: responsiveBorderRadius(40),
+            borderTopRightRadius: responsiveBorderRadius(40),
+            height: height,
+            marginTop: pixelSizeVertical(20),
           }}>
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              backgroundColor: 'white',
-              width: '35%',
-              height: 50,
-              paddingHorizontal: 15,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              alignSelf: 'center',
-              marginTop: 25,
-              borderRadius: 8,
-            }}>
-            <Profile width={30} height={30} />
-            <Text style={{color: 'black'}}>My Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              backgroundColor: 'white',
-              width: '35%',
-              height: 50,
-              paddingHorizontal: 15,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              alignSelf: 'center',
-              marginTop: 25,
-              borderRadius: 8,
-            }}>
-            <Stats width={30} height={30} />
-            <Text style={{color: 'black'}}>My Stats</Text>
-          </TouchableOpacity>
+          <View style={{gap: 25, paddingVertical: 25}}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                backgroundColor: 'white',
+                width: Dimensions.get('window').width * 0.5,
+                height: Dimensions.get('window').height * 0.09,
+                paddingHorizontal: pixelSizeHorizontal(15),
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                alignSelf: 'center',
+                // marginTop: pixelSizeVertical(25),
+                borderRadius: 8,
+                elevation: 8,
+                shadowColor: '#171717',
+                shadowOffset: {width: -2, height: 4},
+                shadowOpacity: 0.2,
+                shadowRadius: 3,
+              }}>
+              <Profile width={horizontalScale(40)} height={verticalScale(40)} />
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: fontPixel(16),
+                  fontFamily: FontFamily.regular,
+                }}>
+                My Profile
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                backgroundColor: 'white',
+                width: Dimensions.get('window').width * 0.5,
+                height: Dimensions.get('window').height * 0.09,
+                paddingHorizontal: pixelSizeHorizontal(15),
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                alignSelf: 'center',
+                // marginTop: pixelSizeVertical(25),
+                borderRadius: 8,
+                elevation: 8,
+                shadowColor: '#171717',
+                shadowOffset: {width: 2, height: 4},
+                shadowOpacity: 0.2,
+                shadowRadius: 3,
+              }}>
+              <Stats width={horizontalScale(40)} height={verticalScale(40)} />
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: fontPixel(16),
+                  fontFamily: FontFamily.regular,
+                }}>
+                My Stats
+              </Text>
+            </TouchableOpacity>
+          </View>
           {/* carousel starts */}
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            horizontal
-            pagingEnabled
-            onScroll={e => {
-              const x = e.nativeEvent.contentOffset.x;
-              setCurrentIndex((x / width).toFixed(0));
-            }}
-            style={{}}
-            contentContainerStyle={{
-              marginTop: 25,
-            }}
-            contentInsetAdjustmentBehavior="never"
-            snapToAlignment="center"
-            automaticallyAdjustContentInsets={false}
-            showsHorizontalScrollIndicator={false}
-            scrollEventThrottle={1}
-          />
           <View
             style={{
-              flexDirection: 'row',
-              width: width,
-              justifyContent: 'center',
-              alignItems: 'center',
+              backgroundColor: '#F6F6F6',
             }}>
-            {data.map((item, index) => {
-              return (
-                <View
-                  style={{
-                    width: currentIndex == index ? 10 : 8,
-                    height: currentIndex == index ? 10 : 8,
-                    borderRadius: currentIndex == index ? 5 : 4,
-                    backgroundColor:
-                      currentIndex == index ? 'gray' : 'lightgray',
-                    marginLeft: 5,
-                  }}
-                />
-              );
-            })}
+            {/* card carousel */}
+            <FlatList
+              data={data}
+              renderItem={renderItem}
+              horizontal
+              pagingEnabled
+              onScroll={e => {
+                const x = e.nativeEvent.contentOffset.x;
+                setCurrentIndex((x / width).toFixed(0));
+              }}
+              contentContainerStyle={{
+                padding: 8,
+              }}
+              contentInsetAdjustmentBehavior="automatic"
+              snapToAlignment="center"
+              automaticallyAdjustContentInsets={false}
+              showsHorizontalScrollIndicator={false}
+              scrollEventThrottle={1}
+            />
+            {/* </View> */}
+            <View
+              style={{
+                flexDirection: 'row',
+                width: width,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#F6F6F6',
+                padding: 2,
+              }}>
+              {data.map((item, index) => {
+                return (
+                  <View
+                    style={{
+                      width: currentIndex == index ? 10 : 6,
+                      height: currentIndex == index ? 10 : 6,
+                      borderRadius: currentIndex == index ? 5 : 3,
+                      backgroundColor:
+                        currentIndex == index ? 'gray' : 'lightgray',
+                      marginLeft: 5,
+                    }}
+                  />
+                );
+              })}
+            </View>
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

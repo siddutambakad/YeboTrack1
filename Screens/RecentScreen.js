@@ -63,7 +63,12 @@ const RecentScreen = () => {
     );
   };
   return (
-    <View style={{flex: 1, backgroundColor: 'rgba(246, 246, 246, 1)'}}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: 'rgba(246, 246, 246, 1)',
+        justifyContent: recent.length === 0 ? 'center' : null,
+      }}>
       {recent.length === 0 ? (
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <Text

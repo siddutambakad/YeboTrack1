@@ -80,7 +80,14 @@ const UpComingScreens = ({navigation}) => {
     );
   };
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          justifyContent:
+            driverRoasterList.upcoming.length === 0 ? 'center' : null,
+        },
+      ]}>
       {driverRoasterList.upcoming.length === 0 ? (
         <Text style={styles.noDataFound}>No Data Found</Text>
       ) : (
