@@ -37,7 +37,7 @@ const HomeScreen = ({navigation}) => {
         style={{
           backgroundColor: 'white',
           borderRadius: 8,
-          width: width * 0.9,
+          width: width * 0.91,
           marginLeft: pixelSizeHorizontal(13),
           marginRight: pixelSizeHorizontal(13),
           marginBottom: pixelSizeVertical(10),
@@ -166,6 +166,9 @@ const HomeScreen = ({navigation}) => {
           }}>
           <View style={{gap: 25, paddingVertical: 25}}>
             <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('UserProfile', {screen: "Home "})
+            }}
               style={{
                 flexDirection: 'row',
                 backgroundColor: 'white',
@@ -194,6 +197,9 @@ const HomeScreen = ({navigation}) => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('MyTripStats');
+              }}
               style={{
                 flexDirection: 'row',
                 backgroundColor: 'white',

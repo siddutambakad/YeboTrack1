@@ -35,7 +35,7 @@ import {AppContext} from './Context/AppContext';
 import AdhacScreeen from '../Screens/UserScreens/AdhacScreen';
 import UsersMyTripScreen from './UserScreens/UsersMyTripScreen';
 import StartLoginTripSCreen from './MyTripsScreens/StartLoginTripScreen';
-import {Text, View} from 'react-native';
+import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {
   fontPixel,
   horizontalScale,
@@ -43,6 +43,9 @@ import {
   responsiveBorderRadius,
   verticalScale,
 } from './Utils/Dimensions';
+import MyTripStats from './UserScreens/MyTripStats';
+import UserProfileScreen from './UserScreens/UserProfileScreen';
+import UserMyTripsScreen from './UserScreens/UserMyTripsTopNavigator/UserMyTripsScreen';
 
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -75,8 +78,8 @@ function Auth({props, navigation}) {
               options={{headerShown: false}}
             /> */}
             <Stack.Screen
-              name="Home"
-              component={BottomtabNavigator}
+              name="MainStack"
+              component={UserStack}
               options={{headerShown: false}}
             />
             <Stack.Screen
@@ -144,6 +147,12 @@ function Auth({props, navigation}) {
               component={StartLoginTripSCreen}
               options={{headerShown: false}}
             />
+
+            <Stack.Screen
+              name="MyTripStats"
+              component={MyTripStats}
+              options={{headerShown: false}}
+            />
           </>
         ) : (
           <>
@@ -164,175 +173,211 @@ function Auth({props, navigation}) {
   );
 }
 
-function BottomtabNavigator() {
+function UserStack() {
   return (
-    <BottomTab.Navigator
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: verticalScale(75),
-          borderTopLeftRadius: responsiveBorderRadius(30),
-          borderTopRightRadius: responsiveBorderRadius(30),
-          elevation: 8,
-        },
-      }}>
-      <BottomTab.Screen
-        name="Home "
-        component={HomeScreen}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                width: horizontalScale(80),
-                height: verticalScale(60),
-                alignItems: 'center',
-              }}>
-              {focused && (
-                <View
-                  style={{
-                    borderTopWidth: 3,
-                    width: horizontalScale(50),
-                    height: verticalScale(4),
-                    borderColor: '#C5197D',
-                    marginTop: pixelSizeVertical(-8),
-                  }}></View>
-              )}
-              <View style={{marginTop: pixelSizeVertical(8)}}>
-                <Home width={horizontalScale(30)} height={verticalScale(30)} />
-              </View>
-              <Text
-                style={{
-                  color: '#C5197D',
-                  fontFamily: focused
-                    ? FontFamily.semiBold
-                    : FontFamily.regular,
-                  fontSize: focused ? fontPixel(16) : fontPixel(14),
-                }}>
-                Home
-              </Text>
-            </View>
-          ),
-        }}
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Home"
+        component={BottomtabNavigator}
+        options={{headerShown: false}}
       />
-      <BottomTab.Screen
-        name="My Trips"
-        component={UsersMyTripScreen}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                width: horizontalScale(80),
-                height: verticalScale(60),
-                alignItems: 'center',
-              }}>
-              {focused && (
-                <View
-                  style={{
-                    borderTopWidth: 3,
-                    width: horizontalScale(50),
-                    height: verticalScale(4),
-                    borderColor: '#C5197D',
-                    marginTop: pixelSizeVertical(-8),
-                  }}></View>
-              )}
-              <View style={{marginTop: pixelSizeVertical(8)}}>
-                <Car width={horizontalScale(35)} height={verticalScale(35)} />
-              </View>
-              <Text
-                style={{
-                  color: '#C5197D',
-                  fontFamily: focused
-                    ? FontFamily.semiBold
-                    : FontFamily.regular,
-                  fontSize: focused ? fontPixel(16) : fontPixel(14),
-                }}>
-                My Trips
-              </Text>
-            </View>
-          ),
-        }}
+      <Stack.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
+        options={{headerShown: false}}
       />
-      <BottomTab.Screen
-        name="Adhac"
-        component={AdhacScreeen}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                width: horizontalScale(80),
-                height: verticalScale(60),
-                alignItems: 'center',
-              }}>
-              {focused && (
-                <View
-                  style={{
-                    borderTopWidth: 3,
-                    width: horizontalScale(50),
-                    height: verticalScale(4),
-                    borderColor: '#C5197D',
-                    marginTop: pixelSizeVertical(-8),
-                  }}></View>
-              )}
-              <View style={{marginTop: pixelSizeVertical(8)}}>
-                <Adhac width={horizontalScale(30)} height={verticalScale(30)} />
-              </View>
-              <Text
-                style={{
-                  color: '#C5197D',
-                  fontFamily: focused
-                    ? FontFamily.semiBold
-                    : FontFamily.regular,
-                  fontSize: focused ? fontPixel(16) : fontPixel(14),
-                }}>
-                Adhac
-              </Text>
-            </View>
-          ),
-        }}
+      <Stack.Screen
+        name="UserMyTrips"
+        component={UserMyTripsScreen}
+        options={{headerShown: false}}
       />
-      <BottomTab.Screen
-        name="HelpDesc"
-        component={HelpDescScreen}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({focused}) => (
-            <View
-              style={{
-                width: horizontalScale(80),
-                height: verticalScale(60),
-                alignItems: 'center',
-              }}>
-              {focused && (
-                <View
-                  style={{
-                    borderTopWidth: 3,
-                    width: horizontalScale(50),
-                    height: verticalScale(4),
-                    borderColor: '#C5197D',
-                    marginTop: pixelSizeVertical(-8),
-                  }}></View>
-              )}
-              <View style={{marginTop: pixelSizeVertical(8)}}>
-                <Help width={horizontalScale(30)} height={verticalScale(30)} />
-              </View>
-              <Text
+    </Stack.Navigator>
+  );
+}
+
+function BottomtabNavigator({navigation}) {
+  return (
+    <SafeAreaView style={{flex: 1}}>
+      <BottomTab.Navigator
+        screenOptions={{
+          tabBarShowLabel: false,
+          tabBarStyle: {
+            height: verticalScale(75),
+            borderTopLeftRadius: responsiveBorderRadius(30),
+            borderTopRightRadius: responsiveBorderRadius(30),
+            elevation: 8,
+          },
+        }}>
+        <BottomTab.Screen
+          name="Home "
+          component={HomeScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({focused}) => (
+              <View
                 style={{
-                  color: '#C5197D',
-                  fontFamily: focused
-                    ? FontFamily.semiBold
-                    : FontFamily.regular,
-                  fontSize: focused ? fontPixel(16) : fontPixel(14),
+                  width: horizontalScale(80),
+                  height: verticalScale(60),
+                  alignItems: 'center',
                 }}>
-                Adhac
-              </Text>
-            </View>
-          ),
-        }}
-      />
-    </BottomTab.Navigator>
+                {focused && (
+                  <View
+                    style={{
+                      borderTopWidth: 3,
+                      width: horizontalScale(50),
+                      height: verticalScale(4),
+                      borderColor: '#C5197D',
+                      marginTop: pixelSizeVertical(-8),
+                    }}></View>
+                )}
+                <View style={{marginTop: pixelSizeVertical(8)}}>
+                  <Home
+                    width={horizontalScale(25)}
+                    height={verticalScale(25)}
+                  />
+                </View>
+                <Text
+                  style={{
+                    color: '#C5197D',
+                    fontFamily: focused
+                      ? FontFamily.semiBold
+                      : FontFamily.regular,
+                    fontSize: focused ? fontPixel(16) : fontPixel(14),
+                  }}>
+                  Home
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="My Trips"
+          component={UserMyTripsScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({focused}) => (
+              <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('UserMyTrips')
+              }}
+                style={{
+                  width: horizontalScale(80),
+                  height: verticalScale(60),
+                  alignItems: 'center',
+                }}>
+                {focused && (
+                  <View
+                    style={{
+                      borderTopWidth: 3,
+                      width: horizontalScale(50),
+                      height: verticalScale(4),
+                      borderColor: '#C5197D',
+                      marginTop: pixelSizeVertical(-8),
+                    }}></View>
+                )}
+                <View style={{marginTop: pixelSizeVertical(8)}}>
+                  <Car width={horizontalScale(30)} height={verticalScale(30)} />
+                </View>
+                <Text
+                  style={{
+                    color: '#C5197D',
+                    fontFamily: focused
+                      ? FontFamily.semiBold
+                      : FontFamily.regular,
+                    fontSize: focused ? fontPixel(16) : fontPixel(14),
+                  }}>
+                  My Trips
+                </Text>
+              </TouchableOpacity>
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="Adhac"
+          component={AdhacScreeen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({focused}) => (
+              <View
+                style={{
+                  width: horizontalScale(80),
+                  height: verticalScale(60),
+                  alignItems: 'center',
+                }}>
+                {focused && (
+                  <View
+                    style={{
+                      borderTopWidth: 3,
+                      width: horizontalScale(50),
+                      height: verticalScale(4),
+                      borderColor: '#C5197D',
+                      marginTop: pixelSizeVertical(-8),
+                    }}></View>
+                )}
+                <View style={{marginTop: pixelSizeVertical(8)}}>
+                  <Adhac
+                    width={horizontalScale(30)}
+                    height={verticalScale(30)}
+                  />
+                </View>
+                <Text
+                  style={{
+                    color: '#C5197D',
+                    fontFamily: focused
+                      ? FontFamily.semiBold
+                      : FontFamily.regular,
+                    fontSize: focused ? fontPixel(16) : fontPixel(14),
+                  }}>
+                  Adhac
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="HelpDesc"
+          component={HelpDescScreen}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({focused}) => (
+              <View
+                style={{
+                  width: horizontalScale(80),
+                  height: verticalScale(60),
+                  alignItems: 'center',
+                }}>
+                {focused && (
+                  <View
+                    style={{
+                      borderTopWidth: 3,
+                      width: horizontalScale(50),
+                      height: verticalScale(4),
+                      borderColor: '#C5197D',
+                      marginTop: pixelSizeVertical(-8),
+                    }}></View>
+                )}
+                <View style={{marginTop: pixelSizeVertical(8)}}>
+                  <Help
+                    width={horizontalScale(30)}
+                    height={verticalScale(30)}
+                  />
+                </View>
+                <Text
+                  style={{
+                    color: '#C5197D',
+                    fontFamily: focused
+                      ? FontFamily.semiBold
+                      : FontFamily.regular,
+                    fontSize: focused ? fontPixel(16) : fontPixel(14),
+                  }}>
+                  Help
+                </Text>
+              </View>
+            ),
+          }}
+        />
+      </BottomTab.Navigator>
+    </SafeAreaView>
   );
 }
 

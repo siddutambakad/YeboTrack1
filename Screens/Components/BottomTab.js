@@ -10,6 +10,7 @@ import {
   horizontalScale,
   pixelSizeHorizontal,
   pixelSizeVertical,
+  responsiveBorderRadius,
   verticalScale,
 } from '../Utils/Dimensions';
 
@@ -49,8 +50,8 @@ const BottomTab = props => {
         width: '100%',
         backgroundColor: 'white',
         height: verticalScale(80),
-        borderTopLeftRadius: 35,
-        borderTopRightRadius: 35,
+        borderTopLeftRadius: responsiveBorderRadius(35),
+        borderTopRightRadius: responsiveBorderRadius(35),
         alignItems: 'center',
         // position: 'absolute',
         // bottom: 0,
@@ -60,6 +61,7 @@ const BottomTab = props => {
         shadowOpacity: 0.3,
         shadowRadius: 5,
         overflow: 'visible',
+        // borderWidth: 1
       }}>
       <View
         style={{

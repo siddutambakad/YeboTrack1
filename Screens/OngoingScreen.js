@@ -31,29 +31,7 @@ import {useFocusEffect} from '@react-navigation/native';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const OngoingScreen = ({navigation}) => {
-  // const {
-  //   driverRoasterList: {onGoing},
-  // } = useContext(AppContext);
   const [loader, setLoader] = useState(true);
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     const loadData = async () => {
-  //       try {
-  //         await new Promise(resolve => setTimeout(resolve, 800));
-
-  //         setLoader(false);
-  //       } catch (error) {
-  //         console.error('Error fetching data:', error);
-  //       }
-  //     };
-  //     loadData();
-
-  //     return () => {
-  //       clearTimeout(loadData);
-  //     };
-  //   }, [onGoing]),
-  // );
 
   const {driverRoasterList} = useContext(AppContext);
   const [onGoing, setOnGoing] = useState([]);

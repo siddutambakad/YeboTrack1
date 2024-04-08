@@ -88,6 +88,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     validatedStartTripId,
   );
   const [responseGuardData, setResponseGuardData] = useState([]);
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  console.log("🚀 ~ MyLogoutTripScreen ~ permissionGranted:", permissionGranted)
 
   useEffect(() => {
     // if (otpSubmitedForEmployee) {
@@ -116,6 +118,20 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       getTripDetails(idRoasterDays);
     }
   }, [resumeOngoingTrip]);
+
+  useEffect(() => {
+    requestPermission();
+  }, []);
+
+  const requestPermission = async () => {
+    try {
+      await requestLocationPermission();
+      setPermissionGranted(true);
+    } catch (error) {
+      console.error('Error requesting location permission:', error);
+      setPermissionGranted(false);
+    }
+  };
 
   const stepperPointChanger = tripDetail => {
     const dt = new Map([
@@ -153,7 +169,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       otpErrorMessage: '',
     });
     try {
-      await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
       const locationName = await getLocationName(latitude, longitude);
@@ -170,6 +185,11 @@ const MyLogoutTripScreen = ({route, navigation}) => {
         mobileNo: driverContactNo,
         roasterRouteType: roastertype,
       };
+      console.log(
+        '\nrequestBodyForStartTrip',
+        JSON.stringify(requestBodyForStartTrip, null, 2),
+        '\n',
+      );
       const responseData = await axios.post(apiUrl, requestBodyForStartTrip);
       const response = responseData.data;
       console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
@@ -185,7 +205,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     setLoader(true);
     try {
       const apiUrl = `${APIS.validateStartTripOtp}`;
-      await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
       const locationName = await getLocationName(latitude, longitude);
@@ -228,7 +247,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     setLoader(true);
     try {
       const apiUrl = `${APIS.sendOtpForGuard}`;
-      await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
       const locationName = await getLocationName(latitude, longitude);
@@ -264,7 +282,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     setLoader(true);
     try {
       const apiUrl = `${APIS.sendOtpForGuard}`;
-      await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
       const locationName = await getLocationName(latitude, longitude);
@@ -300,7 +317,11 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   };
 
   const handleStartTrip = () => {
-    startTripForDrop();
+    if (permissionGranted) {
+      startTripForDrop();
+    } else {
+      requestPermission();
+    }
   };
 
   const handlePickupGuardClick = () => {

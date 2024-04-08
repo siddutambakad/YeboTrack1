@@ -1,7 +1,7 @@
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import {Alert, Linking, PermissionsAndroid, Platform} from 'react-native';
-import { PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { PERMISSIONS, RESULTS, check, request } from 'react-native-permissions';
 
 export const handleCallPress = phoneNumber => {
   Linking.openURL(`tel:${phoneNumber}`);
@@ -137,16 +137,16 @@ export const requestLocationPermission = async () => {
     } else {
       const result = await request(
         Platform.OS === 'android'
-          ? PERMISSIONS.ANDROID.CAMERA
-          : PERMISSIONS.IOS.CAMERA,
+          ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
+          : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
       );
       if (result === RESULTS.GRANTED) {
         getCurrentLocation();
       } else {
-        console.log('Camera permission denied');
+        console.log('location permission denied');
         Alert.alert(
           'Alert!!',
-          'Please grant camera permission to take photos.',
+          'Please grant location permission',
           [
             {text: 'Ask Me Later'},
             {text: 'Cancel'},
@@ -157,7 +157,7 @@ export const requestLocationPermission = async () => {
       }
     }
   } catch (error) {
-    console.error('Error requesting camera permission:', error);
+    console.error('Error requesting location permission:', error);
   }
 };
 

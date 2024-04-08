@@ -28,7 +28,6 @@ import Loader from '../Components/Loader';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
-
 const StartLoginTripSCreen = ({navigation, route}) => {
   const {roasterId, roasterIdDays, driverId, driverNo, roasterRouteType} =
     route.params;
@@ -52,6 +51,10 @@ const StartLoginTripSCreen = ({navigation, route}) => {
   });
   const [otpResponse, setOtpResponse] = useState([]);
 
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
+
   const sendStartOtp = async () => {
     setLoader(true);
     setOtpError({
@@ -59,7 +62,6 @@ const StartLoginTripSCreen = ({navigation, route}) => {
       otpErrorMessage: '',
     });
     try {
-      await requestLocationPermission();
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
 

@@ -54,6 +54,8 @@ const LoginPage = ({navigation}) => {
       loginSource: 0,
     };
     handleLoginWithOtp(postLoginData);
+
+    console.log('postLoginData', postLoginData);
   };
 
   const handleLoginWithOtp = async postLoginData => {
@@ -68,6 +70,7 @@ const LoginPage = ({navigation}) => {
       );
       navigation.navigate('Otp', {otpResponse: otpResponse});
     } catch (error) {
+      console.log('error', error);
       if (error.response) {
         if (
           error?.response?.status === 500 ||
@@ -84,6 +87,26 @@ const LoginPage = ({navigation}) => {
       } else {
         Alert.alert('Warning!', 'No internet connection');
       }
+      // if (error.response) {
+      //   // The request was made and the server responded with a status code
+      //   // that falls out of the range of 2xx
+      //   console.log(error.response.data);
+      //   console.log(error.response.status);
+      //   console.log(error.response.headers);
+      // } else if (error.request) {
+      //   // The request was made but no response was received
+      //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      //   // http.ClientRequest in node.js
+      //   console.log(error.request);
+      // } else {
+      //   // Something happened in setting up the request that triggered an Error
+      //   console.log('Error', error.message);
+      // }
+      // console.log(
+      //   '\nerror.config',
+      //   JSON.stringify(error.config, null, 2),
+      //   '\n',
+      // );
     } finally {
       setLoader(false);
     }
@@ -104,7 +127,6 @@ const LoginPage = ({navigation}) => {
   };
 
   return (
-
     <ScrollView
       style={{
         height: Dimensions.get('window').height,
@@ -123,7 +145,7 @@ const LoginPage = ({navigation}) => {
         <Text style={styles.phoneNumberText}>Phone Number</Text>
         <View style={styles.phoneNumberAndTextInput}>
           <View style={styles.countriesText}>
-          <Text style={styles.countryText}>+91</Text>
+            <Text style={styles.countryText}>+91</Text>
           </View>
           <TextInput
             // ref={inputRef}
@@ -260,6 +282,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingLeft: pixelSizeHorizontal(20),
     fontFamily: FontFamily.regular,
-    fontSize: fontPixel(14)
+    fontSize: fontPixel(14),
   },
 });
