@@ -21,7 +21,7 @@ const UserTopTabNavigator = () => {
           // paddingTop: 10,
           borderTopLeftRadius: responsiveBorderRadius(50),
           borderTopRightRadius: responsiveBorderRadius(50),
-          backgroundColor: 'rgba(246, 246, 246, 1)',
+          backgroundColor: '#F6F6F6',
           elevation: 0,
           justifyContent: 'center',
         },

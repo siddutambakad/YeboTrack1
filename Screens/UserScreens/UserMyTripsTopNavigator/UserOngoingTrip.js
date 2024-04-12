@@ -24,7 +24,7 @@ import StartTripModal from '../../Components/StartTripModal';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 const {width, height} = Dimensions.get('window');
 
-const UserOngoingTrip = () => {
+const UserOngoingTrip = ({navigation}) => {
   //   const [data, setData] = useState([1]);
 
   const [selectedCheckIn, setSelectedCheckIn] = useState(false);
@@ -96,7 +96,9 @@ const UserOngoingTrip = () => {
         <TouchableOpacity style={styles.cancelButton}>
           <Text style={styles.cancelText}>Cancel Trip</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.raiseFeedbackButton}>
+        <TouchableOpacity style={styles.raiseFeedbackButton} onPress={() => {
+          navigation.navigate('RaiseFeedBack')
+        }}>
           <Text style={styles.raisefeedbackText}>Raise Feedback</Text>
         </TouchableOpacity>
       </View>

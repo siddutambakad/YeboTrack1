@@ -15,4 +15,6 @@ export const APIS = {
   sendTripEndOtp: `${BASE_URL}api/Roaster/SendTripEndOTP`,
   validateTripEndOtp: `${BASE_URL}api/Roaster/ValidateTripEndOTP`,
   getDriversDetails: `${BASE_URL}api/MasterDriver`,
+  sendBreakEmployeeTrip: `${BASE_URL}api/Roaster/BreakEmpTrip`,
+  sendEmployeeCheckOutTrip: `${BASE_URL}api/Roaster/EmpTripCheckOut`,
 };

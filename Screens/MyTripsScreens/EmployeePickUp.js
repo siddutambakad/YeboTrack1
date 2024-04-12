@@ -3,12 +3,13 @@ import {
   Image,
   Linking,
   PermissionsAndroid,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Back from '../../assets/images/VectorBack.svg';
 import Sos from '../../assets/images/sos.svg';
 import Bell from '../../assets/images/bellIcon.svg';
@@ -39,18 +40,16 @@ import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import {APIS} from '../APIURLS/ApiUrls';
 import Loader from '../Components/Loader';
+import {AppContext} from '../Context/AppContext';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const EmployeePickUp = ({navigation, route}) => {
-  const {employeeDetail, tripId, tripType} = route.params;
-  console.log("🚀 ~ EmployeePickUp ~ tripType:", tripType)
+  const {tripId, tripType, idRoasterDays: idMainRoasterDays} = route.params;
+  // console.log('🚀 ~ EmployeePickUp ~ tripId:', tripId);
 
   const [showConformationModal, setShowConformationModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
-  const [updatedEmployeeDetail, setUpdatedEmployeeDetail] =
-    useState(employeeDetail);
-   
+
   const [loader, setLoader] = useState(false);
   const [checkinResponse, setCheckInResponse] = useState([]);
   const [otpError, setOtpError] = useState({
@@ -59,44 +58,61 @@ const EmployeePickUp = ({navigation, route}) => {
   });
   const [tripIds, setTripIds] = useState(null);
   const [idRoasterDays, setIdRoasterDays] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const {getTripDetails, employeeDetails, idTrip} = useContext(AppContext);
+  console.log("🚀 ~ EmployeePickUp ~ idTrip:", idTrip)
+  console.log('🚀 ~ EmployeePickUp ~ idTrip:', tripId);
+  const [rousterRouteType, setRousterRouteType] = useState(0);
+  console.log('🚀 ~ EmployeePickUp ~ rousterRouteType:', rousterRouteType);
+  const [newEmployeeList, setNewEmployeeList] = useState([]);
+  const [driverContactNo, setDriverContactNo] = useState(null);
+
+  useEffect(() => {
+    // Filter employeeDetails when it changes
+    if (employeeDetails) {
+      const filteredList = employeeDetails.filter(
+        filterObj => filterObj.tripBoardStatus.onBoardStatus === 0,
+      );
+      if (filteredList.length === 0) {
+        if (rousterRouteType === 1) {
+          navigationScreen('MyTripDetail');
+        } else {
+          navigationScreen('MyLogoutTrip');
+        }
+      } else {
+        setRousterRouteType(filteredList[0]?.roasterRoutetype);
+      }
+      console.log(
+        '\nfilteredList===>>>',
+        JSON.stringify(filteredList[0]?.roasterRoutetype, null, 2),
+        '\n',
+      );
+      setNewEmployeeList(filteredList);
+    }
+  }, [employeeDetails]);
+
+  const navigationScreen = screenName => {
+    navigation.navigate(screenName, {
+      otpVerified: true,
+      tripId: tripIds,
+      idRoasterDays: idRoasterDays,
+      driverContactNo: driverContactNo,
+    });
+  };
 
   const openGoogleMaps = item => {
-    openGoogleMap(item?.pickUpLocation);
+    const [latitude, longitude] = item?.dropLocation?.split(',') || [];
+
+    if (latitude && longitude) {
+      openGoogleMap(parseFloat(latitude), parseFloat(longitude));
+    } else {
+      console.error('Invalid drop location format:', item.dropLocation);
+    }
   };
 
   const handleDialPress = item => {
     handleCallPress(item?.employeeMobile);
   };
-  const removeItem = () => {
-    if (selectedItemIndex !== null) {
-      const newData = [...updatedEmployeeDetail];
-      newData.splice(selectedItemIndex, 1); // Remove the item at selectedItemIndex
-      setUpdatedEmployeeDetail(newData); // Update the state with the new data
-    }
-    setShowConformationModal(false);
-  };
-
-  useEffect(() => {
-    console.log('hi1');
-    if (updatedEmployeeDetail.length === 0) {
-      console.log('hi2');
-      if (updatedEmployeeDetail.roasterRoutetypeDesc === 'PickUp') {
-        // navigation.navigate('MyTripDetail', {
-        //   otpVerified: true,
-        //   tripId: tripIds,
-        //   idRoasterDays: idRoasterDays,
-        // });
-        console.log('hi3');
-      } else if (employeeDetail.roasterRoutetypeDesc === 'Drop') {
-        // navigation.navigate('MyLogoutTrip', {
-        //   otpVerified: true,
-        //   tripId: tripIds,
-        //   idRoasterDays: idRoasterDays,
-        // });
-        console.log('hello');
-      }
-    }
-  }, [updatedEmployeeDetail]);
 
   const sendOtpForEmployeeCheckIn = async item => {
     setLoader(true);
@@ -111,7 +127,7 @@ const EmployeePickUp = ({navigation, route}) => {
 
       const locationName = await getLocationName(latitude, longitude);
       const requestBodyForEmployee = {
-        tripId: tripId,
+        tripId: idTrip,
         roasterId: item.idRoaster,
         roasterDetailId: item.idRoasterDetails,
         idRoasterDays: item.idRoasterDays,
@@ -131,21 +147,22 @@ const EmployeePickUp = ({navigation, route}) => {
       );
       const apiUrl = `${APIS.sendOtpForEmployeeCheckIn}`;
       const apiResponse = await axios.post(apiUrl, requestBodyForEmployee);
-      console.log(
-        '\nrapiResponse',
-        JSON.stringify(apiResponse.data?.returnLst, null, 2),
-        '\n',
-      );
+
       setCheckInResponse(apiResponse.data?.returnLst);
       setShowOtpModal(true);
     } catch (error) {
       console.log('\nerror', JSON.stringify(error?.message, null, 2), '\n');
+      if (error.response.data.statusMessage === 'Record Exists') {
+        setShowOtpModal(true);
+      } else {
+        setShowOtpModal(false);
+      }
     } finally {
       setLoader(false);
     }
   };
 
-  const validateOtpForEmployee = async enteredOtp => {
+  const validateOtpForEmployee = async (enteredOtp, selectedItem) => {
     setLoader(true);
     try {
       await requestLocationPermission();
@@ -155,26 +172,34 @@ const EmployeePickUp = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.validateEmployeeCheckIn}`;
       const validateEmployee = {
-        tripId: checkinResponse?.tripId,
-        roasterId: checkinResponse?.roasterId,
-        roasterDetailId: checkinResponse?.roasterDetailId,
-        idRoasterDays: checkinResponse?.roasterDaysId,
-        emplolyeeID: checkinResponse?.employeeId,
-        mobileNo: checkinResponse.mobileNo,
+        tripId: idTrip,
+        roasterId: selectedItem?.idRoaster,
+        roasterDetailId: selectedItem?.idRoasterDetails,
+        idRoasterDays: selectedItem?.idRoasterDays,
+        emplolyeeID: selectedItem?.idEmployee,
+        mobileNo: selectedItem?.employeeMobile,
         tripOtp: enteredOtp,
         empOTPGPSDTM: convertedTime(),
         empOTPGPSLocationLatLon: `${latitude},${longitude}`,
         empOTPGPSLocationName: locationName,
       };
+      console.log(
+        '\nvalidateEmployee',
+        JSON.stringify(validateEmployee, null, 2),
+        '\n',
+      );
       const response = await axios.post(apiUrl, validateEmployee);
       console.log(
         '\nvalidOtpresponse',
         JSON.stringify(response.data.returnLst, null, 2),
         '\n',
       );
-      const tripId = response.data.returnLst?.tripId;
-      setTripIds(tripId);
+      const tripIds = response.data.returnLst?.tripId;
+      setTripIds(tripIds);
       setIdRoasterDays(response.data?.returnLst?.idRoasterDays);
+      setDriverContactNo(response.data?.returnLst?.driverContactNo);
+      await getTripDetails(idMainRoasterDays);
+
       if (response.data.statusCode === 200) {
         setOtpError({
           isOtpError: false,
@@ -193,7 +218,7 @@ const EmployeePickUp = ({navigation, route}) => {
     }
   };
 
-  const skipEmployeeOtp = async (item, _tripId) => {
+  const skipEmployeeOtp = async item => {
     setLoader(true);
     try {
       await requestLocationPermission();
@@ -203,9 +228,10 @@ const EmployeePickUp = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.sendSkipEmpCheckIn}`;
       const skipRequestBody = {
-        tripId: _tripId,
+        tripId: idTrip,
         roasterId: item?.idRoaster,
         roasterDetailId: item?.idRoasterDetails,
+        idRoasterDays: item?.idRoasterDays,
         tripEventDtm: convertedTimeforEvent(),
         eventGpsdtm: convertedTime(),
         eventGpslocationLatLon: `${latitude},${longitude}`,
@@ -214,21 +240,34 @@ const EmployeePickUp = ({navigation, route}) => {
         driverID: item?.driverId,
         routeType: item?.roasterRoutetype,
       };
-      console.log('🚀 ~ skipEmployeeOtp ~ skipRequestBody:', skipRequestBody);
+      console.log(
+        '\nskipRequestBody',
+        JSON.stringify(skipRequestBody, null, 2),
+        '\n',
+      );
       const skipResponse = await axios.post(apiUrl, skipRequestBody);
       console.log(
         '\nvskipResponse',
-        JSON.stringify(skipResponse.data.returnLst, null, 2),
+        JSON.stringify(skipResponse, null, 2),
         '\n',
       );
-      const tripId = skipResponse.data.returnLst?.tripId;
+      const {tripIds, onBoardStatusDesc} = skipResponse.data.returnLst;
+      console.log(
+        '🚀 ~ skipEmployeeOtp ~ onBoardStatusDesc:',
+        onBoardStatusDesc,
+      );
+      await getTripDetails(idMainRoasterDays);
 
-      setTripIds(tripId);
+      setTripIds(tripIds);
       setIdRoasterDays(skipResponse.data?.returnLst?.idRoasterDays);
-      removeItem();
+      setDriverContactNo(response.data?.returnLst?.driverContactNo);
       setShowConformationModal(false);
     } catch (error) {
-      console.log('\nerror', JSON.stringify(error?.message, null, 2), '\n');
+      console.log(
+        '\nerror===>>',
+        JSON.stringify(error?.message, null, 2),
+        '\n',
+      );
     } finally {
       setLoader(false);
     }
@@ -293,7 +332,7 @@ const EmployeePickUp = ({navigation, route}) => {
             style={styles.checkOutButton}
             onPress={() => {
               setShowConformationModal(true);
-              setSelectedItemIndex(index);
+              setSelectedItem(item);
             }}>
             <Text style={styles.checkOutText}>Skip</Text>
           </TouchableOpacity>
@@ -301,7 +340,11 @@ const EmployeePickUp = ({navigation, route}) => {
             style={styles.checkOutButton}
             onPress={() => {
               sendOtpForEmployeeCheckIn(item);
-              setSelectedItemIndex(index);
+              setSelectedItem(item);
+              console.log(
+                'selecteditem for checkin',
+                selectedItem?.idRoasterDays,
+              );
             }}>
             <Text style={styles.checkOutText}>Check In</Text>
           </TouchableOpacity>
@@ -311,7 +354,7 @@ const EmployeePickUp = ({navigation, route}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
           <TouchableOpacity
@@ -338,7 +381,7 @@ const EmployeePickUp = ({navigation, route}) => {
       </View>
       <View style={styles.subContainer}>
         <FlatList
-          data={updatedEmployeeDetail}
+          data={newEmployeeList}
           renderItem={renderItems}
           style={{marginTop: pixelSizeVertical(10)}}
         />
@@ -350,9 +393,10 @@ const EmployeePickUp = ({navigation, route}) => {
         onPressNo={() => {
           setShowConformationModal(false);
         }}
-        onPressYes={() => {
-          skipEmployeeOtp(updatedEmployeeDetail[selectedItemIndex], tripId);
+        onPressYes={item => {
           setShowConformationModal(false);
+          skipEmployeeOtp(selectedItem);
+          console.log('selectedItem', selectedItem?.idRoasterDetails);
         }}
       />
       <CustomModal
@@ -361,12 +405,8 @@ const EmployeePickUp = ({navigation, route}) => {
           setShowOtpModal(false);
         }}
         onPressSubmitButton={enteredOtp => {
-          validateOtpForEmployee(
-            enteredOtp,
-            updatedEmployeeDetail[selectedItemIndex],
-          );
+          validateOtpForEmployee(enteredOtp, selectedItem);
           setShowOtpModal(false);
-          removeItem();
         }}
         onPressCancelButton={() => {
           setShowOtpModal(false);
@@ -376,7 +416,7 @@ const EmployeePickUp = ({navigation, route}) => {
         OTPErrorMessage={otpError.otpErrorMessage}
       />
       {loader && <Loader />}
-    </View>
+    </SafeAreaView>
   );
 };
 

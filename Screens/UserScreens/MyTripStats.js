@@ -15,6 +15,8 @@ import {
 } from '../Utils/Dimensions';
 import FontFamily from '../Styles/FontFamily';
 import MyStatsTabNavi from './TopTabsScreens/MyStatsTabNavi';
+import MyUsage from './TopTabsScreens/MyUsage';
+import AdhocBooking from './TopTabsScreens/AdhocBooking';
 
 const MyTripStats = ({navigation}) => {
   return (
@@ -30,7 +32,12 @@ const MyTripStats = ({navigation}) => {
         <Text style={styles.headerText}>My Trip Stats</Text>
       </View>
       <View style={styles.tabContainer}>
-        <MyStatsTabNavi />
+        <MyStatsTabNavi
+          screen1Name="My Usage"
+          screen1Component={MyUsage}
+          screen2Name="Adhoc"
+          screen2Component={AdhocBooking}
+        />
       </View>
     </SafeAreaView>
   );
@@ -58,6 +65,6 @@ const styles = StyleSheet.create({
     paddingLeft: pixelSizeHorizontal(15),
   },
   tabContainer: {
-    flex: 1
+    flex: 1,
   },
 });

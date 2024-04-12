@@ -120,6 +120,7 @@ export default UserUpcoming;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F6F6F6'
   },
   roasterType: {
     flexDirection: 'row',

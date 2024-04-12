@@ -1,5 +1,6 @@
 import {
   PermissionsAndroid,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -22,7 +23,13 @@ import RN from 'react-native';
 import {actuatedNormalize} from '../Utils/PixelScaling';
 import CustomModal from '../Components/Modal';
 import {APIS} from '../APIURLS/ApiUrls';
-import {convertedTime, convertedTimeforEvent, getCurrentLocation, getLocationName, requestLocationPermission} from '../Utils/ReusableFunctions';
+import {
+  convertedTime,
+  convertedTimeforEvent,
+  getCurrentLocation,
+  getLocationName,
+  requestLocationPermission,
+} from '../Utils/ReusableFunctions';
 import axios from 'axios';
 import Loader from '../Components/Loader';
 import Geolocation from '@react-native-community/geolocation';
@@ -33,7 +40,7 @@ const StopTripScreen = ({navigation, route}) => {
   console.log(
     'roasterId',
     roasterId,
-    'tripId',
+    'tripId:',
     tripId,
     'idRoasterDays',
     idRoasterDays,
@@ -138,7 +145,7 @@ const StopTripScreen = ({navigation, route}) => {
           otpErrorMessage: '',
         });
         setTimeout(() => {
-        navigation.navigate('Recent');
+          navigation.navigate('Recent');
         }, 1000);
         setShowOtpModal(false);
       } else {
@@ -154,9 +161,8 @@ const StopTripScreen = ({navigation, route}) => {
     }
   };
 
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
           <TouchableOpacity
@@ -228,7 +234,7 @@ const StopTripScreen = ({navigation, route}) => {
         <BottomTab activeTab="MyTrips" />
       </View>
       {loader && <Loader />}
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,6 +1,7 @@
 import {
   Alert,
   PermissionsAndroid,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -20,7 +21,10 @@ import Geolocation from '@react-native-community/geolocation';
 import {
   convertedTime,
   convertedTimeforEvent,
+  getCurrentLocation,
+  getLocationName,
   openSettings,
+  requestLocationPermission,
 } from '../Utils/ReusableFunctions';
 import axios from 'axios';
 import {APIS} from '../APIURLS/ApiUrls';
@@ -172,77 +176,77 @@ const StartLoginTripSCreen = ({navigation, route}) => {
     }
   };
 
-  const requestLocationPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        getCurrentLocation();
-      } else {
-        console.log('Gallery permission denied');
-        Alert.alert(
-          'Alert!!',
-          'Please grant gallery permission to use this feature.',
-          [
-            {
-              text: 'Ask me Later',
-            },
-            {
-              text: 'Cancel',
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                openSettings();
-              },
-            },
-          ],
-          {cancelable: false},
-        );
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
+  // const requestLocationPermission = async () => {
+  //   try {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //     );
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       getCurrentLocation();
+  //     } else {
+  //       console.log('Gallery permission denied');
+  //       Alert.alert(
+  //         'Alert!!',
+  //         'Please grant gallery permission to use this feature.',
+  //         [
+  //           {
+  //             text: 'Ask me Later',
+  //           },
+  //           {
+  //             text: 'Cancel',
+  //           },
+  //           {
+  //             text: 'OK',
+  //             onPress: () => {
+  //               openSettings();
+  //             },
+  //           },
+  //         ],
+  //         {cancelable: false},
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //   }
+  // };
 
-  const getCurrentLocation = () => {
-    return new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(
-        position => {
-          const {latitude, longitude} = position.coords;
-          resolve({latitude, longitude});
-        },
-        error => {
-          console.log('Error getting current location:', error);
-          reject(error);
-        },
-      );
-    });
-  };
-  const getLocationName = async (latitude, longitude) => {
-    try {
-      const apiKey = 'AIzaSyAol1uOPzQnphvxtIatoLH-Ayw6OUwRpbA';
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
-      );
+  // const getCurrentLocation = () => {
+  //   return new Promise((resolve, reject) => {
+  //     Geolocation.getCurrentPosition(
+  //       position => {
+  //         const {latitude, longitude} = position.coords;
+  //         resolve({latitude, longitude});
+  //       },
+  //       error => {
+  //         console.log('Error getting current location:', error);
+  //         reject(error);
+  //       },
+  //     );
+  //   });
+  // };
+  // const getLocationName = async (latitude, longitude) => {
+  //   try {
+  //     const apiKey = 'AIzaSyAol1uOPzQnphvxtIatoLH-Ayw6OUwRpbA';
+  //     const response = await axios.get(
+  //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
+  //     );
 
-      // Parse the response
-      const {results} = response.data;
-      if (results && results.length > 0) {
-        // Extract the formatted address or other relevant information
-        const locationName = results[0].formatted_address;
-        return locationName;
-      } else {
-        return 'Unknown Location';
-      }
-    } catch (error) {
-      console.error('Error fetching location:', error);
-      return 'Unknown Location';
-    }
-  };
+  //     // Parse the response
+  //     const {results} = response.data;
+  //     if (results && results.length > 0) {
+  //       // Extract the formatted address or other relevant information
+  //       const locationName = results[0].formatted_address;
+  //       return locationName;
+  //     } else {
+  //       return 'Unknown Location';
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching location:', error);
+  //     return 'Unknown Location';
+  //   }
+  // };
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
           <TouchableOpacity
@@ -329,7 +333,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         <BottomTab activeTab="MyTrips" />
       </View>
       {loader && <Loader />}
-    </View>
+    </SafeAreaView>
   );
 };
 

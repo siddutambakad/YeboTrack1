@@ -33,34 +33,45 @@ const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 const OngoingScreen = ({navigation}) => {
   const [loader, setLoader] = useState(true);
 
-  const {driverRoasterList} = useContext(AppContext);
-  const [onGoing, setOnGoing] = useState([]);
+  const {driverRoasterList, getDriverList, driverId} = useContext(AppContext);
+  // const [onGoing, setOnGoing] = useState([]);
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const loadData = async () => {
+  //       try {
+  //         setLoader(true);
+  //         await new Promise(resolve => setTimeout(resolve, 800));
+
+  //         setOnGoing(driverRoasterList.onGoing);
+  //         setLoader(false); // Set loader to false after data is loaded
+  //       } catch (error) {
+  //         console.error('Error fetching data:', error);
+  //       }
+  //     };
+  //     loadData();
+  //     return () => {};
+  //   }, [driverRoasterList]),
+  // );
 
   useFocusEffect(
     React.useCallback(() => {
-      const loadData = async () => {
-        try {
-          setLoader(true);
-          await new Promise(resolve => setTimeout(resolve, 800));
-
-          setOnGoing(driverRoasterList.onGoing);
-          setLoader(false); // Set loader to false after data is loaded
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-      loadData();
-      return () => {};
-    }, [driverRoasterList]),
+      loadData()
+    }, [driverId])
   );
+  const loadData = async () => {
+    setLoader(true); 
+    await getDriverList(driverId); 
+    setLoader(false); 
+  };
 
   return (
     <ScrollView
       contentContainerStyle={[
         styles.container,
-        {justifyContent: onGoing.length === 0 ? 'center' : null},
+        {justifyContent: driverRoasterList?.onGoing.length === 0 ? 'center' : null},
       ]}>
-      {onGoing.length === 0 ? (
+      {driverRoasterList?.onGoing.length === 0 ? (
         <View style={styles.noDataFoundContainer}>
           <Text style={styles.noDataFoundText}>No Data for Ongoing Trips</Text>
         </View>
@@ -70,7 +81,7 @@ const OngoingScreen = ({navigation}) => {
             <Cars width={horizontalScale(80)} height={verticalScale(80)} />
           </View>
           <View style={{backgroundColor: 'rgba(246, 246, 246, 1)'}}>
-            {onGoing.map((roaster, index) => (
+            {driverRoasterList?.onGoing.map((roaster, index) => (
               <>
                 <View key={index} style={styles.slotAndDateText}>
                   <Text style={styles.slottext}>SLOT# : N/A</Text>
@@ -107,19 +118,19 @@ const OngoingScreen = ({navigation}) => {
             <TouchableOpacity
               style={styles.trackButton}
               onPress={() => {
-                if (onGoing[0].roasterType === 1) {
+                if (driverRoasterList?.onGoing[0].roasterType === 1) {
                   navigation.navigate('MyTripDetail', {
                     resumeOngoingTrip: true,
-                    idRoasterDays: onGoing[0].idRoasterDays,
-                    driverContactNo: onGoing[0].driverContactNo,
-                    roasterType: onGoing[0].roasterType,
+                    idRoasterDays: driverRoasterList?.onGoing[0].idRoasterDays,
+                    driverContactNo: driverRoasterList?.onGoing[0].driverContactNo,
+                    roasterType: driverRoasterList?.onGoing[0].roasterType,
                   });
                 } else {
                   navigation.navigate('MyLogoutTrip', {
                     resumeOngoingTrip: true,
-                    idRoasterDays: onGoing[0].idRoasterDays,
-                    driverContactNo: onGoing[0].driverContactNo,
-                    roasterType: onGoing[0].roasterType,
+                    idRoasterDays: driverRoasterList?.onGoing[0].idRoasterDays,
+                    driverContactNo: driverRoasterList?.onGoing[0].driverContactNo,
+                    roasterType: driverRoasterList?.onGoing[0].roasterType,
                   });
                 }
               }}>

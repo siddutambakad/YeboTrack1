@@ -2,37 +2,49 @@ import {FlatList, StyleSheet, Text, View} from 'react-native';
 import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
-import {AppContext, UpcomingLists} from './Context/AppContext';
+import {AppContext} from './Context/AppContext';
 import {fontPixel} from './Utils/Dimensions';
 import {formatDate} from './Utils/ReusableFunctions';
 import {useFocusEffect} from '@react-navigation/native';
 import Loader from './Components/Loader';
 
 const RecentScreen = () => {
-  const {
-    driverRoasterList: {recent},
-  } = useContext(AppContext);
+  // const {
+  //   driverRoasterList: {recent},
+  // } = useContext(AppContext);
   const [loader, setLoader] = useState(true);
-
+  const {driverRoasterList, getDriverList, driverId} = useContext(AppContext);
   useFocusEffect(
     React.useCallback(() => {
-      const loadData = async () => {
-        try {
-          await new Promise(resolve => setTimeout(resolve, 800));
-
-          setLoader(false);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
       loadData();
-
-      // Cleanup function
-      return () => {
-        clearTimeout(loadData);
-      };
-    }, [recent]),
+    }, [driverId]),
   );
+  const loadData = async () => {
+    setLoader(true);
+    await getDriverList(driverId);
+    setLoader(false);
+  };
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const loadData = async () => {
+  //       try {
+  //         await new Promise(resolve => setTimeout(resolve, 800));
+
+  //         setLoader(false);
+  //       } catch (error) {
+  //         console.error('Error fetching data:', error);
+  //       }
+  //     };
+  //     loadData();
+
+  //     // Cleanup function
+  //     return () => {
+  //       clearTimeout(loadData);
+  //     };
+  //   }, [recent]),
+  // );
+
   const renderItems = ({item, index}) => {
     return (
       <View style={{marginVertical: 10, marginHorizontal: 20}}>
@@ -62,14 +74,16 @@ const RecentScreen = () => {
       </View>
     );
   };
+  
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: 'rgba(246, 246, 246, 1)',
-        justifyContent: recent.length === 0 ? 'center' : null,
+        justifyContent:
+          driverRoasterList?.recent.length === 0 ? 'center' : null,
       }}>
-      {recent.length === 0 ? (
+      {driverRoasterList?.recent.length === 0 ? (
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <Text
             style={{
@@ -82,7 +96,7 @@ const RecentScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={recent}
+          data={driverRoasterList?.recent}
           renderItem={renderItems}
           style={{marginTop: 20}}
         />

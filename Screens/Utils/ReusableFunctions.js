@@ -9,7 +9,8 @@ export const handleCallPress = phoneNumber => {
 
 export const openGoogleMap = (latitude, longitude) => {
   // const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-  const url = `geo:${latitude},${longitude}?q=my_location`;
+  const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  // const url = `geo:${latitude},${longitude}?q=my_location`;
   Linking.openURL(url);
 };
 
@@ -55,76 +56,6 @@ export const openSettings = () => {
   }
 };
 
-// export const requestLocationPermission = async () => {
-//   try {
-//     const granted = await PermissionsAndroid.request(
-//       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-//     );
-//     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-//       getCurrentLocation();
-//     } else {
-//       console.log('Location permission denied');
-//       Alert.alert(
-//         'Alert!!',
-//         'Please grant location permission to use this feature.',
-//         [
-//           {
-//             text: 'Ask me Later',
-//           },
-//           {
-//             text: 'Cancel',
-//           },
-//           {
-//             text: 'OK',
-//             onPress: () => {
-//               openSettings();
-//             },
-//           },
-//         ],
-//         {cancelable: false},
-//       );
-//     }
-//   } catch (err) {
-//     console.warn(err);
-//   }
-// };
-
-// export const requestPermission = async (
-//   permissionType,
-//   permissionMessage,
-//   openFunction,
-// ) => {
-//   try {
-//     const permission = await check(
-//       Platform.OS === 'android' ? permissionType.android : permissionType.ios,
-//     );
-//     if (permission === RESULTS.GRANTED) {
-//       openFunction();
-//     } else {
-//       const result = await request(
-//         Platform.OS === 'android' ? permissionType.android : permissionType.ios,
-//       );
-//       if (result === RESULTS.GRANTED) {
-//         openFunction();
-//       } else {
-//         console.log(`${permissionMessage} permission denied`);
-//         Alert.alert(
-//           'Alert!!',
-//           `Please grant ${permissionMessage} permission to proceed.`,
-//           [
-//             {text: 'Ask Me Later'},
-//             {text: 'Cancel'},
-//             {text: 'Ok', onPress: openSettings},
-//           ],
-//           {cancelable: false},
-//         );
-//       }
-//     }
-//   } catch (error) {
-//     console.error(`Error requesting ${permissionMessage} permission:`, error);
-//   }
-// };
-
 export const requestLocationPermission = async () => {
   try {
     const permission = await check(
@@ -161,16 +92,6 @@ export const requestLocationPermission = async () => {
   }
 };
 
-// export const requestLocationPermission = async () => {
-//   await requestPermission(
-//     {
-//       android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-//       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-//     },
-//     'location',
-//     getCurrentLocation,
-//   );
-// };
 
 export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {

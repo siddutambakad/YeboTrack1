@@ -3,13 +3,14 @@ import {
   Dimensions,
   Linking,
   PermissionsAndroid,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Back from '../../assets/images/VectorBack.svg';
 import Sos from '../../assets/images/sos.svg';
 import Bell from '../../assets/images/bellIcon.svg';
@@ -43,6 +44,7 @@ import {
   requestLocationPermission,
 } from '../Utils/ReusableFunctions';
 import Geolocation from '@react-native-community/geolocation';
+import {AppContext} from '../Context/AppContext';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
@@ -63,6 +65,7 @@ const MyTripDetails = ({route, navigation}) => {
     guardId,
     // items,
   } = route.params;
+  console.log('🚀 ~ MyTripDetails ~ driverContactNo:', driverContactNo);
   // console.log("🚀 ~ MyTripDetails---------->>>>>>>>> ~ items:", items)
   console.log('🚀 ~ MyTripDetails ~ tripId:', tripId);
 
@@ -74,16 +77,30 @@ const MyTripDetails = ({route, navigation}) => {
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
   const [pickupEmployeeCompleted, setPickupEmployeeCompleted] = useState(false);
-  const [loader, setLoader] = useState(true);
   const [pickupGuard, setPickupGuard] = useState([]);
-  const [employeeDetails, setEmployeeDetails] = useState([]);
-  const [responseInfo, setResponseInfo] = useState([]);
+  const {tripDetailsResponse, getTripDetails, loader, setLoader} =
+    useContext(AppContext);
+  console.log(
+    '🚀 ~ MyTripDetails ~ tripDetailsResponse?.idDriver:',
+    tripDetailsResponse?.idDriver,
+    'tripDetailsResponse?.driverContactNo',
+    tripDetailsResponse?.driverContactNo,
+  );
+  console.log(
+    '\ntripDetailsResponse',
+    JSON.stringify(tripDetailsResponse?.roasterDayId, null, 2),
+    '\n',
+  );
   const [otpError, setOtpError] = useState({
     isOtpError: false,
     otpErrorMessage: '',
   });
   const [otpValidateResponse, setOtpValidateResponse] = useState([]);
-  console.log('🚀 ~ MyTripDetails ~ otpValidateResponse:', otpValidateResponse);
+  // console.log(
+  //   '\notpValidateResponse:',
+  //   JSON.stringify(otpValidateResponse?.idRoaster, null, 2),
+  //   '\n',
+  // );
 
   useEffect(() => {
     if (driveOfficeOtp) {
@@ -107,14 +124,21 @@ const MyTripDetails = ({route, navigation}) => {
   ]);
 
   useEffect(() => {
-    if (resumeOngoingTrip) {
+    if (resumeOngoingTrip || idRoasterDays || otpVerified) {
       getTripDetails(idRoasterDays);
     }
-  }, [resumeOngoingTrip]);
+  }, [resumeOngoingTrip, idRoasterDays]);
 
   useEffect(() => {
-    getTripDetails(idRoasterDays);
-  }, [idRoasterDays]);
+    if (tripDetailsResponse) {
+      stepperPointChanger(tripDetailsResponse.tripDetail);
+      setPickupGuard(tripDetailsResponse.roasterGuardDetail);
+    }
+  }, [tripDetailsResponse]);
+
+  // useEffect(() => {
+  //   getTripDetails(idRoasterDays);
+  // }, [idRoasterDays]);
 
   const stepperPointChanger = tripDetail => {
     const dt = new Map([
@@ -131,22 +155,22 @@ const MyTripDetails = ({route, navigation}) => {
     }
   };
 
-  const getTripDetails = async idRoasterDays => {
-    setLoader(true);
-    try {
-      const apiUrl = `${APIS.getTripDeatils}/${idRoasterDays}`;
-      const response = await axios.get(apiUrl);
-      const responseData = response?.data;
-      stepperPointChanger(responseData?.returnLst?.tripDetail);
-      setResponseInfo(responseData?.returnLst);
-      setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
-      setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
-    } catch (error) {
-      console.log('error from the tripdetail', error);
-    } finally {
-      setLoader(false);
-    }
-  };
+  // const getTripDetails = async idRoasterDays => {
+  //   setLoader(true);
+  //   try {
+  //     const apiUrl = `${APIS.getTripDeatils}/${idRoasterDays}`;
+  //     const response = await axios.get(apiUrl);
+  //     const responseData = response?.data;
+  //     stepperPointChanger(responseData?.returnLst?.tripDetail);
+  //     setResponseInfo(responseData?.returnLst);
+  //     setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
+  //     setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
+  //   } catch (error) {
+  //     console.log('error from the tripdetail', error);
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
 
   const sendOtpForGuard = async () => {
     setLoader(true);
@@ -162,8 +186,10 @@ const MyTripDetails = ({route, navigation}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.sendOtpForGuard}`;
       const requestBodyForGuard = {
-        roasterId: responseInfo?.idRoaster,
-        tripId: resumeOngoingTrip ? responseInfo.tripDetail?.idTrip : tripId,
+        roasterId: tripDetailsResponse?.idRoaster,
+        tripId: resumeOngoingTrip
+          ? tripDetailsResponse.tripDetail?.idTrip
+          : tripId,
         idRoasterDays: idRoasterDays,
         tripEventDtm: convertedTimeforEvent(),
         eventGpsdtm: convertedTime(),
@@ -177,7 +203,6 @@ const MyTripDetails = ({route, navigation}) => {
         JSON.stringify(requestBodyForGuard, null, 2),
         '\n',
       );
-
       axios
         .post(apiUrl, requestBodyForGuard)
         .then(response => {
@@ -214,8 +239,10 @@ const MyTripDetails = ({route, navigation}) => {
 
       const apiUrl = `${APIS.validateOtpForGuard}`;
       const requestBodyForGuard = {
-        tripId: otpValidateResponse?.tripId,
-        roasterId: otpValidateResponse?.idRoaster,
+        tripId: resumeOngoingTrip
+          ? tripDetailsResponse.tripDetail?.idTrip
+          : tripId,
+        roasterId: tripDetailsResponse?.idRoaster,
         idRoasterDays: idRoasterDays,
         guardID: otpValidateResponse?.guardId,
         mobileNo: otpValidateResponse?.mobileNo,
@@ -245,7 +272,7 @@ const MyTripDetails = ({route, navigation}) => {
     } catch (error) {
       console.log(
         '\nError validateing OTP:',
-        JSON.stringify(error?.message, null, 2),
+        JSON.stringify(error, null, 2),
         '\n',
       );
       setOtpError({
@@ -274,29 +301,31 @@ const MyTripDetails = ({route, navigation}) => {
   const handlePickupEmployeeClick = () => {
     setPickupEmployeeCompleted(true);
     navigation.navigate('PickUp', {
-      employeeDetail: employeeDetails,
       tripId: tripId,
-      tripType: responseInfo?.tripDetail?.tripType
+      tripType: tripDetailsResponse?.tripDetail?.tripType,
+      idRoasterDays,
     });
   };
 
   const handleEndTripClick = () => {
     navigation.navigate('StopTrip', {
-      roasterId: responseInfo?.idRoaster,
+      roasterId: tripDetailsResponse?.idRoaster,
       tripId: tripId,
-      tripId: responseInfo?.tripDetail?.idTrip,
-      idRoasterDays: idRoasterDays,
-      driverId: responseInfo?.idDriver,
-      mobileNo: driverContactNo,
+      tripId: tripDetailsResponse?.tripDetail?.idTrip,
+      idRoasterDays: tripDetailsResponse?.roasterDayId,
+      driverId: tripDetailsResponse?.idDriver,
+      mobileNo: resumeOngoingTrip
+        ? tripDetailsResponse?.driverContactNo
+        : tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
     });
   };
 
   const handleStartTrip = () => {
     // setShowStartTripModal(true);
     navigation.navigate('StartTripLogin', {
-      roasterId: responseInfo?.idRoaster,
+      roasterId: tripDetailsResponse?.idRoaster,
       roasterIdDays: idRoasterDays,
-      driverId: responseInfo?.idDriver,
+      driverId: tripDetailsResponse?.idDriver,
       driverNo: driverContactNo,
       roasterRouteType: roastertype,
     });
@@ -341,7 +370,7 @@ const MyTripDetails = ({route, navigation}) => {
   ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* header */}
       <View style={styles.header}>
         <View>
@@ -471,12 +500,12 @@ const MyTripDetails = ({route, navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('StopTrip', {
-                  roasterId: responseInfo?.idRoaster,
+                  roasterId: tripDetailsResponse?.idRoaster,
                   tripId: tripId,
-                  tripId: responseInfo?.tripDetail?.idTrip,
-                  idRoasterDays: idRoasterDays,
-                  driverId: responseInfo?.idDriver,
-                  mobileNo: driverContactNo,
+                  tripId: tripDetailsResponse?.tripDetail?.idTrip,
+                  idRoasterDays: tripDetailsResponse?.roasterDayId,
+                  driverId: tripDetailsResponse?.idDriver,
+                  mobileNo: tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
                 });
               }}
               activeOpacity={1}
@@ -547,7 +576,7 @@ const MyTripDetails = ({route, navigation}) => {
         </ScrollView>
         <BottomTab activeTab="MyTrips" />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

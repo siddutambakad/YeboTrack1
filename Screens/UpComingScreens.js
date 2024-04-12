@@ -15,11 +15,25 @@ import ConformationModal from './Components/ConformationModal';
 import {fontPixel, horizontalScale, verticalScale} from './Utils/Dimensions';
 import {AppContext} from './Context/AppContext';
 import {formatDate} from './Utils/ReusableFunctions';
+import {useFocusEffect} from '@react-navigation/native';
+import Loader from './Components/Loader';
 
 const UpComingScreens = ({navigation}) => {
-  const {driverRoasterList} = useContext(AppContext);
+  const {driverRoasterList, getDriverList, driverId} = useContext(AppContext);
 
   const [showModal, setShowModal] = useState(false);
+  const [loader, setLoader] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [driverId]),
+  );
+  const loadData = async () => {
+    setLoader(true);
+    await getDriverList(driverId);
+    setLoader(false);
+  };
 
   const handleItemClick = item => {
     if (item.roasterRouteType === 'Pick-Up') {
@@ -59,6 +73,10 @@ const UpComingScreens = ({navigation}) => {
             styles.distanceText
           }>{`Distance: ${item?.routeDistance}`}</Text>
         <Text style={styles.timeText}>{`Time: ${item?.routeTime}`}</Text>
+        <Text
+          style={
+            styles.timeText
+          }>{`Id RoasterDays: ${item?.idRoasterDays}`}</Text>
         <TouchableOpacity
           style={styles.cancelTripButton}
           onPress={() => {
@@ -79,6 +97,7 @@ const UpComingScreens = ({navigation}) => {
       </TouchableOpacity>
     );
   };
+
   return (
     <View
       style={[
@@ -98,6 +117,7 @@ const UpComingScreens = ({navigation}) => {
           showsVerticalScrollIndicator={false}
         />
       )}
+      {loader && <Loader />}
     </View>
   );
 };

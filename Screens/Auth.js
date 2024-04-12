@@ -46,6 +46,8 @@ import {
 import MyTripStats from './UserScreens/MyTripStats';
 import UserProfileScreen from './UserScreens/UserProfileScreen';
 import UserMyTripsScreen from './UserScreens/UserMyTripsTopNavigator/UserMyTripsScreen';
+import RaiseFeedBackScreen from './UserScreens/RaiseFeedBackScreens/RaiseFeedBackScreen';
+import TicketDetails from './UserScreens/RaiseFeedBackScreens/TicketDetails';
 
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -72,11 +74,11 @@ function Auth({props, navigation}) {
 
         {isLoggedIn ? (
           <>
-            {/* <Stack.Screen
+            <Stack.Screen
               name="Driver"
               component={DriverHomeScreen}
               options={{headerShown: false}}
-            /> */}
+            />
             <Stack.Screen
               name="MainStack"
               component={UserStack}
@@ -189,6 +191,16 @@ function UserStack() {
       <Stack.Screen
         name="UserMyTrips"
         component={UserMyTripsScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="RaiseFeedBack"
+        component={RaiseFeedBackScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="TicketDetails"
+        component={TicketDetails}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

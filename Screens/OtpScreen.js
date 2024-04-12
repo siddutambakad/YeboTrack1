@@ -129,8 +129,8 @@ const OtpScreen = ({navigation, route}) => {
         // setDriverId(res_ponse.idDriver)
         await setUserData(res_ponse);
         let ck = setTimeout(() => {
-          // navigation.navigate('Driver');
-          navigation.navigate('Home');
+          navigation.navigate('Driver');
+          // navigation.navigate('Home');
           clearTimeout(ck);
         }, 800);
       } else {

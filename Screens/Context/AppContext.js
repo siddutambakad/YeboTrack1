@@ -10,14 +10,41 @@ export const AppProvider = ({children}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const [ongoingRoasters, setOngoingRoasters] = useState([]);
   // const [upcomingRoasters, setUpcomingRoasters] = useState([]);
-  const [driverRoasterList, setDriverRoasterList] = useState({upcoming: [],onGoing:[], recent:[]})
+  const [driverRoasterList, setDriverRoasterList] = useState({
+    upcoming: [],
+    onGoing: [],
+    recent: [],
+  });
   const [driverId, setDriverId] = useState('');
-  const [driverDetails, setDriverDetails] = useState(null)
+  const [driverDetails, setDriverDetails] = useState(null);
+  const [tripDetailsResponse, setTripDetailsResponse] = useState(null);
+  const [employeeDetails, setEmployeeDetails] = useState([]);
+  const [idTrip, setIdTrip] = useState(0);
+  // console.log("🚀 ~ AppProvider ~ employeeDetails:", employeeDetails)
+  // console.log("🚀 ~ AppProvider ~ tripDetailsResponse:", tripDetailsResponse)
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     saveIsLoggedIn();
     getDriverId();
   }, [isLoggedIn]);
+
+  const getTripDetails = async idRoasterDays => {
+    setLoader(true);
+    try {
+      const apiUrl = `${APIS.getTripDeatils}/${idRoasterDays}`;
+      const response = await axios.get(apiUrl);
+      const responseData = response?.data;
+      // stepperPointChanger(responseData?.returnLst?.tripDetail);
+      setTripDetailsResponse(responseData?.returnLst);
+      setIdTrip(responseData?.returnLst?.tripDetail?.idTrip);
+      setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
+    } catch (error) {
+      console.log('error from the tripdetail', error);
+    } finally {
+      setLoader(false);
+    }
+  };
 
   const saveIsLoggedIn = async () => {
     try {
@@ -50,35 +77,37 @@ export const AppProvider = ({children}) => {
     if (storedOtpResponseData) {
       const driverId = JSON.parse(storedOtpResponseData);
       const idDriver = driverId?.idDriver;
-      const driverdetails = driverId
+      const driverdetails = driverId;
       setDriverId(idDriver);
-      setDriverDetails(driverdetails)
+      setDriverDetails(driverdetails);
     }
   };
 
   useEffect(() => {
     if (driverId) {
-    getDriverList(driverId);
+      getDriverList(driverId);
     }
   }, [driverId]);
 
-  const getDriverList = async (driverId) => {
+  const getDriverList = async driverId => {
     try {
       const apiUrl = `${APIS.getDriverRoasterList}/${driverId}`;
       const response = await axios.get(apiUrl);
       const data = response.data;
 
       // seggerate data based on "roasterStatus"
-      let keys = { upcoming: 0,onGoing:1, recent:2}
+      let keys = {upcoming: 0, onGoing: 1, recent: 2};
 
-      let seggerateData = Object
-      .entries(keys)
-      .reduce((prvObj,[key,value])=>{
-        let filterData = data.returnLst.filter(filObj=> filObj.roasterStatus == value)
-        return {...prvObj, ...Object.fromEntries([[key, filterData]])}
-      },{})
-      // console.log("\nseggerateData",JSON.stringify(seggerateData,null,2),"\n")
-      setDriverRoasterList(seggerateData)
+      let seggerateData = Object.entries(keys).reduce(
+        (prvObj, [key, value]) => {
+          let filterData = data.returnLst.filter(
+            filObj => filObj.roasterStatus == value,
+          );
+          return {...prvObj, ...Object.fromEntries([[key, filterData]])};
+        },
+        {},
+      );
+      setDriverRoasterList(seggerateData);
 
       // const ongoing = data.returnLst.filter(
       //   roaster => roaster.roasterStatus === 1,
@@ -103,10 +132,17 @@ export const AppProvider = ({children}) => {
         setIsLoggedIn,
         handleLogin,
         handleLogout,
-        // ongoingRoasters,
-        // upcomingRoasters,
         driverDetails,
         driverRoasterList,
+        driverId,
+        tripDetailsResponse,
+        getTripDetails,
+        loader,
+        employeeDetails,
+        setLoader,
+        setEmployeeDetails,
+        idTrip,
+        getDriverList,
         driverId
       }}>
       {children}

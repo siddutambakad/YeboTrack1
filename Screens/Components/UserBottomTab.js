@@ -25,7 +25,7 @@ import RN from 'react-native';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const UserBottomTab = props => {
-  const {activeTab, onPressAlertButton} = props;
+  const {activeTab, onPressAlertButton, onPressSafeDrop} = props;
   const navigation = useNavigation();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -58,15 +58,13 @@ const UserBottomTab = props => {
     <SafeAreaView
       style={{
         width: Dimensions.get('window').width,
-        backgroundColor: '#E5E5E5',
+        backgroundColor: '#F6F6F6',
         height: verticalScale(85),
-        borderTopLeftRadius: responsiveBorderRadius(35),
-        borderTopRightRadius: responsiveBorderRadius(35),
         alignItems: 'center',
         alignSelf: 'center',
         // position: 'absolute',
         // bottom: 0,
-        elevation: 5,
+        elevation: 10,
         shadowColor: 'lightgray',
         shadowOffset: {width: 0, height: -5},
         shadowOpacity: 0.3,
@@ -82,12 +80,13 @@ const UserBottomTab = props => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
+          backgroundColor: '#E5E5E5',
+          borderTopLeftRadius: responsiveBorderRadius(35),
+          borderTopRightRadius: responsiveBorderRadius(35),
         }}>
         <View style={{alignItems: 'center'}}>
           <TouchableOpacity
-            onPress={() => {
-              // navigation.navigate('Driver');
-            }}
+            onPress={onPressSafeDrop}
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -115,7 +114,7 @@ const UserBottomTab = props => {
             marginRight: pixelSizeHorizontal(-20),
           }}>
           <TouchableOpacity
-          activeOpacity={0.7}
+            activeOpacity={0.7}
             onPress={onPressAlertButton}
             style={{
               alignItems: 'center',

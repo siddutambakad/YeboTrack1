@@ -21,9 +21,15 @@ import UserBottomTab from '../../Components/UserBottomTab';
 import UserTopTabNavigator from './UserTopTabNavigator';
 import BottomTab from '../../Components/BottomTab';
 import AlertModal from '../../Components/AlertModal';
+import CustomModal from '../../Components/Modal';
+import StartTripModal from '../../Components/StartTripModal';
+import MyUsage from '../TopTabsScreens/MyUsage';
+import AdhocBooking from '../TopTabsScreens/AdhocBooking';
 
 const UserMyTripsScreen = ({navigation}) => {
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showConformationModal, setShowConformationModal] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -42,7 +48,9 @@ const UserMyTripsScreen = ({navigation}) => {
           activeTab="UserMyTrips"
           onPressAlertButton={() => {
             setShowAlertModal(true);
-            console.log('hii');
+          }}
+          onPressSafeDrop={() => {
+            setShowOtpModal(true);
           }}
         />
         <AlertModal
@@ -53,6 +61,30 @@ const UserMyTripsScreen = ({navigation}) => {
           showConfirmModal={showAlertModal}
           onPressNo={() => {
             setShowAlertModal(false);
+          }}
+        />
+        <CustomModal
+          visible={showOtpModal}
+          onClose={() => {
+            setShowOtpModal(false);
+          }}
+          onPressSubmitButton={() => {
+            setShowOtpModal(false);
+            setShowConformationModal(true);
+          }}
+          onPressCancelButton={() => {
+            setShowOtpModal(false);
+          }}
+          title={'Enter the T-Pin'}
+        />
+        <StartTripModal
+          onPressOK={() => {
+            setShowConformationModal(false);
+          }}
+          title={'T-Pin saved successfully!'}
+          showConfirmModal={showConformationModal}
+          onPressNo={() => {
+            setShowConformationModal(false);
           }}
         />
       </View>

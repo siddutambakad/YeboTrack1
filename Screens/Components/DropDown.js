@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   optionsStyle: {
     backgroundColor: '#FFF8F2',
-    maxHeight: horizontalScale(140),
+    maxHeight: horizontalScale(135),
     // zIndex: 5,
     overflow: 'hidden',
   },

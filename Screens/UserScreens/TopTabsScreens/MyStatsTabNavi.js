@@ -15,8 +15,8 @@ import AdhocBooking from './AdhocBooking';
 
 const Tab = createMaterialTopTabNavigator();
 
-const MyStatsTabNavi = () => {
-
+const MyStatsTabNavi = props => {
+  const {screen1Name, screen1Component, screen2Name, screen2Component} = props;
   return (
     <Tab.Navigator
       screenOptions={{
@@ -36,7 +36,7 @@ const MyStatsTabNavi = () => {
           width: Dimensions.get('window').width * 0.35,
           backgroundColor: 'rgba(102, 39, 110, 1)',
           marginTop: 10,
-          height: 3
+          height: 3,
         },
         tabBarIndicatorContainerStyle: {
           marginLeft: pixelSizeHorizontal(30),
@@ -48,7 +48,7 @@ const MyStatsTabNavi = () => {
           tabBarIcon: ({}) => (
             <View
               style={{
-                width: horizontalScale(100),
+                width: horizontalScale(120),
                 height: verticalScale(40),
                 alignItems: 'center',
                 alignSelf: 'center',
@@ -57,15 +57,15 @@ const MyStatsTabNavi = () => {
                 style={{
                   color: 'black',
                   fontFamily: FontFamily.semiBold,
-                  fontSize: fontPixel(18),
+                  fontSize: fontPixel(14),
                 }}>
-               My Usage
+                {screen1Name}
               </Text>
             </View>
           ),
         }}
-        name="MyUsage"
-        component={MyUsage}
+        name={screen1Name}
+        component={screen1Component}
       />
       <Tab.Screen
         options={{
@@ -81,15 +81,15 @@ const MyStatsTabNavi = () => {
                 style={{
                   color: 'black',
                   fontFamily: FontFamily.semiBold,
-                  fontSize: fontPixel(18),
+                  fontSize: fontPixel(14),
                 }}>
-                Adoc Booking
+                {screen2Name}
               </Text>
             </View>
           ),
         }}
-        name="AdocBook"
-        component={AdhocBooking}
+        name={screen2Name}
+        component={screen2Component}
       />
     </Tab.Navigator>
   );
