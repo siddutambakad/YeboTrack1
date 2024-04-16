@@ -45,6 +45,8 @@
   	<string>YeboTrack Wants to Access the Location</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>YeboTrack Wants Access The MediaGallery</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>YeboTrack Wants to access the Location</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

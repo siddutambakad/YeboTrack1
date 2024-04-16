@@ -19,7 +19,7 @@ export const AppProvider = ({children}) => {
   const [driverDetails, setDriverDetails] = useState(null);
   const [tripDetailsResponse, setTripDetailsResponse] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState([]);
-  const [idTrip, setIdTrip] = useState(0);
+  const [idTrips, setIdTrips] = useState(0);
   // console.log("🚀 ~ AppProvider ~ employeeDetails:", employeeDetails)
   // console.log("🚀 ~ AppProvider ~ tripDetailsResponse:", tripDetailsResponse)
   const [loader, setLoader] = useState(false);
@@ -37,7 +37,7 @@ export const AppProvider = ({children}) => {
       const responseData = response?.data;
       // stepperPointChanger(responseData?.returnLst?.tripDetail);
       setTripDetailsResponse(responseData?.returnLst);
-      setIdTrip(responseData?.returnLst?.tripDetail?.idTrip);
+      setIdTrips(responseData?.returnLst?.tripDetail?.idTrip);
       setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
     } catch (error) {
       console.log('error from the tripdetail', error);
@@ -141,7 +141,7 @@ export const AppProvider = ({children}) => {
         employeeDetails,
         setLoader,
         setEmployeeDetails,
-        idTrip,
+        idTrips,
         getDriverList,
         driverId
       }}>

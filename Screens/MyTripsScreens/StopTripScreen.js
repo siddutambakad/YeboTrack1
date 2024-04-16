@@ -144,9 +144,7 @@ const StopTripScreen = ({navigation, route}) => {
           isOtpError: false,
           otpErrorMessage: '',
         });
-        setTimeout(() => {
-          navigation.navigate('Recent');
-        }, 1000);
+        navigation.navigate('Recent');
         setShowOtpModal(false);
       } else {
         setOtpError({
@@ -205,10 +203,6 @@ const StopTripScreen = ({navigation, route}) => {
         <View style={{flex: 0.4, alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => {
-              // navigation.navigate('Recent', {
-              //   // stopTrip: true,
-              //   // stopTripTime: formatTime(new Date()),
-              // });
               sendOtpForEndTrip();
             }}
             style={styles.endTripButton}>

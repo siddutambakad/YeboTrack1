@@ -44,8 +44,8 @@ import {AppContext} from '../Context/AppContext';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const EmployeePickUp = ({navigation, route}) => {
-  const {tripId, tripType, idRoasterDays: idMainRoasterDays} = route.params;
-  // console.log('🚀 ~ EmployeePickUp ~ tripId:', tripId);
+  const {tripId, idTrip, idRoasterDays: idMainRoasterDays} = route.params;
+  console.log('🚀 ~ EmployeePickUp ~ tripId:', tripId);
 
   const [showConformationModal, setShowConformationModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -59,9 +59,9 @@ const EmployeePickUp = ({navigation, route}) => {
   const [tripIds, setTripIds] = useState(null);
   const [idRoasterDays, setIdRoasterDays] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  const {getTripDetails, employeeDetails, idTrip} = useContext(AppContext);
-  console.log("🚀 ~ EmployeePickUp ~ idTrip:", idTrip)
-  console.log('🚀 ~ EmployeePickUp ~ idTrip:', tripId);
+  const {getTripDetails, employeeDetails, idTrips} = useContext(AppContext);
+  console.log("🚀 ~ EmployeePickUp ~ idTrip:", idTrips)
+  // console.log('🚀 ~ EmployeePickUp ~ employeeDetails:', employeeDetails);
   const [rousterRouteType, setRousterRouteType] = useState(0);
   console.log('🚀 ~ EmployeePickUp ~ rousterRouteType:', rousterRouteType);
   const [newEmployeeList, setNewEmployeeList] = useState([]);
@@ -127,7 +127,7 @@ const EmployeePickUp = ({navigation, route}) => {
 
       const locationName = await getLocationName(latitude, longitude);
       const requestBodyForEmployee = {
-        tripId: idTrip,
+        tripId: idTrips,
         roasterId: item.idRoaster,
         roasterDetailId: item.idRoasterDetails,
         idRoasterDays: item.idRoasterDays,
@@ -172,7 +172,7 @@ const EmployeePickUp = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.validateEmployeeCheckIn}`;
       const validateEmployee = {
-        tripId: idTrip,
+        tripId: idTrips,
         roasterId: selectedItem?.idRoaster,
         roasterDetailId: selectedItem?.idRoasterDetails,
         idRoasterDays: selectedItem?.idRoasterDays,
@@ -228,7 +228,7 @@ const EmployeePickUp = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.sendSkipEmpCheckIn}`;
       const skipRequestBody = {
-        tripId: idTrip,
+        tripId: idTrips,
         roasterId: item?.idRoaster,
         roasterDetailId: item?.idRoasterDetails,
         idRoasterDays: item?.idRoasterDays,
@@ -260,7 +260,7 @@ const EmployeePickUp = ({navigation, route}) => {
 
       setTripIds(tripIds);
       setIdRoasterDays(skipResponse.data?.returnLst?.idRoasterDays);
-      setDriverContactNo(response.data?.returnLst?.driverContactNo);
+      setDriverContactNo(skipResponse.data?.returnLst?.driverContactNo);
       setShowConformationModal(false);
     } catch (error) {
       console.log(

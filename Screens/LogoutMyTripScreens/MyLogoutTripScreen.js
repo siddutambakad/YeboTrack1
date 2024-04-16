@@ -33,11 +33,8 @@ import {
   convertedTimeforEvent,
   getCurrentLocation,
   getLocationName,
-  handleCallPress,
-  openGoogleMap,
   requestLocationPermission,
 } from '../Utils/ReusableFunctions';
-import {actuatedNormalize} from '../Utils/PixelScaling';
 import axios from 'axios';
 import Loader from '../Components/Loader';
 import {APIS} from '../APIURLS/ApiUrls';
@@ -47,31 +44,20 @@ const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const MyLogoutTripScreen = ({route, navigation}) => {
   const {
-    otpSubmitedForEmployee,
-    pickUpTime,
-    startTrip,
-    startTripTime,
-    DroppedEmployee,
-    droppedTime,
-    dropGuard,
-    dropGuardTime,
-
     idRoasterDays,
     driverContactNo,
     roastertype,
     otpVerified,
     tripId,
     resumeOngoingTrip,
+    employeeCheckedOut,
   } = route.params;
   console.log('🚀 ~ MyLogoutTripScreen ~ tripId:', tripId);
-  console.log('🚀 ~ MyLogoutTripScreen ~ roastertype:', roastertype);
-  console.log('🚀 ~ MyLogoutTripScreen ~ driverContactNo:', driverContactNo);
-  console.log('🚀 ~ MyLogoutTripScreen ~ idRoasterDays:', idRoasterDays);
   const [pickUpGuardModal, setPickUpGuardModal] = useState(false);
   const [modalPopupOptions, setModalPopupOptions] = useState({});
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
+  console.log('selectedPosition', selectedPosition);
   const [pickupGuard, setPickupGuard] = useState([]);
   const [showStartOtp, setShowStartOtp] = useState(false);
   const [showGuardOtpModal, setShowGuardOtpModal] = useState([]);
@@ -79,35 +65,28 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     isOtpError: false,
     otpErrorMessage: '',
   });
-  // const [validatedStartTripId, setValidatedStartTripId] = useState([]);
+  const [validatedStartTripId, setValidatedStartTripId] = useState([]);
+  // console.log("🚀 ~ MyLogoutTripScreen ~ validatedStartTripId:", validatedStartTripId)
   const [permissionGranted, setPermissionGranted] = useState(false);
   const {tripDetailsResponse, getTripDetails, loader, setLoader} =
     useContext(AppContext);
-  const [showEndTripButton, setShowEndTripButton] = useState(false);
-
   // console.log(
   //   '\ntripDetailsResponse',
   //   JSON.stringify(tripDetailsResponse, null, 2),
   //   '\n',
   // );
+  const [showEndTripButton, setShowEndTripButton] = useState(false);
+  // console.log("🚀 ~ MyLogoutTripScreen ~ showEndTripButton:", tripDetailsResponse?.tripDetail?.idTrip)
 
   useEffect(() => {
-    // if (otpSubmitedForEmployee) {
-    //   setShowLocationReachedModal(true);
-    // } else if (startTrip) {
-    //   time.push(startTripTime);
-    //   setShowLocationReachedModal(true);
-    // } else if (DroppedEmployee) {
-    //   setSelectedPosition(5);
-    //   time.push(droppedTime);
-    // } else if (dropGuard) {
-    //   setSelectedPosition(6);
-    //   time.push(dropGuardTime);
-    // }
+    console.log('employeeCheckedOut:', employeeCheckedOut);
+    console.log('otpVerified:', otpVerified);
     if (otpVerified) {
       setSelectedPosition(2);
+    } else if (employeeCheckedOut) {
+      setSelectedPosition(4);
     }
-  }, [otpVerified]);
+  }, [otpVerified, employeeCheckedOut]);
 
   useEffect(() => {
     if (resumeOngoingTrip || idRoasterDays) {
@@ -115,13 +94,23 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     }
   }, [resumeOngoingTrip, idRoasterDays]);
 
+  const [_tripDetail, setTripDetail] = useState({});
+
   useEffect(() => {
     if (tripDetailsResponse) {
       stepperPointChanger(tripDetailsResponse.tripDetail);
       setPickupGuard(tripDetailsResponse.roasterGuardDetail);
-      // setEmployeeDetails(tripDetailsResponse.roasterEmpDetails)
+      // setTripDetail(tripDetailsResponse.tripDetail);
+      // checkingStepper(tripDetailsResponse.roasterEmpDetails);
     }
   }, [tripDetailsResponse]);
+
+  // useEffect(() => {
+  //   if (tripDetailsResponse) {
+  //     stepperPointChanger(_tripDetail);
+  //     setPickupGuard(tripDetailsResponse.roasterGuardDetail);
+  //   }
+  // }, [tripDetailsResponse, _tripDetail]);
 
   useEffect(() => {
     requestPermission();
@@ -137,34 +126,115 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     }
   };
 
+  // const checkingStepper = data => {
+  //   let fgh = data.map(item => {
+  //     if (item?.tripBoardStatus?.onBoardStatus !== 0) {
+  //       return true;
+  //     }
+  //     return false;
+  //   });
+
+  //   if (!fgh.includes(false)) {
+  //     setTripDetail({
+  //       ...tripDetailsResponse?.tripDetail,
+  //       tripStatusDesc: 'Trip CheckOut',
+  //     });
+  //   } else {
+  //     setTripDetail(tripDetailsResponse?.tripDetail);
+  //   }
+  // };
+
+  // const stepperPointChanger = tripDetail => {
+  //   // console.log(
+  //   //   '🚀 ~ stepperPointChanger ~ tripDetailsResponse:',
+  //   //   tripDetailsResponse,
+  //   // );
+  //   console.log('========>>>>>>>>>');
+  //   const dt = new Map([
+  //     ['Not-Started', 0],
+  //     ['Trip-Start', 1],
+  //     ['Emp Check In-Progress', 2],
+  //     // ['Onboarding Completed', 2],
+  //     ['Guard-CheckIn', 3],
+  //     ['Trip CheckOut', 4],
+  //     ['Trip-End', 5],
+  //   ]);
+  //   const {roasterEmpDetails} = tripDetailsResponse;
+  //   const filterBoardStatusData = roasterEmpDetails?.filter(
+  //     item =>
+  //       item.tripBoardStatus?.onBoardStatus === 5 ||
+  //       item.tripBreakStatus?.trpBreakStatus === 0,
+  //   ).length;
+  //   console.log('filterBoardStatusData', filterBoardStatusData);
+  //   let stepIndicator =
+  //     tripDetail?.tripStatusDesc === 'Emp Check In-Progress'
+  //       ? 1
+  //       : dt?.get(tripDetail?.tripStatusDesc) ;
+  //   setSelectedPosition(stepIndicator <= -1 ? 0 : stepIndicator);
+  //   console.log(
+  //     'stepIndicator',
+  //     tripDetail?.tripStatusDesc,
+  //     'stepIndicator',
+  //     stepIndicator,
+  //   );
+  //   // setSelectedPosition(dt.get(tripDetail?.tripStatusDesc));
+  //   if (dt.get(tripDetail?.tripStatusDesc) > 3) {
+  //     setShowEndTripButton(true);
+  //   }
+  // };
+
   const stepperPointChanger = tripDetail => {
+    console.log('========>>>>>>>>>');
     const dt = new Map([
       ['Not-Started', 0],
       ['Trip-Start', 1],
-      ['Onboarding Completed', 2],
-      ['Guard-Check-In', 3],
-      ['Trip-End', 4],
+      ['Emp Check In-Progress', 2],
+      ['Guard-CheckIn', 3],
+      ['Trip CheckOut', 4],
+      ['Trip-End', 5],
     ]);
-    setSelectedPosition(dt.get(tripDetail?.tripStatusDesc));
-  };
+    const {roasterEmpDetails} = tripDetailsResponse;
 
-  // const getTripDetails = async idRoasterDays => {
-  //   setLoader(true);
-  //   try {
-  //     const apiUrl = `${APIS.getTripDeatils}/${idRoasterDays}`;
-  //     const response = await axios.get(apiUrl);
-  //     const responseData = response?.data;
-  //     console.log('🚀 ~ getTripDetails ~ responseData:', responseData);
-  //     stepperPointChanger(responseData?.returnLst?.tripDetail);
-  //     setResponseInfo(responseData?.returnLst);
-  //     setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
-  //     setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
-  //   } catch (error) {
-  //     console.log('error from the tripdetail', error);
-  //   } finally {
-  //     setLoader(false);
-  //   }
-  // };
+    // Check if any employee has a trip break status or trip board status
+    let hasTripBreakOrBoardStatus = roasterEmpDetails.some(
+      item =>
+        (item.tripBoardStatus?.onBoardStatus === 5 ||
+          item.tripBreakStatus?.trpBreakStatus === 0) &&
+        item.tripBoardStatus?.onBoardStatus !== 1,
+    );
+
+    const hasOnBoardStatus1 = roasterEmpDetails.some(
+      item => item.tripBoardStatus?.onBoardStatus === 1,
+    );
+
+    if (hasOnBoardStatus1) {
+      hasTripBreakOrBoardStatus = false;
+    }
+    console.log('hasOnBoardStatus1', hasOnBoardStatus1);
+    console.log('hasTripBreakOrBoardStatus', hasTripBreakOrBoardStatus);
+    let stepIndicator = 0;
+
+    if (hasTripBreakOrBoardStatus) {
+      stepIndicator = dt.get('Trip CheckOut');
+    } else {
+      stepIndicator =
+        tripDetail?.tripStatusDesc === 'Emp Check In-Progress'
+          ? 1
+          : dt.get(tripDetail?.tripStatusDesc) - 1;
+    }
+
+    setSelectedPosition(stepIndicator <= -1 ? 0 : stepIndicator);
+    console.log(
+      'stepIndicator',
+      tripDetail?.tripStatusDesc,
+      'stepIndicator',
+      stepIndicator,
+    );
+
+    if (stepIndicator > 3) {
+      setShowEndTripButton(true);
+    }
+  };
 
   const startTripForDrop = async () => {
     setLoader(true);
@@ -231,7 +301,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       };
       const responseData = await axios.post(apiUrl, validateStartTrip);
       const response = responseData?.data;
-      // setValidatedStartTripId(response?.returnLst?.tripId);
+      setValidatedStartTripId(response?.returnLst?.tripId);
       console.log('response====>>>', JSON.stringify(response), 2);
       if (response.statusCode === 200) {
         setOtpError({
@@ -241,8 +311,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
         setSelectedPosition(1);
       } else {
         setOtpError({
-          isOtpError: false,
-          otpErrorMessage: '',
+          isOtpError: true,
+          otpErrorMessage: 'Invalid otp',
         });
       }
     } catch (error) {
@@ -261,9 +331,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       const locationName = await getLocationName(latitude, longitude);
       const requestBodyGuard = {
         roasterId: tripDetailsResponse?.idRoaster,
-        tripId: resumeOngoingTrip
-          ? tripDetailsResponse?.tripDetail?.idTrip
-          : tripId,
+        tripId: tripDetailsResponse?.tripDetail?.idTrip,
         idRoasterDays: tripDetailsResponse?.roasterDayId,
         tripEventDtm: convertedTimeforEvent(),
         eventGpsdtm: convertedTime(),
@@ -301,15 +369,13 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   const validateSendGuardOtp = async OTP => {
     setLoader(true);
     try {
-      const apiUrl = `${APIS.sendOtpForGuard}`;
+      const apiUrl = `${APIS.validateOtpForGuard}`;
       const currentLocation = await getCurrentLocation();
       const {latitude, longitude} = currentLocation;
       const locationName = await getLocationName(latitude, longitude);
 
       const requestBodyGuard = {
-        tripId: resumeOngoingTrip
-          ? tripDetailsResponse?.tripDetail?.idTrip
-          : tripId,
+        tripId: tripDetailsResponse?.tripDetail?.idTrip,
         roasterId: tripDetailsResponse?.idRoaster,
         idRoasterDays: tripDetailsResponse?.roasterDayId,
         guardID: pickupGuard?.idGuard,
@@ -331,6 +397,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
         JSON.stringify(responseData, null, 2),
         '\n',
       );
+      setShowEndTripButton(true);
     } catch (error) {
       console.log('\nerror', JSON.stringify(error, null, 2), '\n');
     } finally {
@@ -356,7 +423,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       isSocialMediaRequired: false,
     });
     setPickUpGuardModal(true);
-    setShowEndTripButton(true);
   };
 
   const handleDropGuard = () => {
@@ -366,17 +432,14 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       tripId: tripDetailsResponse?.tripDetail?.idTrip,
       idRoasterDays: tripDetailsResponse?.roasterDayId,
       driverId: tripDetailsResponse?.idDriver,
-      mobileNo: resumeOngoingTrip
-        ? tripDetailsResponse?.driverContactNo
-        : tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
+      mobileNo: tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
     });
   };
 
   const handlePickupEmployeeClick = () => {
     navigation.navigate('PickUp', {
       tripId: tripDetailsResponse?.tripDetail?.idTrip,
-      // validatedStartOtp: validatedStartTripId,
-      tripId: tripDetailsResponse?.tripDetail?.idTrip,
+      tripId: validatedStartTripId,
       tripType: tripDetailsResponse?.tripDetail?.tripType,
       idRoasterDays,
     });
@@ -384,6 +447,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   const handleDropEmployee = () => {
     navigation.navigate('DroppedCheckIn', {
       roasterIds: tripDetailsResponse?.roasterDayId,
+      // _tripDetail: _tripDetail,
+      // tripDetail: setTripDetail,
     });
   };
 
@@ -567,9 +632,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
                   tripId: tripDetailsResponse?.tripDetail?.idTrip,
                   idRoasterDays: tripDetailsResponse?.roasterDayId,
                   driverId: tripDetailsResponse?.idDriver,
-                  mobileNo: resumeOngoingTrip
-                    ? tripDetailsResponse?.driverContactNo
-                    : tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
+                  mobileNo:
+                    tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
                 });
               }}
               activeOpacity={1}
@@ -578,16 +642,6 @@ const MyLogoutTripScreen = ({route, navigation}) => {
               <Text style={styles.stopTripText}>End Trip</Text>
             </TouchableOpacity>
           )}
-          <ConformationModal
-            title={'Are you sure you want to skip the location pickup?'}
-            onPressYes={() => {
-              setShowConfirmModal(false);
-            }}
-            onPressNo={() => {
-              setShowConfirmModal(false);
-            }}
-            showConfirmModal={showConfirmModal}
-          />
 
           <CustomModal
             visible={showStartOtp}

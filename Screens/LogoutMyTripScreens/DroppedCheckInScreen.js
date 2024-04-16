@@ -44,7 +44,14 @@ import Loader from '../Components/Loader';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const DroppedCheckInScreen = ({navigation, route}) => {
-  const {tripId, tripType, roasterIds} = route.params;
+  const {
+    tripId,
+    tripType,
+    roasterIds,
+    selectedPosition,
+    tripDetail,
+    _tripDetail,
+  } = route.params;
   const [showConformationModal, setShowConformationModal] = useState(false);
   const [showConformationCheckOutModal, setShowConformationCheckOutModal] =
     useState(false);
@@ -58,6 +65,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
   const [tripIds, setTripIds] = useState(null);
   const [idRoasterDays, setIdRoasterDays] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  // console.log("🚀 ~ DroppedCheckInScreen ~ selectedItem:", selectedItem)
   const {getTripDetails, employeeDetails, idTrip} = useContext(AppContext);
   // console.log(
   //   '\nemployeeDetails',
@@ -65,16 +73,16 @@ const DroppedCheckInScreen = ({navigation, route}) => {
   //   '\n',
   // );
   const [rousterRouteType, setRousterRouteType] = useState(0);
-  console.log('🚀 ~ EmployeePickUp ~ rousterRouteType:', rousterRouteType);
+  // console.log('🚀 ~ EmployeePickUp ~ rousterRouteType:', rousterRouteType);
   const [newEmployeeList, setNewEmployeeList] = useState([]);
   // console.log(
   //   '\nnewEmployeeList',
   //   JSON.stringify(newEmployeeList, null, 2),
   //   '\n',
   // );
+  // const setSelectedPosition = navigation.getParam('setSelectedPosition');
 
   useEffect(() => {
-    // Filter employeeDetails when it changes
     if (employeeDetails) {
       const filteredList =
         employeeDetails.filter(
@@ -82,6 +90,8 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         ) || [];
       if (filteredList.length === 0) {
         navigationScreen('MyLogoutTrip');
+        // selectedPosition(4);
+        // tripDetail({..._tripDetail,tripStatusDesc: "Trip CheckOut"})
       } else {
         setRousterRouteType(filteredList[0]?.roasterRoutetype);
       }
@@ -91,9 +101,10 @@ const DroppedCheckInScreen = ({navigation, route}) => {
 
   const navigationScreen = screenName => {
     navigation.navigate(screenName, {
-      otpVerified: true,
+      employeeCheckedOut: true,
       tripId: tripIds,
       idRoasterDays: idRoasterDays,
+      otpVerified: false,
     });
   };
 
@@ -129,7 +140,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         eventGpslocationLatLon: `${latitude},${longitude}`,
         eventGpslocationName: locationName,
         employeeID: item?.idEmployee,
-        driverID: item?.driverID,
+        driverID: item?.driverId,
         routeType: item?.roasterRoutetype,
       };
       console.log(
@@ -137,7 +148,6 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         JSON.stringify(requestBodyForBreakEmp, null, 2),
         '\n',
       );
-
       const response = await axios.post(apiUrl, requestBodyForBreakEmp);
       console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
       await getTripDetails(roasterIds);
@@ -156,6 +166,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
   };
 
   const sendEmpTripCheckOut = async item => {
+    console.log('🚀 ~ sendEmpTripCheckOut ~ item:', item);
     setLoader(true);
     try {
       await requestLocationPermission();
@@ -173,7 +184,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         eventGpslocationLatLon: `${latitude},${longitude}`,
         eventGpslocationName: locationName,
         employeeID: item?.idEmployee,
-        driverID: item?.driverID,
+        driverID: item?.driverId,
         routeType: item?.roasterRoutetype,
       };
       console.log(

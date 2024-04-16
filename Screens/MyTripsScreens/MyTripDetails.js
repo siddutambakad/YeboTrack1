@@ -76,21 +76,23 @@ const MyTripDetails = ({route, navigation}) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [time, setTimes] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(0);
+  // console.log("🚀 ~ MyTripDetails ~ selectedPosition:", selectedPosition)
   const [pickupEmployeeCompleted, setPickupEmployeeCompleted] = useState(false);
+  console.log("🚀 ~ MyTripDetails ~ pickupEmployeeCompleted:", pickupEmployeeCompleted)
   const [pickupGuard, setPickupGuard] = useState([]);
   const {tripDetailsResponse, getTripDetails, loader, setLoader} =
     useContext(AppContext);
-  console.log(
-    '🚀 ~ MyTripDetails ~ tripDetailsResponse?.idDriver:',
-    tripDetailsResponse?.idDriver,
-    'tripDetailsResponse?.driverContactNo',
-    tripDetailsResponse?.driverContactNo,
-  );
-  console.log(
-    '\ntripDetailsResponse',
-    JSON.stringify(tripDetailsResponse?.roasterDayId, null, 2),
-    '\n',
-  );
+  // console.log(
+  //   '🚀 ~ MyTripDetails ~ tripDetailsResponse?.idDriver:',
+  //   tripDetailsResponse?.idDriver,
+  //   'tripDetailsResponse?.driverContactNo',
+  //   tripDetailsResponse?.driverContactNo,
+  // );
+  // console.log(
+  //   '\ntripDetailsResponse',
+  //   JSON.stringify(tripDetailsResponse?.roasterDayId, null, 2),
+  //   '\n',
+  // );
   const [otpError, setOtpError] = useState({
     isOtpError: false,
     otpErrorMessage: '',
@@ -145,32 +147,23 @@ const MyTripDetails = ({route, navigation}) => {
       ['Not-Started', 0],
       ['Trip-Start', 1],
       ['Guard-Check-In', 2],
+      // ['Emp Check In-Progress', 3],
       ['Onboarding Completed', 3],
       ['Trip-End', 4],
     ]);
-    setSelectedPosition(dt.get(tripDetail?.tripStatusDesc));
+    // setSelectedPosition(dt.get(tripDetail?.tripStatusDesc));
 
-    if (dt.get(tripDetail?.tripStatusDesc) >= 3) {
+    let stepIndicator =
+      tripDetail?.tripStatusDesc === 'Emp Check In-Progress'
+        ? 2
+        : dt?.get(tripDetail?.tripStatusDesc);
+    setSelectedPosition(stepIndicator <= -1 ? 0 : stepIndicator);
+    console.log("🚀 ~ stepperPointChanger ~ stepIndicator:", stepIndicator)
+
+    if (stepIndicator) {
       setPickupEmployeeCompleted(true);
     }
   };
-
-  // const getTripDetails = async idRoasterDays => {
-  //   setLoader(true);
-  //   try {
-  //     const apiUrl = `${APIS.getTripDeatils}/${idRoasterDays}`;
-  //     const response = await axios.get(apiUrl);
-  //     const responseData = response?.data;
-  //     stepperPointChanger(responseData?.returnLst?.tripDetail);
-  //     setResponseInfo(responseData?.returnLst);
-  //     setPickupGuard(responseData?.returnLst?.roasterGuardDetail);
-  //     setEmployeeDetails(responseData?.returnLst?.roasterEmpDetails);
-  //   } catch (error) {
-  //     console.log('error from the tripdetail', error);
-  //   } finally {
-  //     setLoader(false);
-  //   }
-  // };
 
   const sendOtpForGuard = async () => {
     setLoader(true);
@@ -301,7 +294,7 @@ const MyTripDetails = ({route, navigation}) => {
   const handlePickupEmployeeClick = () => {
     setPickupEmployeeCompleted(true);
     navigation.navigate('PickUp', {
-      tripId: tripId,
+      tripId: tripDetailsResponse?.tripDetail?.idTrip,
       tripType: tripDetailsResponse?.tripDetail?.tripType,
       idRoasterDays,
     });
@@ -505,7 +498,8 @@ const MyTripDetails = ({route, navigation}) => {
                   tripId: tripDetailsResponse?.tripDetail?.idTrip,
                   idRoasterDays: tripDetailsResponse?.roasterDayId,
                   driverId: tripDetailsResponse?.idDriver,
-                  mobileNo: tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
+                  mobileNo:
+                    tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
                 });
               }}
               activeOpacity={1}
