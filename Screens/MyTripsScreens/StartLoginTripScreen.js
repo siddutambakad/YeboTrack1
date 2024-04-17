@@ -37,15 +37,6 @@ const StartLoginTripSCreen = ({navigation, route}) => {
     route.params;
   console.log('roasterIdDays', roasterIdDays);
 
-  // const formatTime = time => {
-  //   const hours = time.getHours();
-  //   const minutes = time.getMinutes();
-  //   const amOrPm = hours >= 12 ? 'pm' : 'am';
-  //   const formattedHours = hours % 12 || 12; // Convert 0 to 12
-  //   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-  //   return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-  // };
-
   const [showOtpForStartTrip, setShowOtpForStartTrip] = useState(false);
   const [loader, setLoader] = useState(false);
   // const [otp, setOtp] = useState('');

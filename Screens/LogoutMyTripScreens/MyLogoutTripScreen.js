@@ -66,23 +66,26 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     otpErrorMessage: '',
   });
   const [validatedStartTripId, setValidatedStartTripId] = useState([]);
-  // console.log("🚀 ~ MyLogoutTripScreen ~ validatedStartTripId:", validatedStartTripId)
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const {tripDetailsResponse, getTripDetails, loader, setLoader} =
-    useContext(AppContext);
   // console.log(
-  //   '\ntripDetailsResponse',
-  //   JSON.stringify(tripDetailsResponse, null, 2),
-  //   '\n',
+  //   '🚀 ~ MyLogoutTripScreen ~ tripDetailsResponse?.tripDetail?.idTrip:',
+  //   tripDetailsResponse?.tripDetail?.idTrip,
   // );
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  const {tripDetailsResponse, getTripDetails, loader, setLoader, idTrips} =
+    useContext(AppContext);
+  console.log(
+    '\ntripDetailsResponse?.tripDetail?.idTrip:',
+    JSON.stringify(tripDetailsResponse?.tripDetail?.idTrip, null, 2),
+    '\n',
+  );
   const [showEndTripButton, setShowEndTripButton] = useState(false);
-  // console.log("🚀 ~ MyLogoutTripScreen ~ showEndTripButton:", tripDetailsResponse?.tripDetail?.idTrip)
+  console.log('🚀 ~ MyLogoutTripScreen ~ showEndTripButton:', showEndTripButton);
 
   useEffect(() => {
     console.log('employeeCheckedOut:', employeeCheckedOut);
     console.log('otpVerified:', otpVerified);
     if (otpVerified) {
-      setSelectedPosition(2);
+      setSelectedPosition(3);
     } else if (employeeCheckedOut) {
       setSelectedPosition(4);
     }
@@ -188,9 +191,9 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     const dt = new Map([
       ['Not-Started', 0],
       ['Trip-Start', 1],
-      ['Emp Check In-Progress', 2],
+      ['Guard-Check-In', 2],
       ['Guard-CheckIn', 3],
-      ['Trip CheckOut', 4],
+      // ['Trip CheckOut', 4],
       ['Trip-End', 5],
     ]);
     const {roasterEmpDetails} = tripDetailsResponse;
@@ -215,12 +218,12 @@ const MyLogoutTripScreen = ({route, navigation}) => {
     let stepIndicator = 0;
 
     if (hasTripBreakOrBoardStatus) {
-      stepIndicator = dt.get('Trip CheckOut');
+      stepIndicator = 4;
     } else {
       stepIndicator =
         tripDetail?.tripStatusDesc === 'Emp Check In-Progress'
-          ? 1
-          : dt.get(tripDetail?.tripStatusDesc) - 1;
+          ? 2
+          : dt.get(tripDetail?.tripStatusDesc);
     }
 
     setSelectedPosition(stepIndicator <= -1 ? 0 : stepIndicator);
@@ -231,7 +234,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       stepIndicator,
     );
 
-    if (stepIndicator > 3) {
+    if (stepIndicator >= 3) {
       setShowEndTripButton(true);
     }
   };
@@ -309,6 +312,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
           otpErrorMessage: '',
         });
         setSelectedPosition(1);
+        setShowStartOtp(false);
       } else {
         setOtpError({
           isOtpError: true,
@@ -317,6 +321,10 @@ const MyLogoutTripScreen = ({route, navigation}) => {
       }
     } catch (error) {
       console.log('error=====>>>>', JSON.stringify(error), 2);
+      setOtpError({
+        isOtpError: true,
+        otpErrorMessage: 'Incorrect Otp',
+      });
     } finally {
       setLoader(false);
     }
@@ -324,6 +332,10 @@ const MyLogoutTripScreen = ({route, navigation}) => {
 
   const sendGuardOtp = async () => {
     setLoader(true);
+    setOtpError({
+      isOtpError: false,
+      otpErrorMessage: '',
+    });
     try {
       const apiUrl = `${APIS.sendOtpForGuard}`;
       const currentLocation = await getCurrentLocation();
@@ -398,8 +410,13 @@ const MyLogoutTripScreen = ({route, navigation}) => {
         '\n',
       );
       setShowEndTripButton(true);
+      setShowGuardOtpModal(false);
     } catch (error) {
       console.log('\nerror', JSON.stringify(error, null, 2), '\n');
+      setOtpError({
+        isOtpError: true,
+        otpErrorMessage: 'Incorrect Otp',
+      });
     } finally {
       setLoader(false);
     }
@@ -454,8 +471,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
 
   const labels = [
     'Start Trip',
-    'Pickup Employee',
     'Guard-Check-In',
+    'Pickup Employee',
     'Drop Employee',
     'End Trip',
   ];
@@ -486,8 +503,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   //Using an array of functions
   const stepActions = [
     handleStartTrip,
-    handlePickupEmployeeClick,
     handlePickupGuardClick,
+    handlePickupEmployeeClick,
     handleDropEmployee,
     handleDropGuard,
   ];
@@ -649,7 +666,7 @@ const MyLogoutTripScreen = ({route, navigation}) => {
             onClose={() => setShowStartOtp(false)}
             onPressSubmitButton={e => {
               validateStartOtp(e);
-              setShowStartOtp(false);
+              // setShowStartOtp(false);
             }}
             onPressCancelButton={e => {
               setShowStartOtp(false);
@@ -663,8 +680,8 @@ const MyLogoutTripScreen = ({route, navigation}) => {
             onClose={() => setShowGuardOtpModal(false)}
             onPressSubmitButton={e => {
               validateSendGuardOtp(e);
-              setShowGuardOtpModal(false);
-              setSelectedPosition(3);
+              // setShowGuardOtpModal(false);
+              setSelectedPosition(2);
             }}
             onPressCancelButton={e => {
               setShowGuardOtpModal(false);

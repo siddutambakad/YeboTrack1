@@ -15,7 +15,6 @@ import DriverHomeScreen from './DriverHomeScreen';
 import ProfileScreen from './ProfileScreen';
 import Profile from '../assets/images/Profile.svg';
 import FontFamily from './Styles/FontFamily';
-import StartTrip from './LoginTrips/StartTrip';
 import HelpDescScreen from './UserScreens/HelpDescScreen';
 import MyTripDetails from './MyTripsScreens/MyTripDetails';
 import LocationReached from './MyTripsScreens/LocationReached';

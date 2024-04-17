@@ -60,10 +60,8 @@ const EmployeePickUp = ({navigation, route}) => {
   const [idRoasterDays, setIdRoasterDays] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const {getTripDetails, employeeDetails, idTrips} = useContext(AppContext);
-  console.log("🚀 ~ EmployeePickUp ~ idTrip:", idTrips)
-  // console.log('🚀 ~ EmployeePickUp ~ employeeDetails:', employeeDetails);
+  console.log('🚀 ~ EmployeePickUp ~ idTrips:', idTrips);
   const [rousterRouteType, setRousterRouteType] = useState(0);
-  console.log('🚀 ~ EmployeePickUp ~ rousterRouteType:', rousterRouteType);
   const [newEmployeeList, setNewEmployeeList] = useState([]);
   const [driverContactNo, setDriverContactNo] = useState(null);
 
@@ -127,7 +125,7 @@ const EmployeePickUp = ({navigation, route}) => {
 
       const locationName = await getLocationName(latitude, longitude);
       const requestBodyForEmployee = {
-        tripId: idTrips,
+        tripId: rousterRouteType === 2 ? tripId : idTrips,
         roasterId: item.idRoaster,
         roasterDetailId: item.idRoasterDetails,
         idRoasterDays: item.idRoasterDays,
@@ -172,7 +170,7 @@ const EmployeePickUp = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.validateEmployeeCheckIn}`;
       const validateEmployee = {
-        tripId: idTrips,
+        tripId: rousterRouteType === 2 ? tripId : idTrips,
         roasterId: selectedItem?.idRoaster,
         roasterDetailId: selectedItem?.idRoasterDetails,
         idRoasterDays: selectedItem?.idRoasterDays,
@@ -205,6 +203,7 @@ const EmployeePickUp = ({navigation, route}) => {
           isOtpError: false,
           otpErrorMessage: '',
         });
+        setShowOtpModal(false);
       } else {
         setOtpError({
           isOtpError: true,
@@ -213,6 +212,10 @@ const EmployeePickUp = ({navigation, route}) => {
       }
     } catch (error) {
       console.log('\nvalidOtperror', JSON.stringify(error, null, 2), '\n');
+      setOtpError({
+        isOtpError: true,
+        otpErrorMessage: 'Incorrect Otp',
+      });
     } finally {
       setLoader(false);
     }
@@ -228,7 +231,7 @@ const EmployeePickUp = ({navigation, route}) => {
       const locationName = await getLocationName(latitude, longitude);
       const apiUrl = `${APIS.sendSkipEmpCheckIn}`;
       const skipRequestBody = {
-        tripId: idTrips,
+        tripId: rousterRouteType === 2 ? tripId : idTrips,
         roasterId: item?.idRoaster,
         roasterDetailId: item?.idRoasterDetails,
         idRoasterDays: item?.idRoasterDays,
@@ -252,10 +255,10 @@ const EmployeePickUp = ({navigation, route}) => {
         '\n',
       );
       const {tripIds, onBoardStatusDesc} = skipResponse.data.returnLst;
-      console.log(
-        '🚀 ~ skipEmployeeOtp ~ onBoardStatusDesc:',
-        onBoardStatusDesc,
-      );
+      // console.log(
+      //   '🚀 ~ skipEmployeeOtp ~ onBoardStatusDesc:',
+      //   onBoardStatusDesc,
+      // );
       await getTripDetails(idMainRoasterDays);
 
       setTripIds(tripIds);
@@ -385,6 +388,22 @@ const EmployeePickUp = ({navigation, route}) => {
           renderItem={renderItems}
           style={{marginTop: pixelSizeVertical(10)}}
         />
+        <CustomModal
+          visible={showOtpModal}
+          onClose={() => {
+            setShowOtpModal(false);
+          }}
+          onPressSubmitButton={enteredOtp => {
+            validateOtpForEmployee(enteredOtp, selectedItem);
+            // setShowOtpModal(false);
+          }}
+          onPressCancelButton={() => {
+            setShowOtpModal(false);
+          }}
+          title={'Enter Employee check-In pin'}
+          isOtpError={otpError.isOtpError}
+          OTPErrorMessage={otpError.otpErrorMessage}
+        />
         <BottomTab activeTab="MyTrips" />
       </View>
       <ConformationModal
@@ -399,22 +418,7 @@ const EmployeePickUp = ({navigation, route}) => {
           console.log('selectedItem', selectedItem?.idRoasterDetails);
         }}
       />
-      <CustomModal
-        visible={showOtpModal}
-        onClose={() => {
-          setShowOtpModal(false);
-        }}
-        onPressSubmitButton={enteredOtp => {
-          validateOtpForEmployee(enteredOtp, selectedItem);
-          setShowOtpModal(false);
-        }}
-        onPressCancelButton={() => {
-          setShowOtpModal(false);
-        }}
-        title={'Enter Employee check-In pin '}
-        isOtpError={otpError.isOtpError}
-        OTPErrorMessage={otpError.otpErrorMessage}
-      />
+
       {loader && <Loader />}
     </SafeAreaView>
   );

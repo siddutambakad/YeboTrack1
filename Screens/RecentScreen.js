@@ -1,4 +1,10 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React, {useContext, useState} from 'react';
 import FontFamily from './Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
@@ -9,11 +15,12 @@ import {useFocusEffect} from '@react-navigation/native';
 import Loader from './Components/Loader';
 
 const RecentScreen = () => {
-  // const {
-  //   driverRoasterList: {recent},
-  // } = useContext(AppContext);
   const [loader, setLoader] = useState(true);
   const {driverRoasterList, getDriverList, driverId} = useContext(AppContext);
+  // const [visibleData, setVisibleData] = useState([]);
+  // console.log('🚀 ~ RecentScreen ~ visibleData:', visibleData.length);
+  // const [page, setPage] = useState(1);
+
   useFocusEffect(
     React.useCallback(() => {
       loadData();
@@ -25,25 +32,20 @@ const RecentScreen = () => {
     setLoader(false);
   };
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     const loadData = async () => {
-  //       try {
-  //         await new Promise(resolve => setTimeout(resolve, 800));
-
-  //         setLoader(false);
-  //       } catch (error) {
-  //         console.error('Error fetching data:', error);
-  //       }
-  //     };
-  //     loadData();
-
-  //     // Cleanup function
-  //     return () => {
-  //       clearTimeout(loadData);
-  //     };
-  //   }, [recent]),
-  // );
+  // const loadMoreData = () => {
+  //   setLoader(true);
+  //   console.log('===>>>>');
+  //   const itemsPerPage = 10;
+  //   const startIndex = (page - 1) * itemsPerPage;
+  //   const endIndex = startIndex + itemsPerPage;
+  //   const nextItems = driverRoasterList?.recent.slice(startIndex, endIndex);
+  //   if (nextItems.length > 0) {
+  //     setVisibleData([...visibleData, ...nextItems]);
+  //     setPage(page + 1);
+  //   } else {
+  //     setLoader(false);
+  //   }
+  // };
 
   const renderItems = ({item, index}) => {
     return (
@@ -74,7 +76,7 @@ const RecentScreen = () => {
       </View>
     );
   };
-  
+
   return (
     <View
       style={{
@@ -98,6 +100,9 @@ const RecentScreen = () => {
         <FlatList
           data={driverRoasterList?.recent}
           renderItem={renderItems}
+          // onEndReached={loadMoreData}
+          // onEndReachedThreshold={0.8}
+          showsVerticalScrollIndicator={false}
           style={{marginTop: 20}}
         />
       )}

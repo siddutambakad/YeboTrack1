@@ -32,7 +32,6 @@ import {
 } from '../Utils/ReusableFunctions';
 import axios from 'axios';
 import Loader from '../Components/Loader';
-import Geolocation from '@react-native-community/geolocation';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const StopTripScreen = ({navigation, route}) => {
@@ -55,15 +54,6 @@ const StopTripScreen = ({navigation, route}) => {
     otpErrorMessage: '',
   });
   const [loader, setLoader] = useState(false);
-
-  // const formatTime = time => {
-  //   const hours = time.getHours();
-  //   const minutes = time.getMinutes();
-  //   const amOrPm = hours >= 12 ? 'pm' : 'am';
-  //   const formattedHours = hours % 12 || 12; // Convert 0 to 12
-  //   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-  //   return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-  // };
 
   const sendOtpForEndTrip = async () => {
     setLoader(true);
@@ -154,6 +144,10 @@ const StopTripScreen = ({navigation, route}) => {
       }
     } catch (error) {
       console.log('\nerror:', JSON.stringify(error, null, 2), '\n');
+      setOtpError({
+        isOtpError: true,
+        otpErrorMessage: 'Incorrect Otp',
+      });
     } finally {
       setLoader(false);
     }

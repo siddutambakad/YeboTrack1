@@ -61,7 +61,7 @@ export const requestLocationPermission = async () => {
     const permission = await check(
       Platform.OS === 'android'
         ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-        : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+        : PERMISSIONS.IOS.LOCATION_ALWAYS,
     );
     if (permission === RESULTS.GRANTED) {
       getCurrentLocation();
@@ -69,7 +69,7 @@ export const requestLocationPermission = async () => {
       const result = await request(
         Platform.OS === 'android'
           ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-          : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+          : PERMISSIONS.IOS.LOCATION_ALWAYS,
       );
       if (result === RESULTS.GRANTED) {
         getCurrentLocation();

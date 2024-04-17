@@ -158,7 +158,7 @@ const MyTripDetails = ({route, navigation}) => {
         ? 2
         : dt?.get(tripDetail?.tripStatusDesc);
     setSelectedPosition(stepIndicator <= -1 ? 0 : stepIndicator);
-    console.log("🚀 ~ stepperPointChanger ~ stepIndicator:", stepIndicator)
+    // console.log("🚀 ~ stepperPointChanger ~ stepIndicator:", stepIndicator)
 
     if (stepIndicator) {
       setPickupEmployeeCompleted(true);
@@ -307,9 +307,7 @@ const MyTripDetails = ({route, navigation}) => {
       tripId: tripDetailsResponse?.tripDetail?.idTrip,
       idRoasterDays: tripDetailsResponse?.roasterDayId,
       driverId: tripDetailsResponse?.idDriver,
-      mobileNo: resumeOngoingTrip
-        ? tripDetailsResponse?.driverContactNo
-        : tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
+      mobileNo: tripDetailsResponse?.roasterEmpDetails[0].driverContactNo,
     });
   };
 

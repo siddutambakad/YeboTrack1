@@ -27,7 +27,13 @@ import {
 } from './Utils/Dimensions';
 import AddPhotoModal from './Components/AddPhotoModal';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {check, PERMISSIONS, RESULTS, request, openSettings} from 'react-native-permissions';
+import {
+  check,
+  PERMISSIONS,
+  RESULTS,
+  request,
+  openSettings,
+} from 'react-native-permissions';
 import RN from 'react-native';
 import {AppContext} from './Context/AppContext';
 
@@ -36,7 +42,10 @@ const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 const DriverHomeScreen = ({navigation}) => {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
+  // console.log("🚀 ~ DriverHomeScreen ~ selectedImage:", selectedImage)
   const {driverDetails} = useContext(AppContext);
+
+  
   const handleMyTripsPress = () => {
     navigation.navigate('MyTrip');
   };
@@ -44,40 +53,6 @@ const DriverHomeScreen = ({navigation}) => {
   const handleMyProfilePress = () => {
     navigation.navigate('Profile');
   };
-
-  // const requestCameraPermission = async () => {
-  //   try {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.CAMERA,
-  //     );
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       openCamera();
-  //     } else {
-  //       console.log('Camera permission denied');
-  //       Alert.alert(
-  //         'Alert!!',
-  //         'Please grant Camera permission to use this feature.',
-  //         [
-  //           {
-  //             text: 'Ask me later',
-  //           },
-  //           {
-  //             text: 'Cancel',
-  //           },
-  //           {
-  //             text: 'OK',
-  //             onPress: () => {
-  //               openSettings();
-  //             },
-  //           },
-  //         ],
-  //         {cancelable: false},
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.warn(err);
-  //   }
-  // };
 
   const requestCameraPermission = async () => {
     try {
@@ -150,70 +125,6 @@ const DriverHomeScreen = ({navigation}) => {
       console.error('Error requesting camera permission:', error);
     }
   };
-
-  // const openSettings = () => {
-  //   Linking.openSettings();
-  // };
-
-  // const requestPermission = async (
-  //   permissionType,
-  //   permissionMessage,
-  //   openFunction,
-  // ) => {
-  //   try {
-  //     const permission = await check(
-  //       Platform.OS === 'android' ? permissionType.android : permissionType.ios,
-  //     );
-  //     if (permission === RESULTS.GRANTED) {
-  //       openFunction();
-  //     } else {
-  //       const result = await request(
-  //         Platform.OS === 'android'
-  //           ? permissionType.android
-  //           : permissionType.ios,
-  //       );
-  //       if (result === RESULTS.GRANTED) {
-  //         openFunction();
-  //       } else {
-  //         console.log(`${permissionMessage} permission denied`);
-  //         Alert.alert(
-  //           'Alert!!',
-  //           `Please grant ${permissionMessage} permission to proceed.`,
-  //           [
-  //             {text: 'Ask Me Later'},
-  //             {text: 'Cancel'},
-  //             {text: 'Ok', onPress: openSettings},
-  //           ],
-  //           {cancelable: false},
-  //         );
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error(`Error requesting ${permissionMessage} permission:`, error);
-  //   }
-  // };
-
-  // const requestCameraPermission = async () => {
-  //   await requestPermission(
-  //     {
-  //       android: PERMISSIONS.ANDROID.CAMERA,
-  //       ios: PERMISSIONS.IOS.CAMERA,
-  //     },
-  //     'camera',
-  //     openCamera,
-  //   );
-  // };
-
-  // const requestGalleryPermission = async () => {
-  //   await requestPermission(
-  //     {
-  //       android: PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
-  //       ios: PERMISSIONS.IOS.PHOTO_LIBRARY,
-  //     },
-  //     'gallery',
-  //     openGallery,
-  //   );
-  // };
 
   const openSettings = () => {
     if (Platform.OS === 'android') {
