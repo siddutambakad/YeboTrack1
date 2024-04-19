@@ -24,7 +24,15 @@ import RN from 'react-native';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const PickupGuardModal = props => {
-  const {showModal, onCloseModel, options, name, pickupTime, Address} = props;
+  const {
+    showModal,
+    onCloseModel,
+    options,
+    name,
+    pickupTime,
+    Address,
+    profileImage,
+  } = props;
   const handleContentClick = event => {
     event.stopPropagation();
   };
@@ -49,10 +57,7 @@ const PickupGuardModal = props => {
                   paddingRight: 20,
                   paddingLeft: 10,
                 }}>
-                <Image
-                  source={require('../../assets/images/profile.png')}
-                  style={styles.modalImage}
-                />
+                <Image source={profileImage} style={styles.modalImage} />
                 {options?.isSocialMediaRequired && (
                   <View
                     style={{

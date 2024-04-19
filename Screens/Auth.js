@@ -49,11 +49,12 @@ import RaiseFeedBackScreen from './UserScreens/RaiseFeedBackScreens/RaiseFeedBac
 import TicketDetails from './UserScreens/RaiseFeedBackScreens/TicketDetails';
 
 const Stack = createStackNavigator();
+const UserStackScreen = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
 
 function Auth({props, navigation}) {
   const [showSplash, setShowSplash] = useState(true);
-  const {isLoggedIn} = useContext(AppContext);
+  const {isLoggedIn, userRoles} = useContext(AppContext);
 
   useEffect(() => {
     setTimeout(() => {
@@ -73,14 +74,24 @@ function Auth({props, navigation}) {
 
         {isLoggedIn ? (
           <>
+            {/* {userRoles === 17 && (
             <Stack.Screen
               name="Driver"
               component={DriverHomeScreen}
               options={{headerShown: false}}
             />
+          )} */}
+            {/* {userRoles === 15 && (
             <Stack.Screen
               name="MainStack"
               component={UserStack}
+              options={{headerShown: false}}
+            />
+          )} */}
+
+            <Stack.Screen
+              name={userRoles === 17 ? 'Driver' : 'MainStack'}
+              component={userRoles === 17 ? DriverHomeScreen : UserStack}
               options={{headerShown: false}}
             />
             <Stack.Screen
@@ -178,7 +189,7 @@ function UserStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Home"
+        name="UserHome"
         component={BottomtabNavigator}
         options={{headerShown: false}}
       />
@@ -220,8 +231,7 @@ function BottomtabNavigator({navigation}) {
           },
         }}>
         <BottomTab.Screen
-          name="Home "
-          component={HomeScreen}
+          name="Home"
           options={{
             headerShown: false,
             tabBarIcon: ({focused}) => (
@@ -259,8 +269,22 @@ function BottomtabNavigator({navigation}) {
                 </Text>
               </View>
             ),
-          }}
-        />
+          }}>
+          {() => (
+            <UserStackScreen.Navigator>
+              <UserStackScreen.Screen
+                name="UserHome"
+                component={HomeScreen}
+                options={{headerShown: false}}
+              />
+              <UserStackScreen.Screen
+                name="UserProfile"
+                component={UserProfileScreen}
+                options={{headerShown: false}}
+              />
+            </UserStackScreen.Navigator>
+          )}
+        </BottomTab.Screen>
         <BottomTab.Screen
           name="My Trips"
           component={UserMyTripsScreen}
@@ -268,9 +292,9 @@ function BottomtabNavigator({navigation}) {
             headerShown: false,
             tabBarIcon: ({focused}) => (
               <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('UserMyTrips')
-              }}
+                onPress={() => {
+                  navigation.navigate('UserMyTrips');
+                }}
                 style={{
                   width: horizontalScale(80),
                   height: verticalScale(60),

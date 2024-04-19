@@ -1,16 +1,15 @@
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import {Alert, Linking, PermissionsAndroid, Platform} from 'react-native';
-import { PERMISSIONS, RESULTS, check, request } from 'react-native-permissions';
+import {PERMISSIONS, RESULTS, check, request} from 'react-native-permissions';
 
 export const handleCallPress = phoneNumber => {
   Linking.openURL(`tel:${phoneNumber}`);
 };
 
 export const openGoogleMap = (latitude, longitude) => {
-  // const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
   const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-  // const url = `geo:${latitude},${longitude}?q=my_location`;
+  
   Linking.openURL(url);
 };
 
@@ -78,11 +77,7 @@ export const requestLocationPermission = async () => {
         Alert.alert(
           'Alert!!',
           'Please grant location permission',
-          [
-            {text: 'Ask Me Later'},
-            {text: 'Cancel'},
-            {text: 'Ok', onPress: () => openSettings()},
-          ],
+          [{text: 'Cancel'}, {text: 'Ok', onPress: () => openSettings()}],
           {cancelable: false},
         );
       }
@@ -91,7 +86,6 @@ export const requestLocationPermission = async () => {
     console.error('Error requesting location permission:', error);
   }
 };
-
 
 export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {

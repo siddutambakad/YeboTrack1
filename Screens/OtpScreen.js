@@ -26,6 +26,7 @@ import axios from 'axios';
 import {AppContext} from './Context/AppContext';
 import RN from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {CommonActions} from '@react-navigation/native';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
@@ -118,23 +119,30 @@ const OtpScreen = ({navigation, route}) => {
     // console.log(verifyData);
     handleVerifyOtp(verifyData);
   };
+
   const handleVerifyOtp = async verifyData => {
     setLoader(true);
     try {
       const response = await axios.post(APIS.verifyOtp, verifyData);
       const res_ponse = response.data;
-      // console.log('verified', res_ponse);
-      
-      if (res_ponse?.userRoleDesc === 'Driver') {
-        // setDriverId(res_ponse.idDriver)
-        await setUserData(res_ponse);
+      console.log('\nres_ponse', JSON.stringify(res_ponse, null, 2), '\n');
+
+      const {userRole, idUser, driverName, idDriver} = res_ponse;
+
+      if (res_ponse?.userRole === 17) {
+        await AsyncStorage.setItem('driverName', driverName);
+        await AsyncStorage.setItem('idDriver', idDriver.toString());
         let ck = setTimeout(() => {
           navigation.navigate('Driver');
-          // navigation.navigate('Home');
           clearTimeout(ck);
-        }, 800);
-      } else {
-        navigation.navigate('Home');
+        }, 1000);
+      } else if (res_ponse?.userRole === 15) {
+        await AsyncStorage.setItem('userRole', userRole.toString());
+        await AsyncStorage.setItem('idUser', idUser.toString());
+        let ck = setTimeout(() => {
+          navigation.navigate('MainStack');
+          clearTimeout(ck);
+        }, 1000);
       }
       handleLogin();
     } catch (error) {
@@ -187,15 +195,14 @@ const OtpScreen = ({navigation, route}) => {
     }
   };
 
-  const setUserData = async userData => {
-    try {
-      await AsyncStorage.setItem('otpResponseData', JSON.stringify(userData));
-      console.log('otpResponseData saved successfully');
-    } catch (error) {}
-  };
+  // const setUserData = async userData => {
+  //   try {
+  //     await AsyncStorage.setItem('otpResponseData', JSON.stringify(userData));
+  //     console.log('otpResponseData saved successfully');
+  //   } catch (error) {}
+  // };
   return (
-    <ScrollView
-      style={{height: Dimensions.get('window').height, backgroundColor: 'red'}}>
+    <ScrollView style={{height: Dimensions.get('window').height}}>
       <View style={styles.container}>
         <Image
           source={require('../assets/images/yeboFinalLogo.png')}
@@ -281,7 +288,7 @@ const OtpScreen = ({navigation, route}) => {
             height: width / imageAspectRatio,
             objectFit: 'contain',
             position: 'absolute',
-            bottom: 0
+            bottom: 0,
           }}
         />
       </View>

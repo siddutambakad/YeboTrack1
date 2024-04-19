@@ -1,14 +1,10 @@
-import {View, Text, StyleSheet, ActivityIndicator, Image} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator, Image, SafeAreaView} from 'react-native';
 import React from 'react';
 import {horizontalScale, verticalScale} from '../Utils/Dimensions';
 
 const Loader = () => {
   return (
-    <View style={styles.Loader}>
-      {/* <ActivityIndicator
-        size={50}
-        color={'#C5197D'}
-        animating={true}></ActivityIndicator> */}
+    <SafeAreaView style={styles.Loader}>
       <Image
         source={require('../../assets/Gifs/lazyloader.gif')}
         style={{
@@ -16,7 +12,7 @@ const Loader = () => {
           height: verticalScale(80),
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

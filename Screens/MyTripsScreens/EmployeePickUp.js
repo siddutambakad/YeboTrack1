@@ -80,11 +80,11 @@ const EmployeePickUp = ({navigation, route}) => {
       } else {
         setRousterRouteType(filteredList[0]?.roasterRoutetype);
       }
-      console.log(
-        '\nfilteredList===>>>',
-        JSON.stringify(filteredList[0]?.roasterRoutetype, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nfilteredList===>>>',
+      //   JSON.stringify(filteredList[0]?.roasterRoutetype, null, 2),
+      //   '\n',
+      // );
       setNewEmployeeList(filteredList);
     }
   }, [employeeDetails]);
@@ -138,11 +138,11 @@ const EmployeePickUp = ({navigation, route}) => {
         driverID: item.driverId,
         routeType: item.roasterRoutetype,
       };
-      console.log(
-        '\nrequestBodyForEmployee',
-        JSON.stringify(requestBodyForEmployee, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nrequestBodyForEmployee',
+      //   JSON.stringify(requestBodyForEmployee, null, 2),
+      //   '\n',
+      // );
       const apiUrl = `${APIS.sendOtpForEmployeeCheckIn}`;
       const apiResponse = await axios.post(apiUrl, requestBodyForEmployee);
 
@@ -181,17 +181,17 @@ const EmployeePickUp = ({navigation, route}) => {
         empOTPGPSLocationLatLon: `${latitude},${longitude}`,
         empOTPGPSLocationName: locationName,
       };
-      console.log(
-        '\nvalidateEmployee',
-        JSON.stringify(validateEmployee, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nvalidateEmployee',
+      //   JSON.stringify(validateEmployee, null, 2),
+      //   '\n',
+      // );
       const response = await axios.post(apiUrl, validateEmployee);
-      console.log(
-        '\nvalidOtpresponse',
-        JSON.stringify(response.data.returnLst, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nvalidOtpresponse',
+      //   JSON.stringify(response.data.returnLst, null, 2),
+      //   '\n',
+      // );
       const tripIds = response.data.returnLst?.tripId;
       setTripIds(tripIds);
       setIdRoasterDays(response.data?.returnLst?.idRoasterDays);
@@ -216,6 +216,7 @@ const EmployeePickUp = ({navigation, route}) => {
         isOtpError: true,
         otpErrorMessage: 'Incorrect Otp',
       });
+      setShowOtpModal(true);
     } finally {
       setLoader(false);
     }
@@ -243,17 +244,17 @@ const EmployeePickUp = ({navigation, route}) => {
         driverID: item?.driverId,
         routeType: item?.roasterRoutetype,
       };
-      console.log(
-        '\nskipRequestBody',
-        JSON.stringify(skipRequestBody, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nskipRequestBody',
+      //   JSON.stringify(skipRequestBody, null, 2),
+      //   '\n',
+      // );
       const skipResponse = await axios.post(apiUrl, skipRequestBody);
-      console.log(
-        '\nvskipResponse',
-        JSON.stringify(skipResponse, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nvskipResponse',
+      //   JSON.stringify(skipResponse, null, 2),
+      //   '\n',
+      // );
       const {tripIds, onBoardStatusDesc} = skipResponse.data.returnLst;
       // console.log(
       //   '🚀 ~ skipEmployeeOtp ~ onBoardStatusDesc:',
@@ -278,7 +279,7 @@ const EmployeePickUp = ({navigation, route}) => {
 
   const renderItems = ({item, index}) => {
     return (
-      <View style={styles.cardContainer}>
+      <SafeAreaView style={styles.cardContainer}>
         <View style={styles.employeesText}>
           <View style={{flex: 0.4, alignItems: 'center'}}>
             <Image
@@ -344,15 +345,15 @@ const EmployeePickUp = ({navigation, route}) => {
             onPress={() => {
               sendOtpForEmployeeCheckIn(item);
               setSelectedItem(item);
-              console.log(
-                'selecteditem for checkin',
-                selectedItem?.idRoasterDays,
-              );
+              // console.log(
+              //   'selecteditem for checkin',
+              //   selectedItem?.idRoasterDays,
+              // );
             }}>
             <Text style={styles.checkOutText}>Check In</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     );
   };
 
@@ -395,7 +396,7 @@ const EmployeePickUp = ({navigation, route}) => {
           }}
           onPressSubmitButton={enteredOtp => {
             validateOtpForEmployee(enteredOtp, selectedItem);
-            // setShowOtpModal(false);
+            setShowOtpModal(false);
           }}
           onPressCancelButton={() => {
             setShowOtpModal(false);
@@ -415,7 +416,7 @@ const EmployeePickUp = ({navigation, route}) => {
         onPressYes={item => {
           setShowConformationModal(false);
           skipEmployeeOtp(selectedItem);
-          console.log('selectedItem', selectedItem?.idRoasterDetails);
+          // console.log('selectedItem', selectedItem?.idRoasterDetails);
         }}
       />
 

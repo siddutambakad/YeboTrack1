@@ -143,13 +143,13 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         driverID: item?.driverId,
         routeType: item?.roasterRoutetype,
       };
-      console.log(
-        '\nrequestBodyForBreakEmp',
-        JSON.stringify(requestBodyForBreakEmp, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nrequestBodyForBreakEmp',
+      //   JSON.stringify(requestBodyForBreakEmp, null, 2),
+      //   '\n',
+      // );
       const response = await axios.post(apiUrl, requestBodyForBreakEmp);
-      console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
+      // console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
       await getTripDetails(roasterIds);
 
       setTripIds(tripIds);
@@ -166,7 +166,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
   };
 
   const sendEmpTripCheckOut = async item => {
-    console.log('🚀 ~ sendEmpTripCheckOut ~ item:', item);
+    // console.log('🚀 ~ sendEmpTripCheckOut ~ item:', item);
     setLoader(true);
     try {
       await requestLocationPermission();
@@ -187,13 +187,13 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         driverID: item?.driverId,
         routeType: item?.roasterRoutetype,
       };
-      console.log(
-        '\nrequestBodyForEmpCheckOut',
-        JSON.stringify(requestBodyForEmpCheckOut, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nrequestBodyForEmpCheckOut',
+      //   JSON.stringify(requestBodyForEmpCheckOut, null, 2),
+      //   '\n',
+      // );
       const response = await axios.post(apiUrl, requestBodyForEmpCheckOut);
-      console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
+      // console.log('\nresponse', JSON.stringify(response, null, 2), '\n');
       await getTripDetails(roasterIds);
 
       setTripIds(tripIds);
@@ -330,7 +330,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         onPressYes={item => {
           setShowConformationModal(false);
           sendBeakEmployee(selectedItem);
-          console.log('selectedItem', selectedItem?.idRoasterDetails);
+          // console.log('selectedItem', selectedItem?.idRoasterDetails);
         }}
       />
       <ConformationModal
@@ -342,7 +342,7 @@ const DroppedCheckInScreen = ({navigation, route}) => {
         onPressYes={item => {
           setShowConformationCheckOutModal(false);
           sendEmpTripCheckOut(selectedItem);
-          console.log('selectedItem', selectedItem?.idRoasterDetails);
+          // console.log('selectedItem', selectedItem?.idRoasterDetails);
         }}
       />
       <CustomModal

@@ -15,18 +15,19 @@ export const AppProvider = ({children}) => {
     onGoing: [],
     recent: [],
   });
-  const [driverId, setDriverId] = useState('');
-  const [driverDetails, setDriverDetails] = useState(null);
+  const [driverId, setDriverId] = useState(null);
+  // const [driverDetails, setDriverDetails] = useState(null);
   const [tripDetailsResponse, setTripDetailsResponse] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const [idTrips, setIdTrips] = useState(0);
-  // console.log("🚀 ~ AppProvider ~ employeeDetails:", employeeDetails)
-  // console.log("🚀 ~ AppProvider ~ tripDetailsResponse:", tripDetailsResponse)
+  const [userRoles, setUserRoles] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [driverName, setDriverName] = useState(null);
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     saveIsLoggedIn();
-    getDriverId();
+    getUserAndDriverDetails();
   }, [isLoggedIn]);
 
   const getTripDetails = async idRoasterDays => {
@@ -72,14 +73,33 @@ export const AppProvider = ({children}) => {
     AsyncStorage.setItem('isLoggedIn', 'false');
   };
 
-  const getDriverId = async () => {
-    const storedOtpResponseData = await AsyncStorage.getItem('otpResponseData');
-    if (storedOtpResponseData) {
-      const driverId = JSON.parse(storedOtpResponseData);
-      const idDriver = driverId?.idDriver;
-      const driverdetails = driverId;
+  // const getDriverId = async () => {
+  //   const storedOtpResponseData = await AsyncStorage.getItem('otpResponseData');
+  //   if (storedOtpResponseData) {
+  //     const driverId = JSON.parse(storedOtpResponseData);
+  //     const idDriver = driverId?.idDriver;
+  //     const driverdetails = driverId;
+  //     const useRole = driverId?.userRole;
+  //     const userId = driverId?.idUser;
+  //     setDriverId(idDriver);
+  //     setDriverDetails(driverdetails);
+  //     setUserRoles(useRole);
+  //     setUserId(userId);
+  //   }
+  // };
+
+  const getUserAndDriverDetails = async () => {
+    try {
+      const userRole = await AsyncStorage.getItem('userRole');
+      setUserRoles(userRole);
+      const idUser = await AsyncStorage.getItem('idUser');
+      setUserId(idUser);
+      const idDriver = await AsyncStorage.getItem('idDriver');
       setDriverId(idDriver);
-      setDriverDetails(driverdetails);
+      const driverName = await AsyncStorage.getItem('driverName');
+      setDriverName(driverName);
+    } catch (error) {
+      console.log('error in fetching the local storage', error);
     }
   };
 
@@ -132,7 +152,8 @@ export const AppProvider = ({children}) => {
         setIsLoggedIn,
         handleLogin,
         handleLogout,
-        driverDetails,
+        // driverDetails,
+        driverName,
         driverRoasterList,
         driverId,
         tripDetailsResponse,
@@ -143,7 +164,9 @@ export const AppProvider = ({children}) => {
         setEmployeeDetails,
         idTrips,
         getDriverList,
-        driverId
+        driverId,
+        userRoles,
+        userId,
       }}>
       {children}
     </AppContext.Provider>

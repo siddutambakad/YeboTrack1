@@ -17,4 +17,7 @@ export const APIS = {
   getDriversDetails: `${BASE_URL}api/MasterDriver`,
   sendBreakEmployeeTrip: `${BASE_URL}api/Roaster/BreakEmpTrip`,
   sendEmployeeCheckOutTrip: `${BASE_URL}api/Roaster/EmpTripCheckOut`,
+  getUserDetails: `${BASE_URL}api/MasterUsers`
 };
+
+

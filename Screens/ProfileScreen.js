@@ -63,6 +63,8 @@ const ProfileScreen = ({navigation}) => {
   //   }
   // };
 
+
+
   const getDriversDetail = async driverId => {
     setLoader(true);
     try {
@@ -80,6 +82,24 @@ const ProfileScreen = ({navigation}) => {
       setLoader(false);
     }
   };
+
+  // const getUserDetail = async userId => {
+  //   setLoader(true);
+  //   try {
+  //     const apiUrl = `${APIS.getUserDetails}/${userId}`;
+  //     const responseData = await axios.get(apiUrl);
+  //     console.log(
+  //       '\nresponseData',
+  //       JSON.stringify(responseData.data?.returnLst, null, 2),
+  //       '\n',
+  //     );
+  //     setUserData(responseData.data?.returnLst);
+  //   } catch (error) {
+  //     console.log('error', error);
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
 
   return (
     <SafeAreaView style={{flex: 1}}>

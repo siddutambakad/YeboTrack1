@@ -79,7 +79,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         '\n',
       );
       const response = await axios.post(APIS.getStartTripOtp, sendStartOtpBody);
-      console.log('\nresponse', JSON.stringify(response.data, null, 2), '\n');
+      // console.log('\nresponse', JSON.stringify(response.data, null, 2), '\n');
       setOtpResponse(response.data?.returnLst);
       setShowOtpForStartTrip(true);
     } catch (error) {
@@ -124,11 +124,11 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         '\n',
       );
       const responseData = await axios.post(apiUrl, validateOtpBody);
-      console.log(
-        '\nvalidateOtp',
-        JSON.stringify(responseData.data, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nvalidateOtp',
+      //   JSON.stringify(responseData.data, null, 2),
+      //   '\n',
+      // );
       if (responseData.data.statusCode === 200) {
         setOtpError({
           isOtpError: false,
@@ -141,10 +141,10 @@ const StartLoginTripSCreen = ({navigation, route}) => {
           guardId: responseData.data.returnLst?.guardId,
           idRoasterDays: responseData.data.returnLst?.idRoasterDays,
         });
-        console.log(
-          'tripId: responseData.data.returnLst?.tripId,',
-          responseData.data.returnLst?.tripId,
-        );
+        // console.log(
+        //   'tripId: responseData.data.returnLst?.tripId,',
+        //   responseData.data.returnLst?.tripId,
+        // );
         setShowOtpForStartTrip(false);
       } else {
         setOtpError({
@@ -162,6 +162,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
         isOtpError: true,
         otpErrorMessage: 'Incorrect Otp',
       });
+      setShowOtpForStartTrip(true);
     } finally {
       setLoader(false);
     }
@@ -313,6 +314,7 @@ const StartLoginTripSCreen = ({navigation, route}) => {
             onPressSubmitButton={e => {
               // setOtp(e);
               validateOtp(e);
+              setShowOtpForStartTrip(false);
             }}
             onPressCancelButton={() => {
               setShowOtpForStartTrip(false);

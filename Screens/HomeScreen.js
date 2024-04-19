@@ -167,7 +167,7 @@ const HomeScreen = ({navigation}) => {
           <View style={{gap: 25, paddingVertical: 25}}>
             <TouchableOpacity
             onPress={() => {
-              navigation.navigate('UserProfile', {screen: "Home "})
+              navigation.navigate('UserProfile')
             }}
               style={{
                 flexDirection: 'row',

@@ -30,7 +30,7 @@ const LoginPage = ({navigation}) => {
   const imageAspectRatio = 20 / 9;
   const [loader, setLoader] = useState(false);
   const [userDetails, setUserDetails] = useState({
-    PhoneNumber: '9886768385',
+    PhoneNumber: '8899889889',
   });
 
   const [errorMsg, setErrorMsg] = useState({
@@ -87,26 +87,6 @@ const LoginPage = ({navigation}) => {
       } else {
         Alert.alert('Warning!', 'No internet connection');
       }
-      // if (error.response) {
-      //   // The request was made and the server responded with a status code
-      //   // that falls out of the range of 2xx
-      //   console.log(error.response.data);
-      //   console.log(error.response.status);
-      //   console.log(error.response.headers);
-      // } else if (error.request) {
-      //   // The request was made but no response was received
-      //   // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      //   // http.ClientRequest in node.js
-      //   console.log(error.request);
-      // } else {
-      //   // Something happened in setting up the request that triggered an Error
-      //   console.log('Error', error.message);
-      // }
-      // console.log(
-      //   '\nerror.config',
-      //   JSON.stringify(error.config, null, 2),
-      //   '\n',
-      // );
     } finally {
       setLoader(false);
     }
@@ -130,7 +110,7 @@ const LoginPage = ({navigation}) => {
     <ScrollView
       style={{
         height: Dimensions.get('window').height,
-        backgroundColor: 'red',
+        // backgroundColor: 'red',
       }}>
       <View
         style={{

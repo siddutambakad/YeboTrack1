@@ -65,9 +65,9 @@ const MyTripDetails = ({route, navigation}) => {
     guardId,
     // items,
   } = route.params;
-  console.log('🚀 ~ MyTripDetails ~ driverContactNo:', driverContactNo);
+  // console.log('🚀 ~ MyTripDetails ~ driverContactNo:', driverContactNo);
   // console.log("🚀 ~ MyTripDetails---------->>>>>>>>> ~ items:", items)
-  console.log('🚀 ~ MyTripDetails ~ tripId:', tripId);
+  // console.log('🚀 ~ MyTripDetails ~ tripId:', tripId);
 
   const [showStartTripModal, setShowStartTripModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -160,7 +160,7 @@ const MyTripDetails = ({route, navigation}) => {
     setSelectedPosition(stepIndicator <= -1 ? 0 : stepIndicator);
     // console.log("🚀 ~ stepperPointChanger ~ stepIndicator:", stepIndicator)
 
-    if (stepIndicator) {
+    if (stepIndicator >= 3) {
       setPickupEmployeeCompleted(true);
     }
   };
@@ -191,24 +191,24 @@ const MyTripDetails = ({route, navigation}) => {
         guardID: resumeOngoingTrip ? pickupGuard?.idGuard : guardId,
         mobileNo: pickupGuard?.mobileNo,
       };
-      console.log(
-        '\nsendrequestBodyForGuard:',
-        JSON.stringify(requestBodyForGuard, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nsendrequestBodyForGuard:',
+      //   JSON.stringify(requestBodyForGuard, null, 2),
+      //   '\n',
+      // );
       axios
         .post(apiUrl, requestBodyForGuard)
         .then(response => {
-          console.log('===response', JSON.stringify(response, null, 2));
+          // console.log('===response', JSON.stringify(response, null, 2));
           setOtpValidateResponse(response.data?.returnLst);
           setShowOtpModal(true);
         })
         .catch(error => {
           if (error?.response) {
-            console.log(
-              '===rerror1',
-              JSON.stringify(error?.response?.data, null, 2),
-            );
+            // console.log(
+            //   '===rerror1',
+            //   JSON.stringify(error?.response?.data, null, 2),
+            // );
             if (error?.response?.data?.statusMessage === 'Record Exists') {
               setOtpValidateResponse(error?.response?.data?.returnLst);
               setShowOtpModal(true);
@@ -244,13 +244,13 @@ const MyTripDetails = ({route, navigation}) => {
         guardOTPGPSLocationLatLon: `${latitude},${longitude}`,
         guardOTPGPSLocationName: locationName,
       };
-      console.log(
-        '\notprequestBodyForGuard:',
-        JSON.stringify(requestBodyForGuard, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\notprequestBodyForGuard:',
+      //   JSON.stringify(requestBodyForGuard, null, 2),
+      //   '\n',
+      // );
       const response = await axios.post(apiUrl, requestBodyForGuard);
-      console.log('response===>', response);
+      // console.log('response===>', response);
       if (response.data.statusCode === 200) {
         setOtpError({
           isOtpError: false,
@@ -272,6 +272,7 @@ const MyTripDetails = ({route, navigation}) => {
         isOtpError: true,
         otpErrorMessage: 'Incorrect Otp',
       });
+      setShowOtpModal(true);
     } finally {
       setLoader(false);
     }
@@ -345,12 +346,15 @@ const MyTripDetails = ({route, navigation}) => {
     stepIndicatorCurrentColor: selectedPosition ? 'gray' : 'lightgray',
     stepIndicatorLabelFontSize: 0,
     currentStepIndicatorLabelFontSize: 0,
-    labelColor: '#000',
+    labelColor: '#FFF',
     labelSize: fontPixel(14),
     labelFontFamily: FontFamily.medium,
-    currentStepLabelColor: '#000',
+    currentStepLabelColor: '#FFF',
     borderRadiusSize: 20,
     labelAlign: 'flex-start',
+    stepIndicatorLabelUnFinishedColor: 'lightgray',
+    stepIndicatorLabelFinishedColor: 'gray',
+    stepIndicatorLabelCurrentColor: 'gray',
   };
   //Using an array of functions
   const stepActions = [
@@ -531,6 +535,7 @@ const MyTripDetails = ({route, navigation}) => {
             options={modalPopupOptions}
             name={`${pickupGuard?.guardFullName}`}
             // pickupTime={}
+            profileImage={require('../../assets/images/profile.png')}
             Address={`${pickupGuard?.address1}`}
           />
           {/* conformation modal */}

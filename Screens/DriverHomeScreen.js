@@ -43,7 +43,7 @@ const DriverHomeScreen = ({navigation}) => {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
   // console.log("🚀 ~ DriverHomeScreen ~ selectedImage:", selectedImage)
-  const {driverDetails} = useContext(AppContext);
+  const {driverId, driverName} = useContext(AppContext);
 
   
   const handleMyTripsPress = () => {
@@ -77,7 +77,6 @@ const DriverHomeScreen = ({navigation}) => {
             'Alert!!',
             'Please grant camera permission to take photos.',
             [
-              {text: 'Ask Me Later'},
               {text: 'Cancel'},
               {text: 'Ok', onPress: () => openSettings()},
             ],
@@ -113,7 +112,6 @@ const DriverHomeScreen = ({navigation}) => {
             'Alert!!',
             'Please grant gallery permission to select photos.',
             [
-              {text: 'Ask Me Later'},
               {text: 'Cancel'},
               {text: 'Ok', onPress: () => openSettings()},
             ],
@@ -184,11 +182,11 @@ const DriverHomeScreen = ({navigation}) => {
               style={styles.profileImage}
             />
           )}
-          <Text style={styles.jhonedoeText}>{driverDetails?.driverName}</Text>
+          <Text style={styles.jhonedoeText}>{driverName}</Text>
           <Text
             style={
               styles.driverIdText
-            }>{`Driver ID - ${driverDetails?.idDriver}`}</Text>
+            }>{`Driver ID - ${driverId}`}</Text>
           <TouchableOpacity
             style={styles.addPhoto}
             onPress={() => {

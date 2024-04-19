@@ -36,18 +36,18 @@ const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
 const StopTripScreen = ({navigation, route}) => {
   const {roasterId, tripId, idRoasterDays, driverId, mobileNo} = route.params;
-  console.log(
-    'roasterId',
-    roasterId,
-    'tripId:',
-    tripId,
-    'idRoasterDays',
-    idRoasterDays,
-    'driverId',
-    driverId,
-    'mobileNo',
-    mobileNo,
-  );
+  // console.log(
+  //   'roasterId',
+  //   roasterId,
+  //   'tripId:',
+  //   tripId,
+  //   'idRoasterDays',
+  //   idRoasterDays,
+  //   'driverId',
+  //   driverId,
+  //   'mobileNo',
+  //   mobileNo,
+  // );
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpError, setOtpError] = useState({
     isOtpError: false,
@@ -79,17 +79,17 @@ const StopTripScreen = ({navigation, route}) => {
         driverID: driverId,
         mobileNo: mobileNo,
       };
-      console.log(
-        '\nendTripRequestBody:',
-        JSON.stringify(endTripRequestBody, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nendTripRequestBody:',
+      //   JSON.stringify(endTripRequestBody, null, 2),
+      //   '\n',
+      // );
       const response = await axios.post(apiUrl, endTripRequestBody);
-      console.log(
-        '\nresponse:',
-        JSON.stringify(response.data.returnLst, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nresponse:',
+      //   JSON.stringify(response.data.returnLst, null, 2),
+      //   '\n',
+      // );
       setShowOtpModal(true);
     } catch (error) {
       console.log('\nerror:', JSON.stringify(error, null, 2), '\n');
@@ -118,17 +118,17 @@ const StopTripScreen = ({navigation, route}) => {
         tripEndGpslocationLatLon: `${latitude},${longitude}`,
         tripEndGpslocationName: locationName,
       };
-      console.log(
-        '\nrequestEndTripBody:',
-        JSON.stringify(requestEndTripBody, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nrequestEndTripBody:',
+      //   JSON.stringify(requestEndTripBody, null, 2),
+      //   '\n',
+      // );
       const response = await axios.post(apiUrl, requestEndTripBody);
-      console.log(
-        '\nresponse:',
-        JSON.stringify(response.data.returnLst, null, 2),
-        '\n',
-      );
+      // console.log(
+      //   '\nresponse:',
+      //   JSON.stringify(response.data.returnLst, null, 2),
+      //   '\n',
+      // );
       if (response.data.statusCode === 200) {
         setOtpError({
           isOtpError: false,
