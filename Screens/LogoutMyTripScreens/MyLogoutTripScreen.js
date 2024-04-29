@@ -71,10 +71,10 @@ const MyLogoutTripScreen = ({route, navigation}) => {
   //   '🚀 ~ MyLogoutTripScreen ~ validatedStartTripId:',
   //   validatedStartTripId,
   // );
-  // console.log(
-  //   '🚀 ~ MyLogoutTripScreen ~ tripDetailsResponse?.tripDetail?.idTrip:',
-  //   tripDetailsResponse?.tripDetail?.idTrip,
-  // );
+  console.log(
+    '🚀 ~ MyLogoutTripScreen ~ tripDetailsResponse:',
+    tripDetailsResponse,
+  );
   const [permissionGranted, setPermissionGranted] = useState(false);
   const {tripDetailsResponse, getTripDetails, loader, setLoader, idTrips} =
     useContext(AppContext);

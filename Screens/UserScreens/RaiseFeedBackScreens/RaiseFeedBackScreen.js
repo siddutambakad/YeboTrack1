@@ -23,7 +23,10 @@ import StartTripModal from '../../Components/StartTripModal';
 import CustomModal from '../../Components/Modal';
 import AlertModal from '../../Components/AlertModal';
 
-const RaiseFeedBackScreen = ({navigation}) => {
+const RaiseFeedBackScreen = ({navigation, route}) => {
+   const {idRoasterDetails, driverRating} = route.params;
+   console.log("🚀 ~ RaiseFeedBackScreen ~ driverRating:", driverRating)
+   console.log("🚀 ~ RaiseFeedBackScreen ~ idRoasterDetails:", idRoasterDetails)
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showConformationModal, setShowConformationModal] = useState(false);
@@ -42,10 +45,12 @@ const RaiseFeedBackScreen = ({navigation}) => {
       </View>
       <View style={styles.subContainer}>
         <MyStatsTabNavi
-          screen1Name="Write FeedBack"
+          screen1Name="WriteFeedBack"
           screen1Component={WriteFeedBack}
-          screen2Name="My Tickets"
+          screen2Name="MyTickets"
           screen2Component={MyTickets}
+          /////
+          // params={{ idRoasterDetails, driverRating }}
         />
         <UserBottomTab
           activeTab="UserMyTrips"

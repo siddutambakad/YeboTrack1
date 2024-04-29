@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import DropDown from '../../Components/DropDown';
 import {
   fontPixel,
@@ -18,24 +18,69 @@ import {
 } from '../../Utils/Dimensions';
 import FontFamily from '../../Styles/FontFamily';
 import {AirbnbRating, Rating} from 'react-native-ratings';
+import {AppContext} from '../../Context/AppContext';
+import {APIS} from '../../APIURLS/ApiUrls';
+import axios from 'axios';
+import Loader from '../../Components/Loader';
 
 const {width, height} = Dimensions.get('window');
-const WriteFeedBack = () => {
-  const data = [
-    {name: '1'},
-    {name: '2'},
-    {name: '3'},
-    {name: '4'},
-    {name: '5'},
-    {name: '6'},
-    {name: '7'},
-  ];
 
-  const [isClicked, setIsclicked] = useState(false);
-  const [selectedFeedBack, setSelectedFeedBack] = useState(null);
+const WriteFeedBack = ({route}) => {
+  const {idRoasterDetails, driverRating} = route.params;
+  const {loader, setLoader} = useContext(AppContext);
+  const [comments, setComments] = useState('');
+  const [rating, setRating] = useState(0);
+  const [showError, setShowError] = useState({isTrue: false, errorMessage: ''});
+  // const data = [
+  //   {name: '1'},
+  //   {name: '2'},
+  //   {name: '3'},
+  //   {name: '4'},
+  //   {name: '5'},
+  //   {name: '6'},
+  //   {name: '7'},
+  // ];
+
+  // const [isClicked, setIsclicked] = useState(false);
+  // const [selectedFeedBack, setSelectedFeedBack] = useState(null);
+
+  // useEffect(() => {
+  //   sendFeedBack();
+  // }, []);
+
+  const sendFeedBack = async (IdRoasterDetails, DriverRating, Comments) => {
+    if (!comments) {
+      setShowError({
+        isTrue: true,
+        errorMessage: 'Please enter your feedback',
+      });
+    } else {
+      setLoader(true);
+    }
+    try {
+      const apiUrl = `${APIS.giveFeedBackToDriver}/${IdRoasterDetails}/${DriverRating}/${Comments}`;
+      console.log('🚀 ~ sendFeedBack ~ apiUrl:', apiUrl);
+      const response = await axios.put(apiUrl);
+      console.log('response', response);
+      if (response?.status === 200) {
+        setShowError({
+          isTrue: false,
+          errorMessage: '',
+        });
+      }
+    } catch (error) {
+      console.log('error', error?.message);
+      setShowError({
+        isTrue: true,
+        errorMessage: 'Please enter your feedback',
+      });
+    } finally {
+      setLoader(false);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.issueAndDropdown}>
+      {/* <View style={styles.issueAndDropdown}>
         <Text style={styles.issueCategoryText}>Issue Category</Text>
         <DropDown
           options={data}
@@ -51,33 +96,58 @@ const WriteFeedBack = () => {
           style={styles.dropdownHeader}
           customOptionStyles={styles.dropdown}
         />
-      </View>
+      </View> */}
       <View style={styles.subContainer}>
         <Text style={styles.howDoWeText}>How did we do?</Text>
         <Rating
           type="custom"
           tintColor="#F6F6F6"
-          //   ratingImage={require('../../../assets/images/star.png')}
           ratingBackgroundColor={'lightgray'}
           ratingColor="#66276E"
           ratingCount={5}
           imageSize={50}
           fractions={1}
           jumpValue={0.5}
-          startingValue={4.5}
-          readonly
           style={styles.ratings}
+          onFinishRating={e => {
+            console.log('rating=====>', e);
+            setRating(e);
+          }}
+          onSwipeRating={e => {
+            console.log('rating----->>', e);
+            setRating(e);
+          }}
         />
         <Text style={styles.feedBackText}>Do you want to share about it?</Text>
         <TextInput
           style={styles.feedBackContainer}
           multiline={true}
           keyboardType="ascii-capable"
+          value={comments}
+          onChangeText={e => {
+            setComments(e);
+          }}
         />
-        <TouchableOpacity style={styles.sendButton}>
+        {showError.errorMessage && (
+          <Text
+            style={{
+              color: 'red',
+              fontSize: fontPixel(14),
+              fontFamily: FontFamily.regular,
+            }}>
+            {showError.errorMessage}
+          </Text>
+        )}
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={() => {
+            sendFeedBack(idRoasterDetails, rating, comments);
+            setComments('');
+          }}>
           <Text style={styles.sendText}>Send</Text>
         </TouchableOpacity>
       </View>
+      {loader && <Loader />}
     </ScrollView>
   );
 };

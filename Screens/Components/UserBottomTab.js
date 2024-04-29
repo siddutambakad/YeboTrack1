@@ -76,15 +76,15 @@ const UserBottomTab = props => {
           width: Dimensions.get('window').width,
           height: verticalScale(85),
           // marginHorizontal: pixelSizeHorizontal(30),
-          paddingHorizontal: pixelSizeHorizontal(30),
-          flexDirection: 'row',
+          // paddingHorizontal: pixelSizeHorizontal(30),
+          // flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           backgroundColor: '#E5E5E5',
           borderTopLeftRadius: responsiveBorderRadius(35),
           borderTopRightRadius: responsiveBorderRadius(35),
         }}>
-        <View style={{alignItems: 'center'}}>
+        {/* <View style={{alignItems: 'center'}}>
           <TouchableOpacity
             onPress={onPressSafeDrop}
             style={{
@@ -105,13 +105,13 @@ const UserBottomTab = props => {
             }}>
             Safe Drop
           </Text>
-        </View>
+        </View> */}
 
         <View
           style={{
             alignItems: 'center',
             justifyContent: 'flex-end',
-            marginRight: pixelSizeHorizontal(-20),
+            // marginRight: pixelSizeHorizontal(-20),
           }}>
           <TouchableOpacity
             activeOpacity={0.7}
@@ -138,7 +138,7 @@ const UserBottomTab = props => {
         </View>
 
         {/*profile */}
-        <View style={{alignItems: 'center'}}>
+        {/* <View style={{alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => {
               // navigation.navigate('Profile');
@@ -164,7 +164,7 @@ const UserBottomTab = props => {
             }}>
             Connect driver
           </Text>
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );

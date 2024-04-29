@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   fontPixel,
   horizontalScale,
@@ -21,11 +21,15 @@ import Cars from '../../../assets/images/cars.svg';
 import RN from 'react-native';
 import ConformationModal from '../../Components/ConformationModal';
 import StartTripModal from '../../Components/StartTripModal';
+import {AppContext} from '../../Context/AppContext';
+import {useFocusEffect} from '@react-navigation/native';
+import Loader from '../../Components/Loader';
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 const {width, height} = Dimensions.get('window');
 
 const UserOngoingTrip = ({navigation}) => {
-  //   const [data, setData] = useState([1]);
+  const {employeeRoasterList, getUserList, setLoader, loader, idEmployee} =
+    useContext(AppContext);
 
   const [selectedCheckIn, setSelectedCheckIn] = useState(false);
   const [selectedCheckOut, setSelectedCheckOut] = useState(false);
@@ -34,79 +38,112 @@ const UserOngoingTrip = ({navigation}) => {
   const [showCheckOutModal, setShowCheckOutModal] = useState(false);
   const [checkOutModal, setCheckOutModal] = useState(false);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [idEmployee]),
+  );
+  const loadData = async () => {
+    setLoader(true);
+    await getUserList(idEmployee);
+    setLoader(false);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.imageContainer}>
         <Cars width={horizontalScale(80)} height={verticalScale(80)} />
       </View>
-      <View style={styles.slotAndDateText}>
-        <Text style={styles.slottext}>SLOT# : N/A</Text>
-        <Text style={styles.dateText}>16-10-2021</Text>
-      </View>
-      <View style={styles.ticketNodetails}>
-        <View>
-          {/* <Text style={styles.ticketNoText}>Ticket No</Text> */}
-          <Text style={styles.tripNoText}>Log Out</Text>
-          <Text style={styles.noOfPeopleText}>Booking Type</Text>
-          <Text style={styles.distanceText}>Status</Text>
-          <Text style={styles.timeText}>Vehicle</Text>
-          <Text style={styles.timeText}>Sequence</Text>
-        </View>
-        <View>
-          {/* <Text style={styles.ticketText}>#000988786</Text> */}
-          <Text style={styles.rosterText}>08:00 pm</Text>
-          <Text style={styles.numberOfPeopleText}>Roaster</Text>
-          <Text style={styles.distanceMilesText}>Vehicle allocated</Text>
-          <Text style={styles.minutesText}>MI 01 6667 (R6667)</Text>
-          <Text style={styles.minutesText}>1</Text>
-        </View>
-      </View>
-      <View style={styles.checkInOtp}>
-        <Text style={styles.checkInotpText}>Check In OTP : 5487</Text>
-      </View>
-      <View style={styles.radioButtonsContainer}>
-        <View style={styles.checkInButton}>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedCheckIn(!selectedCheckIn);
-              setSelectedCheckOut(false);
-              setShowConfirmModal(true);
-            }}>
-            <View style={styles.checkbox}>
-              {selectedCheckIn && <View style={styles.checkCircle} />}
+      {employeeRoasterList?.onGoing.map((item, index) => {
+        console.log(
+          '\nitem',
+          JSON.stringify(item?.idRoasterDetails, null, 2),
+          '\n',
+        );
+        return (
+          <>
+            <View style={styles.slotAndDateText}>
+              <Text style={styles.slottext}>SLOT# : N/A</Text>
+              <Text style={styles.dateText}>{`${formatDate(
+                item?.roasterPlanDtms,
+              )}`}</Text>
             </View>
-          </TouchableOpacity>
-          <Text style={styles.checkInText}>Check In</Text>
-        </View>
-        <View style={styles.CheckOutButton}>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedCheckOut(!selectedCheckOut);
-              setSelectedCheckIn(false);
-              setShowCheckOutModal(true)
-            }}>
-            <View style={styles.checkbox}>
-              {selectedCheckOut && <View style={styles.checkCircle} />}
+            <View style={styles.ticketNodetails}>
+              <View>
+                <Text style={styles.noOfPeopleText}>Booking Type</Text>
+                <Text style={styles.distanceText}>Status</Text>
+                <Text style={styles.timeText}>Vehicle</Text>
+              </View>
+              <View>
+                {/* <Text style={styles.ticketText}>#000988786</Text> */}
+                <Text style={styles.rosterText}>
+                  {item?.roasterRoutetypeDesc}
+                </Text>
+                <Text style={styles.numberOfPeopleText}>
+                  {item?.activeStatusDesc}
+                </Text>
+                <Text style={styles.distanceMilesText}>
+                  {item?.vehicleRegNo}
+                </Text>
+              </View>
             </View>
-          </TouchableOpacity>
-          <Text style={styles.checkOutText}>Check Out</Text>
-        </View>
-      </View>
-      <View style={styles.finalButtons}>
-        <TouchableOpacity style={styles.cancelButton}>
-          <Text style={styles.cancelText}>Cancel Trip</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.raiseFeedbackButton} onPress={() => {
-          navigation.navigate('RaiseFeedBack')
-        }}>
-          <Text style={styles.raisefeedbackText}>Raise Feedback</Text>
-        </TouchableOpacity>
-      </View>
+            <View style={styles.checkInOtp}>
+              <Text style={styles.checkInotpText}>Check In OTP : 5487</Text>
+            </View>
+            <View style={styles.radioButtonsContainer}>
+              <View style={styles.checkInButton}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedCheckIn(!selectedCheckIn);
+                    setSelectedCheckOut(false);
+                    setShowConfirmModal(true);
+                  }}>
+                  <View style={styles.checkbox}>
+                    {selectedCheckIn && <View style={styles.checkCircle} />}
+                  </View>
+                </TouchableOpacity>
+                <Text style={styles.checkInText}>Check In</Text>
+              </View>
+              <View style={styles.CheckOutButton}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedCheckOut(!selectedCheckOut);
+                    setSelectedCheckIn(false);
+                    setShowCheckOutModal(true);
+                  }}>
+                  <View style={styles.checkbox}>
+                    {selectedCheckOut && <View style={styles.checkCircle} />}
+                  </View>
+                </TouchableOpacity>
+                <Text style={styles.checkOutText}>Check Out</Text>
+              </View>
+            </View>
+            <View style={styles.finalButtons}>
+              <TouchableOpacity style={styles.cancelButton}>
+                <Text style={styles.cancelText}>Cancel Trip</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.raiseFeedbackButton}
+                onPress={() => {
+                  navigation.navigate('RaiseFeedBack', {
+                    screen: 'WriteFeedBack',
+                    params: {
+                      idRoasterDetails: item?.idRoasterDetails,
+                      driverRating: item?.driverRating,
+                    },
+                  });
+                }}>
+                <Text style={styles.raisefeedbackText}>Raise Feedback</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        );
+      })}
 
       <ConformationModal
         onPressYes={() => {
           setShowConfirmModal(false);
-          setShowCheckedInModal(true)
+          setShowCheckedInModal(true);
         }}
         onPressNo={() => {
           setShowConfirmModal(false);
@@ -117,7 +154,7 @@ const UserOngoingTrip = ({navigation}) => {
       <StartTripModal
         onPressOK={() => {
           setShowCheckedInModal(false);
-          setSelectedCheckIn(true)
+          setSelectedCheckIn(true);
         }}
         title={'Checked in successfully!'}
         showConfirmModal={checkedInModal}
@@ -129,7 +166,7 @@ const UserOngoingTrip = ({navigation}) => {
       <ConformationModal
         onPressYes={() => {
           setShowCheckOutModal(false);
-          setCheckOutModal(true)
+          setCheckOutModal(true);
         }}
         onPressNo={() => {
           setShowCheckOutModal(false);
@@ -140,7 +177,7 @@ const UserOngoingTrip = ({navigation}) => {
       <StartTripModal
         onPressOK={() => {
           setCheckOutModal(false);
-          setSelectedCheckOut(true)
+          setSelectedCheckOut(true);
         }}
         title={'Checked Out successfully!'}
         showConfirmModal={checkOutModal}
@@ -148,6 +185,7 @@ const UserOngoingTrip = ({navigation}) => {
           setCheckOutModal(false);
         }}
       />
+      {loader && <Loader />}
     </ScrollView>
   );
 };

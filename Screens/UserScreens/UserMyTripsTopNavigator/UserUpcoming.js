@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import {
   fontPixel,
   pixelSizeHorizontal,
@@ -15,84 +15,51 @@ import {
 } from '../../Utils/Dimensions';
 import FontFamily from '../../Styles/FontFamily';
 import ConformationModal from '../../Components/ConformationModal';
+import {AppContext} from '../../Context/AppContext';
+import {formatDate} from '../../Utils/ReusableFunctions';
+import { useFocusEffect } from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
 const UserUpcoming = () => {
-  const data = [
-    {
-      id: 1,
-      roasterType: 'Upcoming',
-      tripType: 'pickUp',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Sequence: '1',
-      CheckInOTP: '5487',
-      Status: 'Vehicle allocated',
-    },
-    {
-      id: 2,
-      roasterType: 'Upcoming',
-      tripType: 'pickUp',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Sequence: '1',
-      CheckInOTP: '5487',
-      Status: 'Vehicle allocated',
-    },
-    {
-      id: 3,
-      roasterType: 'Upcoming',
-      tripType: 'pickUp',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Sequence: '1',
-      CheckInOTP: '5487',
-      Status: 'Vehicle allocated',
-    },
-    {
-      id: 4,
-      roasterType: 'Upcoming',
-      tripType: 'logout',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Status: 'Vehicle allocated',
-      Sequence: '1',
-      CheckInOTP: '5487',
-    },
-  ];
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const {employeeRoasterList, idEmployee, getUserList, setLoader, loader} = useContext(AppContext);
+  
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [idEmployee]),
+  );
+  const loadData = async () => {
+    setLoader(true);
+    await getUserList(idEmployee);
+    setLoader(false);
+  };
 
   const renderItems = ({item}) => {
     return (
       <View style={styles.cardContainer}>
         <View style={styles.roasterType}>
-          <Text style={styles.roasterTypeText}>{item?.roasterType}</Text>
-          <Text style={styles.roasterDate}>{item?.date}</Text>
+          <Text style={styles.roasterTypeText}>{item?.roasterStatusDesc}</Text>
+          <Text style={styles.roasterDate}>
+            {formatDate(item?.roasterPlanDtms)}
+          </Text>
         </View>
-        <Text style={styles.logoutText}>{`LogOut: ${item.logout}`}</Text>
+        <Text
+          style={
+            styles.logoutText
+          }>{`RoasterRouteTypeDesc : ${item.roasterRoutetypeDesc}`}</Text>
         <Text
           style={
             styles.bookingTypeText
-          }>{`BookingType: ${item.bookingType}`}</Text>
-        <Text style={styles.StatusText}>{`Status: ${item.Status}`}</Text>
-        <Text style={styles.vehicleText}>{`vehicle: ${item.vehicle}`}</Text>
-        <Text style={styles.SequenceText}>{`Sequence: ${item.Sequence}`}</Text>
-        <Text
-          style={
-            styles.CheckInOTPText
-          }>{`CheckInOTP: ${item.CheckInOTP}`}</Text>
-        <TouchableOpacity style={styles.cancelButton} onPress={() => {
-          setShowConfirmModal(true)
-        }}>
+          }>{`IdRoasterDays: ${item.idRoasterDays}`}</Text>
+        <Text style={styles.StatusText}>{`Status: ${item.activeStatusDesc}`}</Text>
+        <Text style={styles.vehicleText}>{`vehicle: ${item.vehicleRegNo}`}</Text>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => {
+            setShowConfirmModal(true);
+          }}>
           <Text style={styles.cancelButtonText}>Cancel Trip</Text>
         </TouchableOpacity>
       </View>
@@ -100,16 +67,16 @@ const UserUpcoming = () => {
   };
   return (
     <View style={styles.container}>
-      <FlatList data={data} renderItem={renderItems} />
+      <FlatList data={employeeRoasterList?.upcoming} renderItem={renderItems} />
       <ConformationModal
-      onPressYes={() => {
-        setShowConfirmModal(false)
-      }}
-      onPressNo={() => {
-        setShowConfirmModal(false)
-      }}
-      title={'Are you sure you want to cancel the trip?'}
-      showConfirmModal={showConfirmModal}
+        onPressYes={() => {
+          setShowConfirmModal(false);
+        }}
+        onPressNo={() => {
+          setShowConfirmModal(false);
+        }}
+        title={'Are you sure you want to cancel the trip?'}
+        showConfirmModal={showConfirmModal}
       />
     </View>
   );
@@ -120,7 +87,7 @@ export default UserUpcoming;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6'
+    backgroundColor: '#F6F6F6',
   },
   roasterType: {
     flexDirection: 'row',
@@ -129,7 +96,7 @@ const styles = StyleSheet.create({
     paddingVertical: pixelSizeVertical(20),
   },
   roasterTypeText: {
-    fontFamily: FontFamily.regular,
+    fontFamily: FontFamily.semiBold,
     fontSize: fontPixel(20),
     color: 'black',
   },

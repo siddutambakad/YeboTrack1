@@ -61,6 +61,9 @@ function Auth({props, navigation}) {
       setShowSplash(false);
     }, 1000);
   }, []);
+
+  console.log("user role====>", userRoles == 17 ? 'Driver' : 'UserStack');
+  
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -74,24 +77,9 @@ function Auth({props, navigation}) {
 
         {isLoggedIn ? (
           <>
-            {/* {userRoles === 17 && (
             <Stack.Screen
-              name="Driver"
-              component={DriverHomeScreen}
-              options={{headerShown: false}}
-            />
-          )} */}
-            {/* {userRoles === 15 && (
-            <Stack.Screen
-              name="MainStack"
-              component={UserStack}
-              options={{headerShown: false}}
-            />
-          )} */}
-
-            <Stack.Screen
-              name={userRoles === 17 ? 'Driver' : 'MainStack'}
-              component={userRoles === 17 ? DriverHomeScreen : UserStack}
+              name={userRoles == 17 ? 'Driver' : 'UserStack'}
+              component={userRoles == 17 ? DriverHomeScreen : UserStack}
               options={{headerShown: false}}
             />
             <Stack.Screen

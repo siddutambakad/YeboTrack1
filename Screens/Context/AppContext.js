@@ -15,14 +15,24 @@ export const AppProvider = ({children}) => {
     onGoing: [],
     recent: [],
   });
+  const [employeeRoasterList, setEmployeeRoasterList] = useState({
+    upcoming: [],
+    onGoing: [],
+    recent: [],
+  });
+  // console.log(
+  //   '🚀 ~ AppProvider ~ employeeRoasterList:',
+  //   employeeRoasterList?.onGoing,
+  // );
   const [driverId, setDriverId] = useState(null);
   // const [driverDetails, setDriverDetails] = useState(null);
   const [tripDetailsResponse, setTripDetailsResponse] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const [idTrips, setIdTrips] = useState(0);
-  const [userRoles, setUserRoles] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [driverName, setDriverName] = useState(null);
+  const [userRoles, setUserRoles] = useState('');
+  const [userId, setUserId] = useState('');
+  const [idEmployee, setIdEmployee] = useState('');
+  const [driverName, setDriverName] = useState('');
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
@@ -73,27 +83,14 @@ export const AppProvider = ({children}) => {
     AsyncStorage.setItem('isLoggedIn', 'false');
   };
 
-  // const getDriverId = async () => {
-  //   const storedOtpResponseData = await AsyncStorage.getItem('otpResponseData');
-  //   if (storedOtpResponseData) {
-  //     const driverId = JSON.parse(storedOtpResponseData);
-  //     const idDriver = driverId?.idDriver;
-  //     const driverdetails = driverId;
-  //     const useRole = driverId?.userRole;
-  //     const userId = driverId?.idUser;
-  //     setDriverId(idDriver);
-  //     setDriverDetails(driverdetails);
-  //     setUserRoles(useRole);
-  //     setUserId(userId);
-  //   }
-  // };
-
   const getUserAndDriverDetails = async () => {
     try {
       const userRole = await AsyncStorage.getItem('userRole');
       setUserRoles(userRole);
       const idUser = await AsyncStorage.getItem('idUser');
       setUserId(idUser);
+      const idEmployee = await AsyncStorage.getItem('idEmployee');
+      setIdEmployee(idEmployee);
       const idDriver = await AsyncStorage.getItem('idDriver');
       setDriverId(idDriver);
       const driverName = await AsyncStorage.getItem('driverName');
@@ -106,8 +103,10 @@ export const AppProvider = ({children}) => {
   useEffect(() => {
     if (driverId) {
       getDriverList(driverId);
+    } else if (idEmployee) {
+      getUserList(idEmployee);
     }
-  }, [driverId]);
+  }, [driverId, idEmployee]);
 
   const getDriverList = async driverId => {
     try {
@@ -143,6 +142,35 @@ export const AppProvider = ({children}) => {
     }
   };
 
+  const getUserList = async idEmployee => {
+    console.log('🚀 ~ getUserList ~ idEmployee:', idEmployee);
+    setLoader(true);
+    try {
+      const apiUrl = `${APIS.getUserList}/${idEmployee}`;
+      console.log('apiUrl', apiUrl);
+      const response = await axios.get(apiUrl);
+      const data = response.data;
+
+      // seggerate data based on "roasterStatus"
+      let keys = {upcoming: 0, onGoing: 1, recent: 2};
+
+      let seggerateData = Object.entries(keys).reduce(
+        (prvObj, [key, value]) => {
+          let filterData = data.returnLst.filter(
+            filObj => filObj.roasterStatus == value,
+          );
+          return {...prvObj, ...Object.fromEntries([[key, filterData]])};
+        },
+        {},
+      );
+      setEmployeeRoasterList(seggerateData);
+    } catch (error) {
+      console.error('Error fetching user list:', error?.message);
+    } finally {
+      setLoader(false);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -167,6 +195,9 @@ export const AppProvider = ({children}) => {
         driverId,
         userRoles,
         userId,
+        employeeRoasterList,
+        getUserList,
+        idEmployee
       }}>
       {children}
     </AppContext.Provider>

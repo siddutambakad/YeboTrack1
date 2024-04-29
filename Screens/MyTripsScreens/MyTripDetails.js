@@ -78,17 +78,16 @@ const MyTripDetails = ({route, navigation}) => {
   const [selectedPosition, setSelectedPosition] = useState(0);
   // console.log("🚀 ~ MyTripDetails ~ selectedPosition:", selectedPosition)
   const [pickupEmployeeCompleted, setPickupEmployeeCompleted] = useState(false);
-  console.log("🚀 ~ MyTripDetails ~ pickupEmployeeCompleted:", pickupEmployeeCompleted)
+  // console.log("🚀 ~ MyTripDetails ~ pickupEmployeeCompleted:", pickupEmployeeCompleted)
   const [pickupGuard, setPickupGuard] = useState([]);
   const {tripDetailsResponse, getTripDetails, loader, setLoader} =
     useContext(AppContext);
+
   // console.log(
-  //   '🚀 ~ MyTripDetails ~ tripDetailsResponse?.idDriver:',
-  //   tripDetailsResponse?.idDriver,
-  //   'tripDetailsResponse?.driverContactNo',
-  //   tripDetailsResponse?.driverContactNo,
+  //   '🚀 ~ MyTripDetails ~ tripDetailsResponse:',
+  //   tripDetailsResponse,
   // );
-  // console.log(
+  // // console.log(
   //   '\ntripDetailsResponse',
   //   JSON.stringify(tripDetailsResponse?.roasterDayId, null, 2),
   //   '\n',

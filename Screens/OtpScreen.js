@@ -26,11 +26,12 @@ import axios from 'axios';
 import {AppContext} from './Context/AppContext';
 import RN from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {CommonActions} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 
 const SCREEN_HEIGHT = RN.Dimensions.get('window').height;
 
-const OtpScreen = ({navigation, route}) => {
+const OtpScreen = ({route}) => {
+  const navigation = useNavigation();
   const {height, width} = Dimensions.get('window');
   const imageAspectRatio = 20.5 / 9;
   const {otpResponse} = route.params;
@@ -127,22 +128,26 @@ const OtpScreen = ({navigation, route}) => {
       const res_ponse = response.data;
       console.log('\nres_ponse', JSON.stringify(res_ponse, null, 2), '\n');
 
-      const {userRole, idUser, driverName, idDriver} = res_ponse;
+      const {userRole, idUser, driverName, idDriver, idEmployee} = res_ponse;
+      console.log('🚀 ~ handleVerifyOtp ~ userRole:', userRole);
 
-      if (res_ponse?.userRole === 17) {
+      if (userRole === 17) {
         await AsyncStorage.setItem('driverName', driverName);
         await AsyncStorage.setItem('idDriver', idDriver.toString());
+        await AsyncStorage.setItem('userRole', userRole.toString());
         let ck = setTimeout(() => {
           navigation.navigate('Driver');
           clearTimeout(ck);
-        }, 1000);
-      } else if (res_ponse?.userRole === 15) {
+        }, 2000);
+      } 
+      else if (userRole === 15) {
         await AsyncStorage.setItem('userRole', userRole.toString());
         await AsyncStorage.setItem('idUser', idUser.toString());
+        await AsyncStorage.setItem('idEmployee', idEmployee.toString());
         let ck = setTimeout(() => {
-          navigation.navigate('MainStack');
+          navigation.navigate('UserStack');
           clearTimeout(ck);
-        }, 1000);
+        }, 2000);
       }
       handleLogin();
     } catch (error) {

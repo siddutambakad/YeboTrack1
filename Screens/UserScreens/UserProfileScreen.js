@@ -28,7 +28,7 @@ import Bell from '../../assets/images/bellIcon.svg';
 
 const UserProfileScreen = ({navigation}) => {
   const {handleLogout, userId, loader, setLoader} = useContext(AppContext);
-  // console.log('🚀 ~ UserProfileScreen ~ userId:', userId);
+  console.log('🚀 ~ UserProfileScreen ~ userId:', userId);
   const [showModal, setShowModal] = useState(false);
   const [userData, setUserData] = useState({});
   // console.log('🚀 ~ UserProfileScreen ~ userData:', userData);
@@ -42,11 +42,11 @@ const UserProfileScreen = ({navigation}) => {
     try {
       const apiUrl = `${APIS.getUserDetails}/${userId}`;
       const responseData = await axios.get(apiUrl);
-      // console.log(
-      //   '\nresponseData',
-      //   JSON.stringify(responseData?.data, null, 2),
-      //   '\n',
-      // );
+      console.log(
+        '\nresponseData',
+        JSON.stringify(responseData?.data, null, 2),
+        '\n',
+      );
       setUserData(responseData?.data);
     } catch (error) {
       console.log('error', error);
@@ -63,13 +63,13 @@ const UserProfileScreen = ({navigation}) => {
               activeOpacity={1}
               style={styles.backbutton}
               onPress={() => {
-                navigation.navigate('MainStack');
+                navigation.goBack();
               }}>
               <Back
                 width={pixelSizeHorizontal(25)}
                 height={pixelSizeVertical(25)}
               />
-              <Text style={styles.backbuttonText}>My Profile</Text>
+            <Text style={styles.backbuttonText}>My Profile</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.subMainHeader}>

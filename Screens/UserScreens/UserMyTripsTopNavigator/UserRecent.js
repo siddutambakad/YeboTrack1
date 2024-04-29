@@ -1,75 +1,94 @@
 import {FlatList, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Loader from '../../Components/Loader';
 import {Rating} from 'react-native-ratings';
 import {fontPixel} from '../../Utils/Dimensions';
 import FontFamily from '../../Styles/FontFamily';
+import {AppContext} from '../../Context/AppContext';
+import {formatDate} from '../../Utils/ReusableFunctions';
+import {useFocusEffect} from '@react-navigation/native';
 
 const UserRecent = () => {
-  const data = [
-    {
-      id: 1,
-      roasterType: 'Upcoming',
-      tripType: 'pickUp',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Sequence: '1',
-      CheckInOTP: '5487',
-      Status: 'Vehicle allocated',
-    },
-    {
-      id: 2,
-      roasterType: 'Upcoming',
-      tripType: 'pickUp',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Sequence: '1',
-      CheckInOTP: '5487',
-      Status: 'Vehicle allocated',
-    },
-    {
-      id: 3,
-      roasterType: 'Upcoming',
-      tripType: 'pickUp',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Sequence: '1',
-      CheckInOTP: '5487',
-      Status: 'Vehicle allocated',
-    },
-    {
-      id: 4,
-      roasterType: 'Upcoming',
-      tripType: 'logout',
-      date: '16-02-2024',
-      logout: '8:00 pm',
-      bookingType: 'Roaster',
-      vehicle: 'MI 01 6667 (R6667)',
-      Status: 'Vehicle allocated',
-      Sequence: '1',
-      CheckInOTP: '5487',
-    },
-  ];
-  const [loader, setLoader] = useState(false);
+  // const data = [
+  //   {
+  //     id: 1,
+  //     roasterType: 'Upcoming',
+  //     tripType: 'pickUp',
+  //     date: '16-02-2024',
+  //     logout: '8:00 pm',
+  //     bookingType: 'Roaster',
+  //     vehicle: 'MI 01 6667 (R6667)',
+  //     Sequence: '1',
+  //     CheckInOTP: '5487',
+  //     Status: 'Vehicle allocated',
+  //   },
+  //   {
+  //     id: 2,
+  //     roasterType: 'Upcoming',
+  //     tripType: 'pickUp',
+  //     date: '16-02-2024',
+  //     logout: '8:00 pm',
+  //     bookingType: 'Roaster',
+  //     vehicle: 'MI 01 6667 (R6667)',
+  //     Sequence: '1',
+  //     CheckInOTP: '5487',
+  //     Status: 'Vehicle allocated',
+  //   },
+  //   {
+  //     id: 3,
+  //     roasterType: 'Upcoming',
+  //     tripType: 'pickUp',
+  //     date: '16-02-2024',
+  //     logout: '8:00 pm',
+  //     bookingType: 'Roaster',
+  //     vehicle: 'MI 01 6667 (R6667)',
+  //     Sequence: '1',
+  //     CheckInOTP: '5487',
+  //     Status: 'Vehicle allocated',
+  //   },
+  //   {
+  //     id: 4,
+  //     roasterType: 'Upcoming',
+  //     tripType: 'logout',
+  //     date: '16-02-2024',
+  //     logout: '8:00 pm',
+  //     bookingType: 'Roaster',
+  //     vehicle: 'MI 01 6667 (R6667)',
+  //     Status: 'Vehicle allocated',
+  //     Sequence: '1',
+  //     CheckInOTP: '5487',
+  //   },
+  // ];
+  const {employeeRoasterList, getUserList, idEmployee, setLoader, loader} =
+    useContext(AppContext);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [idEmployee]),
+  );
+  const loadData = async () => {
+    setLoader(true);
+    await getUserList(idEmployee);
+    setLoader(false);
+  };
   const renderItems = ({item, index}) => {
-    const tripType = item?.tripType; // Get the trip type
-    const capitalizedTripType = `${tripType
-      .charAt(0)
-      .toUpperCase()}${tripType.slice(1)}`;
+    // const tripType = item?.roasterRoutetypeDesc; // Get the trip type
+    // const capitalizedTripType = `${tripType
+    //   .charAt(0)
+    //   .toUpperCase()}${tripType.slice(1)}`;
 
     return (
       <View style={{marginVertical: 10, marginHorizontal: 20}}>
-        <Text style={styles.ticketNoText}>{capitalizedTripType}</Text>
-        <Text style={styles.dateAndTimeText}>{`Date: ${item?.date}`}</Text>
-        <Text style={styles.dbTestText}>{`${item?.bookingType}`}</Text>
+        <Text style={styles.ticketNoText}>{item?.roasterRoutetypeDesc}</Text>
+        <Text style={styles.dateAndTimeText}>{`Date: ${formatDate(
+          item?.roasterPlanDtms,
+        )}`}</Text>
+        <Text style={styles.dbTestText}>{`${item?.roasterStatusDesc}`}</Text>
         <View style={styles.rateing}>
-          <Text style={styles.rateingText}>OR O5 1234</Text>
+          <Text
+            style={
+              styles.rateingText
+            }>{`vehicleRegNo: ${item?.vehicleRegNo}`}</Text>
           <Rating
             type="star"
             tintColor="#F6F6F6"
@@ -80,7 +99,7 @@ const UserRecent = () => {
             imageSize={18}
             fractions={1}
             jumpValue={0.5}
-            startingValue={4.5}
+            startingValue={item?.driverRating}
             readonly
           />
         </View>
@@ -92,9 +111,10 @@ const UserRecent = () => {
       style={{
         flex: 1,
         backgroundColor: 'rgba(246, 246, 246, 1)',
-        // justifyContent: recent.length === 0 ? 'center' : null,
+        justifyContent:
+          employeeRoasterList.recent.length === 0 ? 'center' : null,
       }}>
-      {/* {recent.length === 0 ? (
+      {employeeRoasterList.recent.length === 0 ? (
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <Text
             style={{
@@ -105,9 +125,13 @@ const UserRecent = () => {
             No Recent Trips
           </Text>
         </View>
-      ) : ( */}
-      <FlatList data={data} renderItem={renderItems} style={{marginTop: 20}} />
-      {/* )} */}
+      ) : (
+        <FlatList
+          data={employeeRoasterList?.recent}
+          renderItem={renderItems}
+          style={{marginTop: 20}}
+        />
+      )}
       {loader && <Loader />}
     </View>
   );
